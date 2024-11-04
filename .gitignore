@@ -1,7 +1,10 @@
+# Yarn Berry 관련
 .yarn/*
-!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# PnP API (자동 생성된 파일로, 필요에 따라 추가)
+.pnp.*
