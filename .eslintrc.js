@@ -1,56 +1,83 @@
 module.exports = {
     root: true,
-    env: {
-     browser: true,
-     es2021: true,
-     node: true,
-    },
-    extends: [
-     'eslint:recommended',
-     'plugin:@typescript-eslint/recommended',
-     'plugin:prettier/recommended',
-    ],
     parser: '@typescript-eslint/parser',
-    parserOptions: {
-     ecmaVersion: 12,
-     sourceType: 'module',
-     project: './tsconfig.json',
-    },
     plugins: ['@typescript-eslint'],
+    extends: [
+      'eslint:recommended',
+      'plugin:@typescript-eslint/recommended',
+      'prettier', // prettier와 통합하여 코드 스타일 적용
+    ],
     rules: {
-     'prettier/prettier': ['error', { endOfLine: 'auto' }],
-     '@typescript-eslint/explicit-module-boundary-types': 'off',
-     '@typescript-eslint/no-explicit-any': 'warn',
-     'no-console': 'warn',
-     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-     'eqeqeq': 'error',
-     'curly': 'error',
-     // 팀 컨벤션 반영
-     'func-style': ['error', 'declaration', { "allowArrowFunctions": false }], // 화살표 함수가 아닌 함수 선언식 사용
-     'camelcase': 'error', // 변수명 카멜 케이스 강제
-     'id-match': [
-      'error',
-      '^([A-Z][a-zA-Z0-9]*|[a-z][a-zA-Z0-9]*|I[A-Z][a-zA-Z0-9]*)$', // PascalCase or camelCase, 인터페이스는 I로 시작
-      {
-       'properties': true,
-      },
-     ],
-     '@typescript-eslint/naming-convention': [
-      'error',
-      {
-       'selector': 'interface',
-       'format': ['PascalCase'],
-       'prefix': ['I'], // 인터페이스는 'I' 접두사와 PascalCase 사용
-      },
-      {
-       'selector': 'typeLike',
-       'format': ['PascalCase'], // 타입, 컴포넌트는 PascalCase 사용
-      },
-     ],
-     '@typescript-eslint/explicit-function-return-type': 'error', // 명시적 반환 타입 강제
-     'prefer-const': 'error', // const 기본 사용
-     '@typescript-eslint/no-inferrable-types': 'off', // 타입 명시
-     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'], // 인터페이스로 통일
-     '@typescript-eslint/explicit-member-accessibility': ['error'], // 멤버 접근성 명시
+      // 일반 함수 사용
+      'prefer-arrow-callback': 'off',
+      'func-names': ['error', 'never'],
+  
+      // PascalCase 규칙 강제
+      '@typescript-eslint/naming-convention': [
+        'error',
+        {
+          selector: 'default',
+          format: ['camelCase'],
+        },
+        {
+          selector: 'variable',
+          format: ['camelCase', 'UPPER_CASE'],
+          leadingUnderscore: 'allow',
+        },
+        {
+          selector: 'typeLike', // 클래스, 인터페이스, 타입, 컴포넌트
+          format: ['PascalCase'],
+        },
+        {
+          selector: 'interface',
+          format: ['PascalCase'],
+          prefix: ['I'], // 인터페이스 이름에 I를 접두사로 사용
+        },
+      ],
+  
+      // 함수명은 동사+명사 조합으로 작성, 카멜케이스 강제
+      'camelcase': ['error', { properties: 'never', ignoreDestructuring: false }],
+      'func-names': 'off', // 함수명 강제 규칙, 예: handleEvent
+  
+      // Named Exports 강제
+      'import/prefer-default-export': 'off',
+  
+      // const 기본 사용, let은 변경 시만 사용
+      'prefer-const': 'error',
+      'no-var': 'error',
+  
+      // 고차 함수 사용 지향
+      'array-callback-return': 'error',
+      'no-unused-expressions': ['error', { allowShortCircuit: true }],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ForInStatement',
+          message: 'for...in loops are not allowed. Use Object.keys or other utilities.',
+        },
+        {
+          selector: 'ForOfStatement',
+          message: 'for...of loops are not allowed. Use array methods instead.',
+        },
+      ],
+  
+      // Boolean 타입 접두사 is 사용
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+        },
+      ],
+  
+      // Enum 사용 지향
+      '@typescript-eslint/no-shadow': ['error', { ignoreTypeValueShadow: true }],
+      'no-shadow': 'off',
     },
-   };
+    settings: {
+      'import/resolver': {
+        typescript: {},
+      },
+    },
+  };
+  
