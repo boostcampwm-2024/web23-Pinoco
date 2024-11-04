@@ -1,5 +1,5 @@
-dist/
-build/
-node_modules/
-*.config.js
-*.json
+# 모든 폴더와 파일을 무시
+**
+# packages 폴더 내 모든 파일을 검사 대상으로 설정
+!packages/
+!packages/**
