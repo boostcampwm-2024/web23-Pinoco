@@ -12,5 +12,9 @@
     "passport-google-oauth20": "^2.0.0",
     "redis": "^4.7.0",
     "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.7",
+    "@nestjs/schematics": "^10.2.3"
   }
 }
