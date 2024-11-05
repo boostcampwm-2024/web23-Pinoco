@@ -804,14 +804,14 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["@nestjs/core", [\
       ["npm:10.4.6", {\
-        "packageLocation": "./.yarn/unplugged/@nestjs-core-virtual-d86588c939/node_modules/@nestjs/core/",\
+        "packageLocation": "./.yarn/cache/@nestjs-core-npm-10.4.6-e5763ab66a-7d43f08637.zip/node_modules/@nestjs/core/",\
         "packageDependencies": [\
           ["@nestjs/core", "npm:10.4.6"]\
         ],\
         "linkType": "SOFT"\
       }],\
       ["virtual:aa59773ac87791c4813d53447077fcf8a847d6de5a301d34dc31286584b1dbb26d30d3adb5b4c41c1e8aea04371e926fda05c09c6253647c432e11d872a304ba#npm:10.4.6", {\
-        "packageLocation": "./.yarn/unplugged/@nestjs-core-virtual-d86588c939/node_modules/@nestjs/core/",\
+        "packageLocation": "./.yarn/__virtual__/@nestjs-core-virtual-d86588c939/0/cache/@nestjs-core-npm-10.4.6-e5763ab66a-7d43f08637.zip/node_modules/@nestjs/core/",\
         "packageDependencies": [\
           ["@nestjs/core", "virtual:aa59773ac87791c4813d53447077fcf8a847d6de5a301d34dc31286584b1dbb26d30d3adb5b4c41c1e8aea04371e926fda05c09c6253647c432e11d872a304ba#npm:10.4.6"],\
           ["@nestjs/common", "virtual:aa59773ac87791c4813d53447077fcf8a847d6de5a301d34dc31286584b1dbb26d30d3adb5b4c41c1e8aea04371e926fda05c09c6253647c432e11d872a304ba#npm:10.4.6"],\
@@ -2541,7 +2541,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["esbuild", [\
       ["npm:0.21.5", {\
-        "packageLocation": "./.yarn/unplugged/esbuild-npm-0.21.5-d85dfbc965/node_modules/esbuild/",\
+        "packageLocation": "./.yarn/cache/esbuild-npm-0.21.5-d85dfbc965-fa08508adf.zip/node_modules/esbuild/",\
         "packageDependencies": [\
           ["esbuild", "npm:0.21.5"],\
           ["@esbuild/aix-ppc64", "npm:0.21.5"],\
