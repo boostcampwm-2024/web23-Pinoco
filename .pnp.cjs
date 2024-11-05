@@ -962,6 +962,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/runtime", [\
+      ["npm:7.26.0", {\
+        "packageLocation": "./.yarn/cache/@babel-runtime-npm-7.26.0-9afa3c4ef6-12c01357e0.zip/node_modules/@babel/runtime/",\
+        "packageDependencies": [\
+          ["@babel/runtime", "npm:7.26.0"],\
+          ["regenerator-runtime", "npm:0.14.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/template", [\
       ["npm:7.25.9", {\
         "packageLocation": "./.yarn/cache/@babel-template-npm-7.25.9-d903b7b6d5-ebe677273f.zip/node_modules/@babel/template/",\
@@ -6674,6 +6684,7 @@ const RAW_RUNTIME_STATE =
           ["postcss", "npm:8.4.47"],\
           ["react", "npm:18.3.1"],\
           ["react-dom", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:18.3.1"],\
+          ["react-error-boundary", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.1.2"],\
           ["react-router-dom", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:6.27.0"],\
           ["react-toastify", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:10.0.6"],\
           ["tailwindcss", "npm:3.4.14"],\
@@ -9761,6 +9772,29 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["react-error-boundary", [\
+      ["npm:4.1.2", {\
+        "packageLocation": "./.yarn/cache/react-error-boundary-npm-4.1.2-7591172537-0737e5259b.zip/node_modules/react-error-boundary/",\
+        "packageDependencies": [\
+          ["react-error-boundary", "npm:4.1.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.1.2", {\
+        "packageLocation": "./.yarn/__virtual__/react-error-boundary-virtual-a6bf478f9e/0/cache/react-error-boundary-npm-4.1.2-7591172537-0737e5259b.zip/node_modules/react-error-boundary/",\
+        "packageDependencies": [\
+          ["react-error-boundary", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.1.2"],\
+          ["@babel/runtime", "npm:7.26.0"],\
+          ["@types/react", "npm:18.3.12"],\
+          ["react", "npm:18.3.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/react",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["react-is", [\
       ["npm:18.3.1", {\
         "packageLocation": "./.yarn/cache/react-is-npm-18.3.1-370a81e1e9-f2f1e60010.zip/node_modules/react-is/",\
@@ -9923,6 +9957,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/reflect-metadata-npm-0.2.2-5e0bfac201-1cd93a15ea.zip/node_modules/reflect-metadata/",\
         "packageDependencies": [\
           ["reflect-metadata", "npm:0.2.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["regenerator-runtime", [\
+      ["npm:0.14.1", {\
+        "packageLocation": "./.yarn/cache/regenerator-runtime-npm-0.14.1-a6c97c609a-1b16eb2c4b.zip/node_modules/regenerator-runtime/",\
+        "packageDependencies": [\
+          ["regenerator-runtime", "npm:0.14.1"]\
         ],\
         "linkType": "HARD"\
       }]\

@@ -418,6 +418,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.12.5":
+  version: 7.26.0
+  resolution: "@babel/runtime@npm:7.26.0"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 10c0/12c01357e0345f89f4f7e8c0e81921f2a3e3e101f06e8eaa18a382b517376520cd2fa8c237726eb094dab25532855df28a7baaf1c26342b52782f6936b07c287
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.25.9, @babel/template@npm:^7.3.3":
   version: 7.25.9
   resolution: "@babel/template@npm:7.25.9"
@@ -4696,6 +4705,7 @@ __metadata:
     postcss: "npm:^8.4.47"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
+    react-error-boundary: "npm:^4.1.2"
     react-router-dom: "npm:^6.27.0"
     react-toastify: "npm:^10.0.6"
     tailwindcss: "npm:^3.4.14"
@@ -7364,6 +7374,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-error-boundary@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "react-error-boundary@npm:4.1.2"
+  dependencies:
+    "@babel/runtime": "npm:^7.12.5"
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 10c0/0737e5259bed40ce14eb0823b3c7b152171921f2179e604f48f3913490cdc594d6c22d43d7abb4ffb1512c832850228db07aa69d3b941db324953a5e393cb399
+  languageName: node
+  linkType: hard
+
 "react-is@npm:^18.0.0":
   version: 18.3.1
   resolution: "react-is@npm:18.3.1"
@@ -7485,6 +7506,13 @@ __metadata:
   version: 0.2.2
   resolution: "reflect-metadata@npm:0.2.2"
   checksum: 10c0/1cd93a15ea291e420204955544637c264c216e7aac527470e393d54b4bb075f10a17e60d8168ec96600c7e0b9fcc0cb0bb6e91c3fbf5b0d8c9056f04e6ac1ec2
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.14.0":
+  version: 0.14.1
+  resolution: "regenerator-runtime@npm:0.14.1"
+  checksum: 10c0/1b16eb2c4bceb1665c89de70dcb64126a22bc8eb958feef3cd68fe11ac6d2a4899b5cd1b80b0774c7c03591dc57d16631a7f69d2daa2ec98100e2f29f7ec4cc4
   languageName: node
   linkType: hard
 
