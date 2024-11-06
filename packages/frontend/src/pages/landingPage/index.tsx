@@ -1,5 +1,5 @@
-import GuestLoginButton from '@/components/landing/GuestLoginButton';
-import OAuthLoginButton from '@/components/landing/OAuthLoginButton';
+import GuestLoginButton from '@/components/landingPage/GuestLoginButton';
+import OAuthLoginButton from '@/components/landingPage/OAuthLoginButton';
 import PinocoLogo from '@/assets/svgs/pinocoLogo.svg?react';
 
 export default function LandingPage() {
