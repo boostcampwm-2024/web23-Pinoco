@@ -1,5 +1,5 @@
 import Button from '@/components/common/Button';
-function LoginButton() {
+function OAuthLoginButton() {
   function handleClick() {}
   return (
     <>
@@ -8,8 +8,7 @@ function LoginButton() {
         onClick={handleClick}
         buttonText="소셜 로그인(구글 로그인)"
       />
-      <Button buttonText="소셜 로그인(구글 로그인)" />
     </>
   );
 }
-export default LoginButton;
+export default OAuthLoginButton;
