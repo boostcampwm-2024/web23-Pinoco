@@ -1,19 +1,16 @@
 import Background from '@/assets/images/BackgroundImage.svg';
 
-interface IBackgroundImageProps {
-  className?: string;
+interface BackgroundImageProps {
+  gradientClass: string;
 }
 
-export default function BackgroundImage({
-  className,
-  ...props
-}: IBackgroundImageProps & React.HTMLAttributes<HTMLImageElement>) {
+export default function BackgroundImage({ gradientClass }: BackgroundImageProps) {
   return (
-    <img
-      src={Background}
-      className={`object-cover absolute w-full h-full ${className}`}
-      {...props}
-      alt="Background"
-    />
+    <div
+      className="fixed inset-0 w-full h-full bg-center bg-cover -z-10"
+      style={{ backgroundImage: `url(${Background})` }}
+    >
+      <div className={`absolute inset-0 ${gradientClass}`} />
+    </div>
   );
 }
