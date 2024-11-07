@@ -7,7 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 function Button({ onClick, className, buttonText, ...props }: ButtonProps) {
   return (
     <button
-      className={`w-full min-h-16 rounded-md ${className} transition-all active:bg-grayscale-200`}
+      className={`w-full min-h-16 rounded-md ${className} transition-all active:bg-grayscale-200 cursor-pointer`}
       onClick={onClick}
       {...props}
     >
