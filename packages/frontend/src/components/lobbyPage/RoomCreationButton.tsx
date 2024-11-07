@@ -1,17 +1,16 @@
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 
-function GuestLoginButton() {
+export default function RoomCreationButton() {
   const navigate = useNavigate();
   function handleClick() {
-    navigate('/lobby');
+    navigate('/game');
   }
   return (
     <Button
       className="w-4/5 text-xl font-semibold text-black bg-white hover:bg-gray-300"
       onClick={handleClick}
-      buttonText="비회원으로 시작하기"
+      buttonText="게임 생성하기"
     />
   );
 }
-export default GuestLoginButton;
