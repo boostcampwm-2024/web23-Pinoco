@@ -4,10 +4,10 @@ import PinocoLogo from '@/assets/svgs/pinocoLogo.svg?react';
 
 export default function LandingPage() {
   return (
-    <main className="w-screen h-screen flex justify-center items-center">
-      <section className="flex justify-between w-2/3 items-center gap-16">
+    <main className="flex h-screen w-screen items-center justify-center">
+      <section className="flex w-2/3 items-center justify-between gap-16">
         <div className="flex flex-col gap-16">
-          <div className="text-strong  text-6xl font-bold flex flex-col gap-2">
+          <div className="text-strong flex flex-col gap-2 text-6xl font-bold">
             <p>실시간 화상 통화로</p>
             <p>진행하는 라이어 게임</p>
           </div>
