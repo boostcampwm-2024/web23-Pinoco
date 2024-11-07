@@ -1,25 +1,23 @@
 import GuestLoginButton from '@/components/landingPage/GuestLoginButton';
 import OAuthLoginButton from '@/components/landingPage/OAuthLoginButton';
-import PinocoLogo from '@/assets/svgs/pinocoLogo.svg?react';
+import BackgroundImage from '@/components/layout/BackgroundImage';
+import MainLogo from '@/assets/images/MainLogo.svg?react';
 
 export default function LandingPage() {
   return (
-    <main className="flex h-screen w-screen items-center justify-center">
-      <section className="flex w-2/3 items-center justify-between gap-16">
-        <div className="flex flex-col gap-16">
-          <div className="text-strong flex flex-col gap-2 text-6xl font-bold">
-            <p>실시간 화상 통화로</p>
-            <p>진행하는 라이어 게임</p>
-          </div>
-          <div className="flex flex-col gap-6">
-            <OAuthLoginButton />
-            <GuestLoginButton />
-          </div>
+    <>
+      <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />
+      <div className="relative flex items-center justify-center w-full h-screen gap-28 text-white-default">
+        <div className="flex flex-col flex-shrink-0 gap-4">
+          <span className="font-semibold text-7xl">실시간 화상 통화로</span>
+          <span className="mb-24 font-semibold text-7xl">진행하는 라이어 게임</span>
+          <GuestLoginButton/>
+          <OAuthLoginButton/>
         </div>
         <div>
-          <PinocoLogo alt="Pinoco Logo" />
+          <MainLogo/>
         </div>
-      </section>
-    </main>
+      </div>
+    </>
   );
 }
