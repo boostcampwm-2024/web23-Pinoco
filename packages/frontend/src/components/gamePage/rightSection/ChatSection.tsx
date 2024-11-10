@@ -1,6 +1,6 @@
 export default function ChatSection() {
   return (
-    <div className="flex-grow p-4 bg-black rounded-lg opacity-80">
+    <div className="flex-grow p-4 bg-black rounded-lg opacity-80 *:text-white-default">
       <div className="text-lg font-bold">채팅</div>
       <div className="mt-2 space-y-2">
         <div className="text-sm">
