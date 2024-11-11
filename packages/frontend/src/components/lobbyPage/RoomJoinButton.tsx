@@ -1,13 +1,15 @@
 import Button from '@/components/common/Button';
 
-export default function RoomJoinButton() {
-  function handleClick() {}
+interface IRoomJoinButtonProps {
+  onClick: () => void;
+}
+
+export default function RoomJoinButton({ onClick }: IRoomJoinButtonProps) {
   return (
     <Button
-      className="w-4/5 text-xl font-semibold text-black bg-white hover:bg-gray-300"
-      onClick={handleClick}
+      className="w-4/5 bg-white text-xl font-semibold text-black hover:bg-gray-300"
+      onClick={onClick}
       buttonText="게임 참가하기"
     />
   );
 }
-
