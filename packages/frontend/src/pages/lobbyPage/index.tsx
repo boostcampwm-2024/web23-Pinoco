@@ -26,7 +26,7 @@ export default function LobbyPage() {
 
         <p className="mb-24 mt-2 text-center text-2xl">실시간 화상 통화로 진행하는 라이어 게임</p>
         <div className="flex w-full items-center gap-2">
-          <VideoAudioTestButton onClick={openModal} />
+          <VideoAudioTestButton />
           <RoomCreationButton />
           <RoomJoinButton onClick={openModal} />
         </div>
