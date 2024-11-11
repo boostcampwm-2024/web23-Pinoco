@@ -1,12 +1,10 @@
-import { useState } from 'react';
-
 interface IModalProps {
   title: string;
   subtitle?: string;
   textForm?: string;
   image?: string;
   onConfirm?: () => void;
-  onClose?: () => void;
+  onClose: () => void;
 }
 
 export default function Modal({
@@ -14,18 +12,9 @@ export default function Modal({
   subtitle,
   textForm,
   image,
-  onConfirm,
   onClose,
+  onConfirm,
 }: IModalProps) {
-  const [isOpen, setIsOpen] = useState(true);
-
-  const handleClose = () => {
-    setIsOpen(false);
-    if (onClose) onClose();
-  };
-
-  if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="rounded-radius100 bg-surface-default shadow-popup relative w-96 max-w-lg p-8">
@@ -49,7 +38,7 @@ export default function Modal({
 
         <div className="mt-4 flex justify-center gap-4">
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="rounded-radius100 w-32 py-2 text-black shadow-[0_0_0_1px_rgba(0,0,0,1)] hover:bg-gray-100"
           >
             취소
