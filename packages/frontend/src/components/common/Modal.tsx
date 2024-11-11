@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import ReactDOM from 'react-dom';
+
 interface IModalProps {
   title: string;
   subtitle?: string;
@@ -15,7 +18,9 @@ export default function Modal({
   onClose,
   onConfirm,
 }: IModalProps) {
-  return (
+  const [isOpen, setIsOpen] = useState(true);
+
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="rounded-radius100 bg-surface-default shadow-popup relative w-96 max-w-lg p-8">
         {image && (
@@ -55,4 +60,6 @@ export default function Modal({
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.getElementById('portal-root') as HTMLElement);
 }
