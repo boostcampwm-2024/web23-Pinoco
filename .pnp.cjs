@@ -2685,6 +2685,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@socket.io/component-emitter", [\
+      ["npm:3.1.2", {\
+        "packageLocation": "./.yarn/cache/@socket.io-component-emitter-npm-3.1.2-bc4133d33f-c4242bad66.zip/node_modules/@socket.io/component-emitter/",\
+        "packageDependencies": [\
+          ["@socket.io/component-emitter", "npm:3.1.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@sqltools/formatter", [\
       ["npm:1.2.5", {\
         "packageLocation": "./.yarn/cache/@sqltools-formatter-npm-1.2.5-709e7c0ab8-4b4fa62b8c.zip/node_modules/@sqltools/formatter/",\
@@ -5717,6 +5726,29 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["engine.io-client", [\
+      ["npm:6.6.2", {\
+        "packageLocation": "./.yarn/cache/engine.io-client-npm-6.6.2-5eef7f59d1-a1a0995df1.zip/node_modules/engine.io-client/",\
+        "packageDependencies": [\
+          ["engine.io-client", "npm:6.6.2"],\
+          ["@socket.io/component-emitter", "npm:3.1.2"],\
+          ["debug", "virtual:1bd53d09cc3a66ba3dc2b1493eac17c3fba411654c0f03de22ca5f5e3c01451076f4a934c456a794660a59b07e686298e5a0e02d6b88896070753f81aa85e288#npm:4.3.7"],\
+          ["engine.io-parser", "npm:5.2.3"],\
+          ["ws", "virtual:5eef7f59d1d1aa0582a7b75dde266b71af8bd36e062eaf8f33ffa3a9a4f4c8f703b23c6b4cc826183bdcc4769c89f98c10fa6fcbba77be1d9b4b8d97cc3e059c#npm:8.17.1"],\
+          ["xmlhttprequest-ssl", "npm:2.1.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["engine.io-parser", [\
+      ["npm:5.2.3", {\
+        "packageLocation": "./.yarn/cache/engine.io-parser-npm-5.2.3-6dfa36cede-ed4900d8db.zip/node_modules/engine.io-parser/",\
+        "packageDependencies": [\
+          ["engine.io-parser", "npm:5.2.3"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["enhanced-resolve", [\
       ["npm:5.17.1", {\
         "packageLocation": "./.yarn/cache/enhanced-resolve-npm-5.17.1-296305b69f-81a0515675.zip/node_modules/enhanced-resolve/",\
@@ -6687,6 +6719,7 @@ const RAW_RUNTIME_STATE =
           ["react-error-boundary", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.1.2"],\
           ["react-router-dom", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:6.27.0"],\
           ["react-toastify", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:10.0.6"],\
+          ["socket.io-client", "npm:4.8.1"],\
           ["tailwindcss", "npm:3.4.14"],\
           ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"],\
           ["typescript-eslint", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:8.12.2"],\
@@ -10402,6 +10435,30 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["socket.io-client", [\
+      ["npm:4.8.1", {\
+        "packageLocation": "./.yarn/cache/socket.io-client-npm-4.8.1-eb1c9f0ea4-544c49cc8c.zip/node_modules/socket.io-client/",\
+        "packageDependencies": [\
+          ["socket.io-client", "npm:4.8.1"],\
+          ["@socket.io/component-emitter", "npm:3.1.2"],\
+          ["debug", "virtual:1bd53d09cc3a66ba3dc2b1493eac17c3fba411654c0f03de22ca5f5e3c01451076f4a934c456a794660a59b07e686298e5a0e02d6b88896070753f81aa85e288#npm:4.3.7"],\
+          ["engine.io-client", "npm:6.6.2"],\
+          ["socket.io-parser", "npm:4.2.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["socket.io-parser", [\
+      ["npm:4.2.4", {\
+        "packageLocation": "./.yarn/cache/socket.io-parser-npm-4.2.4-bf87f78bcd-9383b30358.zip/node_modules/socket.io-parser/",\
+        "packageDependencies": [\
+          ["socket.io-parser", "npm:4.2.4"],\
+          ["@socket.io/component-emitter", "npm:3.1.2"],\
+          ["debug", "virtual:1bd53d09cc3a66ba3dc2b1493eac17c3fba411654c0f03de22ca5f5e3c01451076f4a934c456a794660a59b07e686298e5a0e02d6b88896070753f81aa85e288#npm:4.3.7"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["socks", [\
       ["npm:2.8.3", {\
         "packageLocation": "./.yarn/cache/socks-npm-2.8.3-3532b59899-d54a52bf93.zip/node_modules/socks/",\
@@ -11930,6 +11987,41 @@ const RAW_RUNTIME_STATE =
           ["write-file-atomic", "npm:4.0.2"],\
           ["imurmurhash", "npm:0.1.4"],\
           ["signal-exit", "npm:3.0.7"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["ws", [\
+      ["npm:8.17.1", {\
+        "packageLocation": "./.yarn/cache/ws-npm-8.17.1-f57fb24a2c-f4a49064af.zip/node_modules/ws/",\
+        "packageDependencies": [\
+          ["ws", "npm:8.17.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:5eef7f59d1d1aa0582a7b75dde266b71af8bd36e062eaf8f33ffa3a9a4f4c8f703b23c6b4cc826183bdcc4769c89f98c10fa6fcbba77be1d9b4b8d97cc3e059c#npm:8.17.1", {\
+        "packageLocation": "./.yarn/__virtual__/ws-virtual-60464f8a68/0/cache/ws-npm-8.17.1-f57fb24a2c-f4a49064af.zip/node_modules/ws/",\
+        "packageDependencies": [\
+          ["ws", "virtual:5eef7f59d1d1aa0582a7b75dde266b71af8bd36e062eaf8f33ffa3a9a4f4c8f703b23c6b4cc826183bdcc4769c89f98c10fa6fcbba77be1d9b4b8d97cc3e059c#npm:8.17.1"],\
+          ["@types/bufferutil", null],\
+          ["@types/utf-8-validate", null],\
+          ["bufferutil", null],\
+          ["utf-8-validate", null]\
+        ],\
+        "packagePeers": [\
+          "@types/bufferutil",\
+          "@types/utf-8-validate",\
+          "bufferutil",\
+          "utf-8-validate"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["xmlhttprequest-ssl", [\
+      ["npm:2.1.2", {\
+        "packageLocation": "./.yarn/cache/xmlhttprequest-ssl-npm-2.1.2-7d8e3817bc-70d6086932.zip/node_modules/xmlhttprequest-ssl/",\
+        "packageDependencies": [\
+          ["xmlhttprequest-ssl", "npm:2.1.2"]\
         ],\
         "linkType": "HARD"\
       }]\
