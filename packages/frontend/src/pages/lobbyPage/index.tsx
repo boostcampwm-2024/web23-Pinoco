@@ -4,12 +4,8 @@ import RoomCreationButton from '@/components/lobbyPage/RoomCreationButton';
 import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import LobbyHeader from '@/components/lobbyPage/LobbyHeader';
-import Modal from '@/components/common/Modal';
-import useModal from '@/hooks/useModal';
 
 export default function LobbyPage() {
-  const { isOpen: isModalOpen, openModal, closeModal } = useModal();
-
   return (
     <>
       <LobbyHeader />
@@ -28,18 +24,9 @@ export default function LobbyPage() {
         <div className="flex w-full items-center gap-2">
           <VideoAudioTestButton />
           <RoomCreationButton />
-          <RoomJoinButton onClick={openModal} />
+          <RoomJoinButton />
         </div>
       </div>
-      {isModalOpen && (
-        <Modal
-          title="게임 참가하기"
-          subtitle="게임코드 입력"
-          textForm="코드 입력"
-          onClose={closeModal}
-          onConfirm={closeModal}
-        />
-      )}
     </>
   );
 }
