@@ -42,13 +42,15 @@ const RAW_RUNTIME_STATE =
       [null, {\
         "packageLocation": "./",\
         "packageDependencies": [\
+          ["@types/uuid", "npm:10.0.0"],\
           ["@typescript-eslint/eslint-plugin", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:8.12.2"],\
           ["@typescript-eslint/parser", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:8.12.2"],\
           ["eslint", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:9.14.0"],\
           ["import", "npm:0.0.6"],\
           ["plugin", "npm:0.3.3"],\
           ["prettier", "npm:3.3.3"],\
-          ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"]\
+          ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"],\
+          ["uuid", "npm:11.0.3"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -3618,6 +3620,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@types/uuid", [\
+      ["npm:10.0.0", {\
+        "packageLocation": "./.yarn/cache/@types-uuid-npm-10.0.0-9ac1066765-9a1404bf28.zip/node_modules/@types/uuid/",\
+        "packageDependencies": [\
+          ["@types/uuid", "npm:10.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@types/yargs", [\
       ["npm:17.0.33", {\
         "packageLocation": "./.yarn/cache/@types-yargs-npm-17.0.33-1d6cca6a2e-d16937d7ac.zip/node_modules/@types/yargs/",\
@@ -7033,6 +7044,7 @@ const RAW_RUNTIME_STATE =
           ["@tanstack/react-query", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.59.19"],\
           ["@types/react", "npm:18.3.12"],\
           ["@types/react-dom", "npm:18.3.1"],\
+          ["@types/uuid", "npm:10.0.0"],\
           ["@vitejs/plugin-react", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.3.3"],\
           ["autoprefixer", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:10.4.20"],\
           ["axios", "npm:1.7.7"],\
@@ -7053,6 +7065,7 @@ const RAW_RUNTIME_STATE =
           ["tailwindcss", "npm:3.4.14"],\
           ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"],\
           ["typescript-eslint", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:8.12.2"],\
+          ["uuid", "npm:11.0.3"],\
           ["vite", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.4.10"],\
           ["vite-plugin-svgr", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.3.0"],\
           ["vite-tsconfig-paths", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.1.0"],\
@@ -12185,6 +12198,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["uuid", [\
+      ["npm:11.0.3", {\
+        "packageLocation": "./.yarn/cache/uuid-npm-11.0.3-abcb5b16c0-cee762fc76.zip/node_modules/uuid/",\
+        "packageDependencies": [\
+          ["uuid", "npm:11.0.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:9.0.1", {\
         "packageLocation": "./.yarn/cache/uuid-npm-9.0.1-39a8442bc6-1607dd32ac.zip/node_modules/uuid/",\
         "packageDependencies": [\
@@ -12361,13 +12381,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["web23-pinoco", "workspace:."],\
+          ["@types/uuid", "npm:10.0.0"],\
           ["@typescript-eslint/eslint-plugin", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:8.12.2"],\
           ["@typescript-eslint/parser", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:8.12.2"],\
           ["eslint", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:9.14.0"],\
           ["import", "npm:0.0.6"],\
           ["plugin", "npm:0.3.3"],\
           ["prettier", "npm:3.3.3"],\
-          ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"]\
+          ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"],\
+          ["uuid", "npm:11.0.3"]\
         ],\
         "linkType": "SOFT"\
       }]\
