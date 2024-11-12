@@ -1,4 +1,4 @@
-import { useModal } from '@/hooks/useModal';
+import useModal from '@/hooks/useModal';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 
