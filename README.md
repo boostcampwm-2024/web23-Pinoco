@@ -3,6 +3,8 @@
   
 <h3>🤥 피노코인가, 제페토인가? 실시간 화상 통화로 진행하는 라이어 게임</h3>
 <p>#WebRTC #OpenVidu #NestJS #OAuth2.0</p>
+<a href="https://www.pinoco.shop/">Pinoco</a>
+<br>
 <br>
 
 <div align="center">
