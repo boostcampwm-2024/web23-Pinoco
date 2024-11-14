@@ -9,13 +9,13 @@ export default function SettingSection() {
       <div className="flex items-center gap-4 mr-8">
         <div className="flex flex-col items-center p-2 rounded-md bg-grayscale-white opacity-40">
           <span className="cursor-pointer">
-            <MikeOn />
+            <MikeOn className="text-black" />
           </span>
           <span className="text-black">마이크</span>
         </div>
         <div className="flex flex-col items-center p-2 rounded-md bg-grayscale-white opacity-40">
           <span className="cursor-pointer">
-            <CameraOn />
+            <CameraOn className="text-black" />
           </span>
           <span className="text-black">마이크</span>
         </div>
