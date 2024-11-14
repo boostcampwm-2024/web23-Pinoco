@@ -9,7 +9,7 @@ export default function RoomJoinButton() {
     <>
       <Button
         onClick={openModal}
-        className="w-4/5 bg-white text-xl font-semibold text-black hover:bg-gray-300"
+        className="w-full h-56 text-xl font-semibold text-black bg-white hover:bg-gray-300"
         buttonText="게임 참가하기"
       />
       {isOpen && (

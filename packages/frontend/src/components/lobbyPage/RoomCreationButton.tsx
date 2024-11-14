@@ -6,7 +6,7 @@ export default function RoomCreationButton() {
 
   return (
     <Button
-      className="w-4/5 text-xl font-semibold text-black bg-white hover:bg-gray-300"
+      className="relative w-full h-56 text-xl font-semibold text-black bg-white hover:bg-gray-300"
       onClick={handleCreateRoom}
       buttonText="게임 생성하기"
     />
