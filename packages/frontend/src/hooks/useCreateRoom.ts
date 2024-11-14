@@ -8,7 +8,7 @@ interface IUseCreateRoom {
   createRoom: () => void;
 }
 
-export default function useCreateRoom(): IUseCreateRoom {
+function useCreateRoom(): IUseCreateRoom {
   const navigate = useNavigate();
   const [usid, setUsid] = useState<string>('');
   const [gsid, setGsid] = useState<string>('');
@@ -29,11 +29,13 @@ export default function useCreateRoom(): IUseCreateRoom {
     };
   }, [navigate]);
 
-  const createRoom = () => {
+  function createRoom() {
     if (usid) {
       socket.emit('join_room', { usid });
     }
-  };
+  }
 
   return { createRoom };
 }
+
+export default useCreateRoom;
