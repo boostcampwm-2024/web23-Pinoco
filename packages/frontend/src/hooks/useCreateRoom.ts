@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/states/store/authStore';
+import { useRoomStore } from '@/states/store/roomStore';
 
 const socket: Socket = io('ws://localhost:3000', {
   transports: ['websocket'],
@@ -12,24 +14,20 @@ interface IUseCreateRoom {
 
 function useCreateRoom(): IUseCreateRoom {
   const navigate = useNavigate();
-  const [usid, setUsid] = useState<string>('');
-  const [gsid, setGsid] = useState<string>('');
+  const usid = useAuthStore((state) => state.usid);
+  const setGsid = useRoomStore((state) => state.setGsid);
 
   useEffect(() => {
-    const storedUsid = localStorage.getItem('usid');
-    if (storedUsid) setUsid(storedUsid);
-
     socket.on('join_room_success', (data: { gsid: string }) => {
       const { gsid } = data;
       setGsid(gsid);
-      localStorage.setItem('gsid', gsid);
       navigate(`/game/${gsid}`);
     });
 
     return () => {
       socket.off('join_room_success');
     };
-  }, [navigate]);
+  }, [navigate, setGsid]);
 
   function createRoom() {
     if (usid) {
