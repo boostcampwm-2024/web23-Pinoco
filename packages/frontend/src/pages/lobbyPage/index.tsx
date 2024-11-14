@@ -3,25 +3,25 @@ import MainLogo from '@/assets/images/MainLogo.svg?react';
 import RoomCreationButton from '@/components/lobbyPage/RoomCreationButton';
 import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
-import LobbyHeader from '@/components/lobbyPage/LobbyHeader';
+import Header from '@/components/layout/Header';
 
 export default function LobbyPage() {
   return (
     <>
-      <LobbyHeader />
       <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />
-      <div className="text-white-default relative mx-auto flex h-screen w-4/5 flex-col items-center justify-center">
+      <Header />
+      <div className="relative flex flex-col items-center justify-center w-4/5 h-screen mx-auto text-white-default">
         <MainLogo className="-mt-52" />
-        <div className="my-4 flex w-full items-center justify-center">
+        <div className="flex items-center justify-center w-full my-4">
           <span className="flex-grow border-t border-white"></span>
-          <span className="mx-2 size-2 rounded-full bg-white"></span>
-          <span className="mx-2 size-4 rounded-full border-2 border-white"></span>
-          <span className="mx-2 size-2 rounded-full bg-white"></span>
+          <span className="mx-2 bg-white rounded-full size-2"></span>
+          <span className="mx-2 border-2 border-white rounded-full size-4"></span>
+          <span className="mx-2 bg-white rounded-full size-2"></span>
           <span className="flex-grow border-t border-white"></span>
         </div>
 
-        <p className="mb-24 mt-2 text-center text-2xl">실시간 화상 통화로 진행하는 라이어 게임</p>
-        <div className="flex w-full items-center gap-2">
+        <p className="mt-2 mb-24 text-2xl text-center">실시간 화상 통화로 진행하는 라이어 게임</p>
+        <div className="flex items-center w-full gap-2">
           <VideoAudioTestButton />
           <RoomCreationButton />
           <RoomJoinButton />
