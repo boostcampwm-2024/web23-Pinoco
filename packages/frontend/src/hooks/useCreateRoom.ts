@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 
 const socket: Socket = io('http://localhost:3000');
 
-interface UseCreateRoom {
+interface IUseCreateRoom {
   createRoom: () => void;
 }
 
-export default function useCreateRoom(): UseCreateRoom {
+export default function useCreateRoom(): IUseCreateRoom {
   const navigate = useNavigate();
   const [usid, setUsid] = useState<string>('');
   const [gsid, setGsid] = useState<string>('');
