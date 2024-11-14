@@ -9,7 +9,7 @@ const socket: Socket = io('ws://localhost:3000', {
 });
 
 interface IUseCreateRoom {
-  createRoom: () => void;
+  handleCreateRoom: () => void;
 }
 
 function useCreateRoom(): IUseCreateRoom {
@@ -29,13 +29,13 @@ function useCreateRoom(): IUseCreateRoom {
     };
   }, [navigate, setGsid]);
 
-  function createRoom() {
+  function handleCreateRoom() {
     if (usid) {
       socket.emit('join_room', { usid });
     }
   }
 
-  return { createRoom };
+  return { handleCreateRoom };
 }
 
 export default useCreateRoom;
