@@ -4,7 +4,7 @@ import RoomCreationButton from '@/components/lobbyPage/RoomCreationButton';
 import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import Header from '@/components/layout/Header';
-import SettingSection from '../../components/lobbyPage/SettingSection';
+import SettingSection from '@/components/lobbyPage/SettingSection';
 
 export default function LobbyPage() {
   return (
