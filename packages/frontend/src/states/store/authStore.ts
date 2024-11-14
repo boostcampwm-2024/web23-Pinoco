@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface AuthState {
+interface IAuthState {
   userId: string | null;
   usid: string | null;
   setUserData: (userId: string, usid: string) => void;
 }
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<IAuthState>()(
   persist(
     (set) => ({
       userId: null,
