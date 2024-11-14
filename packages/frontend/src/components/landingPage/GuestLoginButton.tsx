@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { postGuestLogin } from '@/apis/login';
 import { useAuthStore } from '@/states/store/authStore';
 
-function GuestLoginButton() {
+export default function GuestLoginButton() {
   const navigate = useNavigate();
   const { setUserData } = useAuthStore();
 
@@ -25,4 +25,3 @@ function GuestLoginButton() {
     />
   );
 }
-export default GuestLoginButton;
