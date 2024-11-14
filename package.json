@@ -16,5 +16,10 @@
   "dependencies": {
     "import": "^0.0.6",
     "plugin": "^0.3.3"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
