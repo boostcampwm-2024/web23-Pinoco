@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 
-const socket: Socket = io('http://localhost:3000');
+const socket: Socket = io('ws://localhost:3000', {
+  transports: ['websocket'],
+});
 
 interface IUseCreateRoom {
   createRoom: () => void;
