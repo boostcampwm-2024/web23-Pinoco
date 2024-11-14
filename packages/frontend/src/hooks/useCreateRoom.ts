@@ -1,0 +1,39 @@
+import { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
+
+const socket: Socket = io('http://localhost:3000');
+
+interface UseCreateRoom {
+  createRoom: () => void;
+}
+
+export default function useCreateRoom(): UseCreateRoom {
+  const navigate = useNavigate();
+  const [usid, setUsid] = useState<string>('');
+  const [gsid, setGsid] = useState<string>('');
+
+  useEffect(() => {
+    const storedUsid = localStorage.getItem('usid');
+    if (storedUsid) setUsid(storedUsid);
+
+    socket.on('join_room_success', (data: { gsid: string }) => {
+      const { gsid } = data;
+      setGsid(gsid);
+      localStorage.setItem('gsid', gsid);
+      navigate(`/game/${gsid}`);
+    });
+
+    return () => {
+      socket.off('join_room_success');
+    };
+  }, [navigate]);
+
+  const createRoom = () => {
+    if (usid) {
+      socket.emit('join_room', { usid });
+    }
+  };
+
+  return { createRoom };
+}
