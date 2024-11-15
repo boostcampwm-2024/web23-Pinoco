@@ -4,35 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
 
-const socket: Socket = io('ws://localhost:3000', {
-  transports: ['websocket'],
-});
-
-interface IUseCreateRoom {
-  handleCreateRoom: () => void;
-}
-
-function useCreateRoom(): IUseCreateRoom {
+function useCreateRoom() {
   const navigate = useNavigate();
   const usid = useAuthStore((state) => state.usid);
-  const setGsid = useRoomStore((state) => state.setGsid);
-
-  useEffect(() => {
-    socket.on('join_room_success', (data: { gsid: string }) => {
-      const { gsid } = data;
-      setGsid(gsid);
-      navigate(`/game/${gsid}`);
-    });
-
-    return () => {
-      socket.off('join_room_success');
-    };
-  }, [navigate, setGsid]);
+  const setRoomData = useRoomStore((state) => state.setRoomData);
 
   function handleCreateRoom() {
-    if (usid) {
-      socket.emit('join_room', { usid });
-    }
+    if (!usid) return;
+
+    const socket = io('ws://localhost:8080');
+    socket.emit('create_room', { usid });
+    socket.on('roomCreated', (data) => {
+      setRoomData(data.gsid, data.isHost);
+      navigate(`/game/${data.gsid}`);
+    });
   }
 
   return { handleCreateRoom };
