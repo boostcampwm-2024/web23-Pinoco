@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
 
-function useJoinRoom() {
+export default function useJoinRoom() {
   const navigate = useNavigate();
   const usid = useAuthStore((state) => state.usid);
   const setRoomData = useRoomStore((state) => state.setRoomData);
@@ -26,5 +26,3 @@ function useJoinRoom() {
 
   return { handleJoinRoom };
 }
-
-export default useJoinRoom;

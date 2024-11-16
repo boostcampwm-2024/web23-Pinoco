@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
 
-function useCreateRoom() {
+export default function useCreateRoom() {
   const navigate = useNavigate();
   const usid = useAuthStore((state) => state.usid);
   const setRoomData = useRoomStore((state) => state.setRoomData);
@@ -22,5 +22,3 @@ function useCreateRoom() {
 
   return { handleCreateRoom };
 }
-
-export default useCreateRoom;
