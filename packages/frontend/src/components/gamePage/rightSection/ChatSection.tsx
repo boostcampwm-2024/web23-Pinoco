@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSocket } from '@/hooks/useSocket';
+import { useChatSocket } from '@/hooks/useChatSocket';
 import { useAuthStore } from '@/states/store/authStore';
 import { useChatStore } from '@/states/store/chatStore';
 
@@ -8,13 +8,13 @@ export default function ChatSection() {
   const { gsid } = useParams();
   const usid = useAuthStore((state) => state.usid);
   const { messages } = useChatStore();
-  const { sendMessage } = useSocket('http://localhost:3000', gsid!, usid!);
-  const [input, setInput] = useState('');
+  const { sendMessage } = useChatSocket('http://localhost:3000', gsid!, usid!);
+  const [chat, setChat] = useState('');
 
   const handleSend = () => {
     if (input.trim()) {
       sendMessage(input);
-      setInput('');
+      setChat('');
     }
   };
 
@@ -36,7 +36,7 @@ export default function ChatSection() {
       <input
         className="w-full p-2 mt-4 bg-gray-600 rounded-lg outline-none"
         placeholder="채팅을 입력해주세요..."
-        value={input}
+        value={chat}
         onChange={(e) => setInput(e.target.value)}
         onKeyPress={handleKeyPress}
       />

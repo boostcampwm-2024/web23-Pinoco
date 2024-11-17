@@ -7,7 +7,7 @@ interface ChatMessage {
   message: string;
 }
 
-export const useSocket = (url: string, gsid: string, usid: string) => {
+export const useChatSocket = (url: string, gsid: string, usid: string) => {
   const addMessage = useChatStore((state) => state.addMessage);
   const setMessages = useChatStore((state) => state.setMessages);
 
