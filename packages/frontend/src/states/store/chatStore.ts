@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 
-interface ChatMessage {
+interface IChatMessage {
   usid: string;
   message: string;
 }
 
 interface ChatState {
-  messages: ChatMessage[];
-  addMessage: (message: ChatMessage) => void;
-  setMessages: (messages: ChatMessage[]) => void;
+  messages: IChatMessage[];
+  addMessage: (message: IChatMessage) => void;
+  setMessages: (messages: IChatMessage[]) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
