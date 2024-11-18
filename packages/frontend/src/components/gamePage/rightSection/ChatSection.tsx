@@ -1,39 +1,44 @@
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useChatSocket } from '@/hooks/useChatSocket';
+import { useAuthStore } from '@/states/store/authStore';
+import { useChatStore } from '@/states/store/chatStore';
+
 export default function ChatSection() {
+  const { gsid } = useParams();
+  const usid = useAuthStore((state) => state.usid);
+  const { messages } = useChatStore();
+  const { sendMessage } = useChatSocket('http://localhost:3000', gsid!, usid!);
+  const [chat, setChat] = useState('');
+
+  const handleSend = () => {
+    if (input.trim()) {
+      sendMessage(input);
+      setChat('');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  };
+
   return (
     <div className="flex flex-col flex-grow p-4 bg-black rounded-lg opacity-80 text-white-default">
-      <div className="text-lg font-bold">채팅</div>
       <div className="h-56 mt-2 space-y-2 overflow-y-auto grow">
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 채팅 영역...
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 피노코 이신가요?
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 채팅 영역...
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 피노코 이신가요?
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 채팅 영역...
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 피노코 이신가요?
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 채팅 영역...
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 피노코 이신가요?
-        </div>
-        <div className="text-sm">
-          <span className="font-semibold">J072</span>: 채팅 영역...
-        </div>
+        {messages.map((msg, index) => (
+          <div key={index} className="text-sm">
+            <span className="font-semibold">{msg.usid}</span>: {msg.message}
+          </div>
+        ))}
       </div>
       <input
         className="w-full p-2 mt-4 bg-gray-600 rounded-lg outline-none"
-        placeholder="Send a message..."
+        placeholder="채팅을 입력해주세요..."
+        value={chat}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyPress={handleKeyPress}
       />
     </div>
   );
