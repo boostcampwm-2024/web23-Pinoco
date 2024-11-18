@@ -6,14 +6,14 @@ import { useChatStore } from '@/states/store/chatStore';
 
 export default function ChatSection() {
   const { gsid } = useParams();
-  const usid = useAuthStore((state) => state.usid);
+  const userId = useAuthStore((state) => state.userId);
   const { messages } = useChatStore();
-  const { sendMessage } = useChatSocket('http://localhost:3000', gsid!, usid!);
+  const { sendMessage } = useChatSocket(gsid!, userId!);
   const [chat, setChat] = useState('');
 
   const handleSend = () => {
-    if (input.trim()) {
-      sendMessage(input);
+    if (chat.trim()) {
+      sendMessage(chat);
       setChat('');
     }
   };
@@ -29,7 +29,7 @@ export default function ChatSection() {
       <div className="h-56 mt-2 space-y-2 overflow-y-auto grow">
         {messages.map((msg, index) => (
           <div key={index} className="text-sm">
-            <span className="font-semibold">{msg.usid}</span>: {msg.message}
+            <span className="font-semibold">{msg.userId}</span>: {msg.message}
           </div>
         ))}
       </div>
@@ -37,7 +37,7 @@ export default function ChatSection() {
         className="w-full p-2 mt-4 bg-gray-600 rounded-lg outline-none"
         placeholder="채팅을 입력해주세요..."
         value={chat}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={(e) => setChat(e.target.value)}
         onKeyPress={handleKeyPress}
       />
     </div>

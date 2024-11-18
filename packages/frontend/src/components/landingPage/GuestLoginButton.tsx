@@ -2,15 +2,18 @@ import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
 import { postGuestLogin } from '@/apis/login';
 import { useAuthStore } from '@/states/store/authStore';
+import { useSocketStore } from '@/states/store/socketStore';
 
 export default function GuestLoginButton() {
   const navigate = useNavigate();
   const { setUserData } = useAuthStore();
+  const { connectSocket } = useSocketStore();
 
   async function handleClick() {
     try {
-      const { userId, usid } = await postGuestLogin();
-      setUserData(userId, usid);
+      const { userId, password } = await postGuestLogin();
+      setUserData(userId, password);
+      connectSocket(userId, password);
       navigate('/lobby');
     } catch (error) {
       console.error('Guest login failed:', error);
