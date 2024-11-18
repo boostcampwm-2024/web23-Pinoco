@@ -4,21 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
 
-export default function useCreateRoom() {
+export default function useJoinRoom() {
   const navigate = useNavigate();
   const usid = useAuthStore((state) => state.usid);
   const setRoomData = useRoomStore((state) => state.setRoomData);
 
-  function handleCreateRoom() {
+  function handleJoinRoom(gsid: string) {
     if (!usid) return;
 
     const socket = io('http://localhost:3000');
-    socket.emit('create_room', { usid });
-    socket.on('roomCreated', (data) => {
+    socket.emit('join_room', { usid, gsid });
+    socket.on('join_room_success', (data) => {
       setRoomData(data.gsid, data.isHost);
       navigate(`/game/${data.gsid}`);
     });
+
+    socket.on('join_room_fail', (data) => {
+      alert(`방 참가에 실패했습니다: ${data.errorMessage}`);
+    });
   }
 
-  return { handleCreateRoom };
+  return { handleJoinRoom };
 }

@@ -1,10 +1,11 @@
 import useModal from '@/hooks/useModal';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
+import useJoinRoom from '@/hooks/useJoinRoom';
 
 export default function RoomJoinButton() {
   const { isOpen, openModal, closeModal } = useModal();
-
+  const { handleJoinRoom } = useJoinRoom();
   return (
     <>
       <Button
@@ -18,7 +19,7 @@ export default function RoomJoinButton() {
           subtitle="게임코드 입력"
           textForm="코드 입력"
           onClose={closeModal}
-          onConfirm={closeModal}
+          onConfirm={handleJoinRoom}
         />
       )}
     </>
