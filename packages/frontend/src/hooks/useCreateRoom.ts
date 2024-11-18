@@ -12,7 +12,7 @@ export default function useCreateRoom() {
   function handleCreateRoom() {
     if (!usid) return;
 
-    const socket = io('ws://localhost:8080');
+    const socket = io('https://localhost:8080');
     socket.emit('create_room', { usid });
     socket.on('roomCreated', (data) => {
       setRoomData(data.gsid, data.isHost);

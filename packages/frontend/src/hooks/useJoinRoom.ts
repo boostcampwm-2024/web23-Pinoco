@@ -12,7 +12,7 @@ export default function useJoinRoom() {
   function handleJoinRoom(gsid: string) {
     if (!usid) return;
 
-    const socket = io('ws://localhost:8080');
+    const socket = io('https://localhost:8080');
     socket.emit('join_room', { usid, gsid });
     socket.on('join_room_success', (data) => {
       setRoomData(data.gsid, data.isHost);
