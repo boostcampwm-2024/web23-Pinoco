@@ -64,8 +64,34 @@ export class GatewayGateway
       const newHostId = await this.roomService.getHostUserId(gsid);
       if (newHostId) {
         console.log('New host assigned:', { newHostId });
-        this.server.to(gsid).emit('change_host', { hostUserId: newHostId });
+        this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
       }
+    }
+  }
+
+  // 게임방 나가기 요청 처리
+  @SubscribeMessage('leave_room')
+  async handleLeaveRoom(@ConnectedSocket() client: Socket) {
+    const userId = client.data.userId;
+    const gsid = client.data.gsid;
+
+    console.log('Leave room requested:', { userId, gsid });
+
+    await this.roomService.leaveRoom(gsid, userId);
+    client.leave(gsid);
+    client.data.gsid = null; // 클라이언트 세션에서 gsid 제거
+
+    console.log('Room left successfully:', { gsid, userId });
+    client.emit('leave_room_success', { gsid });
+
+    // 다른 사용자들에게 알림
+    this.server.to(gsid).emit('user_left', { userId });
+
+    // 방장이 나갔을 경우 방장 변경
+    const newHostId = await this.roomService.getHostUserId(gsid);
+    if (newHostId) {
+      console.log('New host assigned:', { newHostId });
+      this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
     }
   }
 

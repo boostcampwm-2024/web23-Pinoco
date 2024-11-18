@@ -13,6 +13,7 @@ export declare class GatewayGateway implements OnGatewayConnection, OnGatewayDis
     constructor(authService: AuthService, roomService: RoomService, gameService: GameService, chatService: ChatService);
     handleConnection(client: Socket): Promise<void>;
     handleDisconnect(client: Socket): Promise<void>;
+    handleLeaveRoom(client: Socket): Promise<void>;
     handleCreateRoom(client: Socket): Promise<void>;
     handleJoinRoom(data: {
         gsid: string;

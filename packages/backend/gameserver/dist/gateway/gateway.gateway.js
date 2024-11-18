@@ -50,8 +50,24 @@ let GatewayGateway = class GatewayGateway {
             const newHostId = await this.roomService.getHostUserId(gsid);
             if (newHostId) {
                 console.log('New host assigned:', { newHostId });
-                this.server.to(gsid).emit('change_host', { hostUserId: newHostId });
+                this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
             }
+        }
+    }
+    async handleLeaveRoom(client) {
+        const userId = client.data.userId;
+        const gsid = client.data.gsid;
+        console.log('Leave room requested:', { userId, gsid });
+        await this.roomService.leaveRoom(gsid, userId);
+        client.leave(gsid);
+        client.data.gsid = null;
+        console.log('Room left successfully:', { gsid, userId });
+        client.emit('leave_room_success', { gsid });
+        this.server.to(gsid).emit('user_left', { userId });
+        const newHostId = await this.roomService.getHostUserId(gsid);
+        if (newHostId) {
+            console.log('New host assigned:', { newHostId });
+            this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
         }
     }
     async handleCreateRoom(client) {
@@ -133,6 +149,13 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], GatewayGateway.prototype, "handleDisconnect", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('leave_room'),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], GatewayGateway.prototype, "handleLeaveRoom", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('create_room'),
     __param(0, (0, websockets_1.ConnectedSocket)()),
