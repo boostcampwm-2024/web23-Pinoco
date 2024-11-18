@@ -9,6 +9,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameService = void 0;
 const common_1 = require("@nestjs/common");
 let GameService = class GameService {
+    constructor() {
+        this.gameStates = new Map();
+    }
+    startGame(roomId) {
+        this.gameStates.set(roomId, { started: true });
+        return `Game started in room ${roomId}`;
+    }
+    getGameState(roomId) {
+        return this.gameStates.get(roomId);
+    }
 };
 exports.GameService = GameService;
 exports.GameService = GameService = __decorate([
