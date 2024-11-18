@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 
-interface TimerProps {
+interface ITimerProps {
   initialTime: number; // seconds
   onTimeEnd?: () => void;
 }
 
-export default function Timer({ initialTime, onTimeEnd }: TimerProps) {
+export default function Timer({ initialTime, onTimeEnd }: ITimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
