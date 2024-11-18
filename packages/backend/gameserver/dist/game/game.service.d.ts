@@ -1,5 +1,6 @@
 export declare class GameService {
-    private gameStates;
-    startGame(roomId: string): string;
-    getGameState(roomId: string): any;
+    private games;
+    startGame(gsid: string): Promise<void>;
+    isGameStarted(gsid: string): Promise<boolean>;
+    endGame(gsid: string): Promise<void>;
 }

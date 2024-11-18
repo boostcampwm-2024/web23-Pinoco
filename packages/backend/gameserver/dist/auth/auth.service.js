@@ -10,17 +10,13 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const uuid_1 = require("uuid");
 let AuthService = class AuthService {
-    constructor() {
-        this.userSession = new Map();
-    }
     guestLogin() {
-        const usid = (0, uuid_1.v4)();
-        const userId = `guest_${usid.substring(0, 4)}`;
-        this.userSession.set(usid, true);
-        return { userId, usid };
+        const userId = (0, uuid_1.v4)();
+        const password = '123';
+        return { userId, password };
     }
-    isValidGuest(usid) {
-        return this.userSession.has(usid);
+    isValidGuest(userId, password) {
+        return true;
     }
 };
 exports.AuthService = AuthService;

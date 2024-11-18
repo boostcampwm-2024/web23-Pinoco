@@ -3,6 +3,7 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     guestLogin(): {
-        usid: string;
+        userId: string;
+        password: string;
     };
 }

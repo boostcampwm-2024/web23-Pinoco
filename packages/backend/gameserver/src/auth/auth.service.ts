@@ -3,17 +3,17 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
-  private userSession = new Map<string, boolean>();
+  //로그인 되어있는 유저들 세션 저장해야 할수도 있음
 
-  guestLogin(): { userId: string; usid: string } {
-    const usid = uuidv4();
-    const userId = `guest_${usid.substring(0, 4)}`;
-    this.userSession.set(usid, true);
+  guestLogin(): { userId: string; password: string } {
+    const userId = uuidv4();
+    const password = '123';
 
-    return { userId, usid };
+    return { userId, password };
   }
 
-  isValidGuest(usid: string): boolean {
-    return this.userSession.has(usid);
+  isValidGuest(userId: string, password: string): boolean {
+    //db에서 userId와 password 확인해서 검증
+    return true;
   }
 }

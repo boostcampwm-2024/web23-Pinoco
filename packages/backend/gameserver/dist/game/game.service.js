@@ -10,14 +10,20 @@ exports.GameService = void 0;
 const common_1 = require("@nestjs/common");
 let GameService = class GameService {
     constructor() {
-        this.gameStates = new Map();
+        this.games = new Map();
     }
-    startGame(roomId) {
-        this.gameStates.set(roomId, { started: true });
-        return `Game started in room ${roomId}`;
+    async startGame(gsid) {
+        if (this.games.has(gsid)) {
+            throw new Error('이미 게임이 시작되었습니다.');
+        }
+        this.games.set(gsid, { gsid, isStarted: true });
     }
-    getGameState(roomId) {
-        return this.gameStates.get(roomId);
+    async isGameStarted(gsid) {
+        const game = this.games.get(gsid);
+        return game ? game.isStarted : false;
+    }
+    async endGame(gsid) {
+        this.games.delete(gsid);
     }
 };
 exports.GameService = GameService;

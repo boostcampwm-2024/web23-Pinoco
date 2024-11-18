@@ -9,8 +9,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatService = void 0;
 const common_1 = require("@nestjs/common");
 let ChatService = class ChatService {
-    sendMessage(roomId, message) {
-        return `Message sent to room ${roomId}: ${message}`;
+    constructor() {
+        this.chatRooms = new Map();
+    }
+    async saveMessage(gsid, userId, message) {
+        const chatMessages = this.chatRooms.get(gsid) || [];
+        chatMessages.push({
+            userId,
+            message,
+            timestamp: Date.now(),
+        });
+        this.chatRooms.set(gsid, chatMessages);
+    }
+    async getMessages(gsid) {
+        return this.chatRooms.get(gsid) || [];
     }
 };
 exports.ChatService = ChatService;

@@ -6,7 +6,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('guest-login')
-  guestLogin(): { usid: string } {
+  guestLogin(): { userId: string; password: string } {
     return this.authService.guestLogin();
   }
 }

@@ -12,16 +12,48 @@ let RoomService = class RoomService {
     constructor() {
         this.rooms = new Map();
     }
-    joinRoom(roomId, userId) {
-        if (!this.rooms.has(roomId)) {
-            this.rooms.set(roomId, []);
-        }
-        const users = this.rooms.get(roomId);
-        users.push(userId);
-        return `User ${userId} joined room ${roomId}`;
+    async createRoom(hostUserId) {
+        const gsid = `room_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        const newRoom = {
+            gsid,
+            hostUserId,
+            userIds: new Set([hostUserId]),
+            readyUserIds: new Set(),
+        };
+        this.rooms.set(gsid, newRoom);
+        return gsid;
     }
-    getRoomUsers(roomId) {
-        return this.rooms.get(roomId) || [];
+    async joinRoom(gsid, userId) {
+        const room = this.rooms.get(gsid);
+        if (!room) {
+            throw new Error('방을 찾을 수 없습니다.');
+        }
+        room.userIds.add(userId);
+        return room;
+    }
+    async leaveRoom(gsid, userId) {
+        const room = this.rooms.get(gsid);
+        if (room) {
+            room.userIds.delete(userId);
+            room.readyUserIds.delete(userId);
+            if (room.userIds.size === 0) {
+                this.rooms.delete(gsid);
+            }
+            else if (room.hostUserId === userId) {
+                room.hostUserId = Array.from(room.userIds)[0];
+            }
+        }
+    }
+    async getRoomInfo(gsid) {
+        const room = this.rooms.get(gsid);
+        if (!room) {
+            throw new Error('방을 찾을 수 없습니다.');
+        }
+        return room;
+    }
+    async getHostUserId(gsid) {
+        const room = this.rooms.get(gsid);
+        return room ? room.hostUserId : null;
     }
 };
 exports.RoomService = RoomService;

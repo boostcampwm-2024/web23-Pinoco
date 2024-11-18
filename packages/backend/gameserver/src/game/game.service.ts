@@ -1,15 +1,30 @@
 import { Injectable } from '@nestjs/common';
 
+interface Game {
+  gsid: string;
+  isStarted: boolean;
+}
+
 @Injectable()
 export class GameService {
-  private gameStates: Map<string, any> = new Map();
+  private games: Map<string, Game> = new Map();
 
-  startGame(roomId: string): string {
-    this.gameStates.set(roomId, { started: true });
-    return `Game started in room ${roomId}`;
+  // 게임 시작
+  async startGame(gsid: string): Promise<void> {
+    if (this.games.has(gsid)) {
+      throw new Error('이미 게임이 시작되었습니다.');
+    }
+    this.games.set(gsid, { gsid, isStarted: true });
   }
 
-  getGameState(roomId: string): any {
-    return this.gameStates.get(roomId);
+  // 게임 상태 확인
+  async isGameStarted(gsid: string): Promise<boolean> {
+    const game = this.games.get(gsid);
+    return game ? game.isStarted : false;
+  }
+
+  // 게임 종료
+  async endGame(gsid: string): Promise<void> {
+    this.games.delete(gsid);
   }
 }

@@ -11,21 +11,13 @@ export declare class GatewayGateway implements OnGatewayConnection, OnGatewayDis
     private readonly chatService;
     server: Server;
     constructor(authService: AuthService, roomService: RoomService, gameService: GameService, chatService: ChatService);
-    handleConnection(client: Socket): void;
-    handleDisconnect(client: Socket): void;
-    handleJoinRoom(payload: {
-        roomId: string;
-        userId: string;
-    }, client: Socket): string;
-    handleStartGame(payload: {
-        roomId: string;
-    }, client: Socket): string;
-    handleSendMessage(payload: {
-        roomId: string;
+    handleConnection(client: Socket): Promise<void>;
+    handleDisconnect(client: Socket): Promise<void>;
+    handleCreateRoom(client: Socket): Promise<void>;
+    handleJoinRoom(data: {
+        gsid: string;
+    }, client: Socket): Promise<void>;
+    handleSendMessage(data: {
         message: string;
-    }, client: Socket): string;
-    handleEcho(payload: any, client: Socket): {
-        status: string;
-        payload: any;
-    };
+    }, client: Socket): Promise<void>;
 }

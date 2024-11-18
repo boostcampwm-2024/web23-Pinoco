@@ -26,56 +26,94 @@ let GatewayGateway = class GatewayGateway {
         this.gameService = gameService;
         this.chatService = chatService;
     }
-    handleConnection(client) {
-        const usid = client.handshake.query.usid;
-        console.log(`Attempting connection for usid: ${usid} from client: ${client.id}`);
-        if (!this.authService.isValidGuest(usid)) {
-            console.log(`Unauthorized connection: ${client.id} with usid: ${usid}`);
+    async handleConnection(client) {
+        const userId = client.handshake.query.userId;
+        const password = client.handshake.query.password;
+        console.log('New connection attempt:', { userId, password });
+        if (!this.authService.isValidGuest(userId, password)) {
+            console.log('Authentication failed for user:', userId);
             client.disconnect();
             return;
         }
-        console.log(`Client connected: ${client.id}, usid: ${usid}`);
+        client.data.userId = userId;
+        console.log('Connection successful for user:', userId);
     }
-    handleDisconnect(client) {
-        console.log(`Client disconnected: ${client.id}`);
+    async handleDisconnect(client) {
+        const userId = client.data.userId;
+        const gsid = client.data.gsid;
+        console.log('Disconnecting user:', { userId, gsid });
+        if (gsid) {
+            await this.roomService.leaveRoom(gsid, userId);
+            client.leave(gsid);
+            console.log('User left room:', { userId, gsid });
+            this.server.to(gsid).emit('user_left', { userId });
+            const newHostId = await this.roomService.getHostUserId(gsid);
+            if (newHostId) {
+                console.log('New host assigned:', { newHostId });
+                this.server.to(gsid).emit('change_host', { hostUserId: newHostId });
+            }
+        }
     }
-    handleJoinRoom(payload, client) {
-        console.log(payload);
-        console.log(`Received joinRoom request: roomId=${payload.roomId}, userId=${payload.userId} from client ${client.id}`);
-        const response = this.roomService.joinRoom(payload.roomId, payload.userId);
-        console.log(`User ${payload.userId} joined room ${payload.roomId}`);
-        client.join(payload.roomId);
-        this.server
-            .to(payload.roomId)
-            .emit('userJoined', { userId: payload.userId });
-        console.log(`User joined event emitted for room ${payload.roomId}`);
-        return response;
+    async handleCreateRoom(client) {
+        const userId = client.data.userId;
+        console.log('Create room requested by user:', userId);
+        try {
+            const gsid = await this.roomService.createRoom(userId);
+            client.join(gsid);
+            client.data.gsid = gsid;
+            console.log('Room created successfully:', { gsid, userId });
+            client.emit('create_room_success', { gsid, isHost: true });
+        }
+        catch (error) {
+            console.error('Create room failed:', { userId, error });
+            client.emit('create_room_fail', { errorMessage: error.message });
+        }
     }
-    handleStartGame(payload, client) {
-        console.log(`Received startGame request for roomId=${payload.roomId} from client ${client.id}`);
-        const response = this.gameService.startGame(payload.roomId);
-        console.log(`Game started in room ${payload.roomId}`);
-        this.server
-            .to(payload.roomId)
-            .emit('gameStarted', { roomId: payload.roomId });
-        console.log(`Game started event emitted for room ${payload.roomId}`);
-        return response;
+    async handleJoinRoom(data, client) {
+        const userId = client.data.userId;
+        const { gsid } = data;
+        console.log('Join room requested:', { userId, gsid });
+        try {
+            const roomInfo = await this.roomService.joinRoom(gsid, userId);
+            client.join(gsid);
+            client.data.gsid = gsid;
+            console.log('Room joined successfully:', { gsid, userId, roomInfo });
+            client.emit('join_room_success', {
+                userIds: Array.from(roomInfo.userIds),
+                readyUserIds: Array.from(roomInfo.readyUserIds),
+                isHost: roomInfo.hostUserId === userId,
+                hostUserId: roomInfo.hostUserId,
+            });
+            client.to(gsid).emit('user_joined', { userId });
+        }
+        catch (error) {
+            console.error('Join room failed:', { userId, gsid, error });
+            client.emit('join_room_fail', { errorMessage: error.message });
+        }
     }
-    handleSendMessage(payload, client) {
-        console.log(`Received sendMessage request: roomId=${payload.roomId}, message=${payload.message} from client ${client.id}`);
-        const response = this.chatService.sendMessage(payload.roomId, payload.message);
-        console.log(`Message sent in room ${payload.roomId}: ${payload.message}`);
-        this.server
-            .to(payload.roomId)
-            .emit('newMessage', { message: payload.message });
-        console.log(`New message event emitted for room ${payload.roomId}`);
-        return response;
-    }
-    handleEcho(payload, client) {
-        console.log(`Echo received from client ${client.id}:`, payload);
-        client.emit('echoResponse', payload);
-        console.log(`Echo response sent back to client ${client.id}`);
-        return { status: 'success', payload };
+    async handleSendMessage(data, client) {
+        const userId = client.data.userId;
+        const gsid = client.data.gsid;
+        console.log('Message send requested:', {
+            userId,
+            gsid,
+            message: data.message,
+        });
+        if (!gsid) {
+            console.error('User not in room:', { userId });
+            client.emit('error', { errorMessage: '방에 참여되어 있지 않습니다.' });
+            return;
+        }
+        const { message } = data;
+        try {
+            await this.chatService.saveMessage(gsid, userId, message);
+            console.log('Message saved and broadcasted:', { userId, gsid, message });
+            this.server.to(gsid).emit('receive_message', { userId, message });
+        }
+        catch (error) {
+            console.error('Message send failed:', { userId, gsid, error });
+            client.emit('error', { errorMessage: error.message });
+        }
     }
 };
 exports.GatewayGateway = GatewayGateway;
@@ -87,46 +125,37 @@ __decorate([
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GatewayGateway.prototype, "handleConnection", null);
 __decorate([
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GatewayGateway.prototype, "handleDisconnect", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('joinRoom'),
+    (0, websockets_1.SubscribeMessage)('create_room'),
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], GatewayGateway.prototype, "handleCreateRoom", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('join_room'),
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GatewayGateway.prototype, "handleJoinRoom", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('startGame'),
+    (0, websockets_1.SubscribeMessage)('send_message'),
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, websockets_1.ConnectedSocket)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], GatewayGateway.prototype, "handleStartGame", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('sendMessage'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], GatewayGateway.prototype, "handleSendMessage", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('echo'),
-    __param(0, (0, websockets_1.MessageBody)()),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], GatewayGateway.prototype, "handleEcho", null);
 exports.GatewayGateway = GatewayGateway = __decorate([
     (0, websockets_1.WebSocketGateway)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService,

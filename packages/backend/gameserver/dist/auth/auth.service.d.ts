@@ -1,8 +1,7 @@
 export declare class AuthService {
-    private userSession;
     guestLogin(): {
         userId: string;
-        usid: string;
+        password: string;
     };
-    isValidGuest(usid: string): boolean;
+    isValidGuest(userId: string, password: string): boolean;
 }

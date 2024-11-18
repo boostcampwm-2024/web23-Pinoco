@@ -27,99 +27,130 @@ export class GatewayGateway
     private readonly chatService: ChatService,
   ) {}
 
-  handleConnection(@ConnectedSocket() client: Socket) {
-    const usid = client.handshake.query.usid as string;
+  // 소켓 연결 시 인증 처리
+  async handleConnection(@ConnectedSocket() client: Socket) {
+    const userId = client.handshake.query.userId as string;
+    const password = client.handshake.query.password as string;
 
-    console.log(
-      `Attempting connection for usid: ${usid} from client: ${client.id}`,
-    );
+    console.log('New connection attempt:', { userId, password });
 
-    if (!this.authService.isValidGuest(usid)) {
-      console.log(`Unauthorized connection: ${client.id} with usid: ${usid}`);
+    if (!this.authService.isValidGuest(userId, password)) {
+      console.log('Authentication failed for user:', userId);
       client.disconnect();
       return;
     }
 
-    console.log(`Client connected: ${client.id}, usid: ${usid}`);
+    // 사용자 ID를 소켓 데이터에 저장
+    client.data.userId = userId;
+    console.log('Connection successful for user:', userId);
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+  // 소켓 연결 해제 시 처리
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
+    const userId = client.data.userId;
+    const gsid = client.data.gsid;
+
+    console.log('Disconnecting user:', { userId, gsid });
+
+    if (gsid) {
+      await this.roomService.leaveRoom(gsid, userId);
+      client.leave(gsid);
+      console.log('User left room:', { userId, gsid });
+
+      // 다른 사용자들에게 알림
+      this.server.to(gsid).emit('user_left', { userId });
+
+      // 방장이 나갔을 경우 방장 변경
+      const newHostId = await this.roomService.getHostUserId(gsid);
+      if (newHostId) {
+        console.log('New host assigned:', { newHostId });
+        this.server.to(gsid).emit('change_host', { hostUserId: newHostId });
+      }
+    }
   }
 
-  @SubscribeMessage('joinRoom')
-  handleJoinRoom(
-    @MessageBody() payload: { roomId: string; userId: string },
+  // 게임방 생성 요청 처리
+  @SubscribeMessage('create_room')
+  async handleCreateRoom(@ConnectedSocket() client: Socket) {
+    const userId = client.data.userId;
+
+    console.log('Create room requested by user:', userId);
+
+    try {
+      const gsid = await this.roomService.createRoom(userId);
+      client.join(gsid);
+      client.data.gsid = gsid; // 클라이언트 세션에 gsid 저장
+
+      console.log('Room created successfully:', { gsid, userId });
+      client.emit('create_room_success', { gsid, isHost: true });
+    } catch (error) {
+      console.error('Create room failed:', { userId, error });
+      client.emit('create_room_fail', { errorMessage: error.message });
+    }
+  }
+
+  // 게임방 참가 요청 처리
+  @SubscribeMessage('join_room')
+  async handleJoinRoom(
+    @MessageBody() data: { gsid: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(payload);
-    console.log(
-      `Received joinRoom request: roomId=${payload.roomId}, userId=${payload.userId} from client ${client.id}`,
-    );
+    const userId = client.data.userId;
+    const { gsid } = data;
 
-    const response = this.roomService.joinRoom(payload.roomId, payload.userId);
+    console.log('Join room requested:', { userId, gsid });
 
-    console.log(`User ${payload.userId} joined room ${payload.roomId}`);
-    client.join(payload.roomId);
+    try {
+      const roomInfo = await this.roomService.joinRoom(gsid, userId);
+      client.join(gsid);
+      client.data.gsid = gsid; // 클라이언트 세션에 gsid 저장
 
-    this.server
-      .to(payload.roomId)
-      .emit('userJoined', { userId: payload.userId });
+      console.log('Room joined successfully:', { gsid, userId, roomInfo });
+      client.emit('join_room_success', {
+        userIds: Array.from(roomInfo.userIds),
+        readyUserIds: Array.from(roomInfo.readyUserIds),
+        isHost: roomInfo.hostUserId === userId,
+        hostUserId: roomInfo.hostUserId,
+      });
 
-    console.log(`User joined event emitted for room ${payload.roomId}`);
-    return response;
+      // 다른 사용자들에게 참가 알림
+      client.to(gsid).emit('user_joined', { userId });
+    } catch (error) {
+      console.error('Join room failed:', { userId, gsid, error });
+      client.emit('join_room_fail', { errorMessage: error.message });
+    }
   }
 
-  @SubscribeMessage('startGame')
-  handleStartGame(
-    @MessageBody() payload: { roomId: string },
+  // 채팅 메시지 보내기 처리
+  @SubscribeMessage('send_message')
+  async handleSendMessage(
+    @MessageBody() data: { message: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(
-      `Received startGame request for roomId=${payload.roomId} from client ${client.id}`,
-    );
+    const userId = client.data.userId;
+    const gsid = client.data.gsid;
 
-    const response = this.gameService.startGame(payload.roomId);
+    console.log('Message send requested:', {
+      userId,
+      gsid,
+      message: data.message,
+    });
 
-    console.log(`Game started in room ${payload.roomId}`);
-    this.server
-      .to(payload.roomId)
-      .emit('gameStarted', { roomId: payload.roomId });
+    if (!gsid) {
+      console.error('User not in room:', { userId });
+      client.emit('error', { errorMessage: '방에 참여되어 있지 않습니다.' });
+      return;
+    }
 
-    console.log(`Game started event emitted for room ${payload.roomId}`);
-    return response;
-  }
+    const { message } = data;
 
-  @SubscribeMessage('sendMessage')
-  handleSendMessage(
-    @MessageBody() payload: { roomId: string; message: string },
-    @ConnectedSocket() client: Socket,
-  ) {
-    console.log(
-      `Received sendMessage request: roomId=${payload.roomId}, message=${payload.message} from client ${client.id}`,
-    );
-
-    const response = this.chatService.sendMessage(
-      payload.roomId,
-      payload.message,
-    );
-
-    console.log(`Message sent in room ${payload.roomId}: ${payload.message}`);
-    this.server
-      .to(payload.roomId)
-      .emit('newMessage', { message: payload.message });
-
-    console.log(`New message event emitted for room ${payload.roomId}`);
-    return response;
-  }
-
-  @SubscribeMessage('echo')
-  handleEcho(@MessageBody() payload: any, @ConnectedSocket() client: Socket) {
-    console.log(`Echo received from client ${client.id}:`, payload);
-
-    client.emit('echoResponse', payload);
-
-    console.log(`Echo response sent back to client ${client.id}`);
-    return { status: 'success', payload };
+    try {
+      await this.chatService.saveMessage(gsid, userId, message);
+      console.log('Message saved and broadcasted:', { userId, gsid, message });
+      this.server.to(gsid).emit('receive_message', { userId, message });
+    } catch (error) {
+      console.error('Message send failed:', { userId, gsid, error });
+      client.emit('error', { errorMessage: error.message });
+    }
   }
 }
