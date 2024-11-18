@@ -10910,10 +10910,14 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/backend/signalingServer/",\
         "packageDependencies": [\
           ["signaling-server", "workspace:packages/backend/signalingServer"],\
+          ["@types/cors", "npm:2.8.17"],\
           ["@types/express", "npm:5.0.0"],\
           ["@types/node", "npm:22.9.0"],\
+          ["cors", "npm:2.8.5"],\
+          ["dotenv", "npm:16.4.5"],\
           ["express", "npm:4.21.1"],\
           ["nodemon", "npm:3.1.7"],\
+          ["socket.io", "npm:4.8.1"],\
           ["ts-node", "virtual:2d9933a087c84fcd62d02992a37dafa5c496871a2a0dfeb337925831c46d4d9033e14c0a97d371781dad355836e17912cc77c7f093a35d788f2e7255f48b3b8f#npm:10.9.2"],\
           ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"]\
         ],\

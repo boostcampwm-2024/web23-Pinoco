@@ -7,9 +7,13 @@
     "dev": "nodemon --exec ts-node ./src/app.ts"
   },
   "dependencies": {
-    "express": "^4.21.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "@types/cors": "^2",
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
     "nodemon": "^3.1.7",
