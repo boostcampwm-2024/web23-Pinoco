@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { useChatStore } from '@/states/store/chatStore';
 
-interface ChatMessage {
+interface IChatMessage {
   usid: string;
   message: string;
 }
@@ -11,9 +11,9 @@ export const useChatSocket = (url: string, gsid: string, usid: string) => {
   const addMessage = useChatStore((state) => state.addMessage);
   const setMessages = useChatStore((state) => state.setMessages);
 
-  useEffect(() => {
-    const socket: Socket = io(url);
+  const socket = io(url);
 
+  useEffect(() => {
     // 방에 참여
     socket.emit('join_room', { gsid, usid });
 
@@ -23,21 +23,20 @@ export const useChatSocket = (url: string, gsid: string, usid: string) => {
     });
 
     // 새로운 메시지 수신
-    socket.on('receive_message', (data: ChatMessage) => {
+    socket.on('receive_message', (data: IChatMessage) => {
       addMessage(data);
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [url, gsid]);
+  }, [gsid, usid]);
 
   const sendMessage = (message: string) => {
-    if (message.trim()) {
-      const newMessage = { usid, message };
-      addMessage(newMessage);
-      socket.emit('send_message', { gsid, usid, message });
-    }
+    if (!message.trim()) return;
+    const newMessage = { usid, message };
+    addMessage(newMessage);
+    socket.emit('send_message', { gsid, usid, message });
   };
 
   return { sendMessage };
