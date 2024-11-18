@@ -1,19 +1,19 @@
-import { useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
+import { useSocketStore } from '@/states/store/socketStore';
 
 export default function useJoinRoom() {
   const navigate = useNavigate();
-  const usid = useAuthStore((state) => state.usid);
+  const userId = useAuthStore((state) => state.userId);
   const setRoomData = useRoomStore((state) => state.setRoomData);
+  const socket = useSocketStore((state) => state.socket);
 
   function handleJoinRoom(gsid: string) {
-    if (!usid) return;
+    if (!userId || !socket) return;
 
-    const socket = io('http://localhost:3000');
-    socket.emit('join_room', { usid, gsid });
+    socket.emit('join_room', { usid: userId, gsid });
+
     socket.on('join_room_success', (data) => {
       setRoomData(data.gsid, data.isHost);
       navigate(`/game/${data.gsid}`);
@@ -22,6 +22,11 @@ export default function useJoinRoom() {
     socket.on('join_room_fail', (data) => {
       alert(`방 참가에 실패했습니다: ${data.errorMessage}`);
     });
+
+    return () => {
+      socket.off('join_room_success');
+      socket.off('join_room_fail');
+    };
   }
 
   return { handleJoinRoom };
