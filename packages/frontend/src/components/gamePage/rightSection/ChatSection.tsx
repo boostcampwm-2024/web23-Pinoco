@@ -6,19 +6,18 @@ import { useChatStore } from '@/states/store/chatStore';
 
 export default function ChatSection() {
   const { gsid } = useParams();
-  const userId = useAuthStore((state) => state.userId);
+  const { userId } = useAuthStore();
   const { messages } = useChatStore();
   const { sendMessage } = useChatSocket(gsid!, userId!);
   const [chat, setChat] = useState('');
 
   const handleSend = () => {
-    if (chat.trim()) {
-      sendMessage(chat);
-      setChat('');
-    }
+    if (!chat.trim()) return;
+    sendMessage(chat);
+    setChat('');
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSend();
     }
@@ -38,7 +37,7 @@ export default function ChatSection() {
         placeholder="채팅을 입력해주세요..."
         value={chat}
         onChange={(e) => setChat(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
       />
     </div>
   );
