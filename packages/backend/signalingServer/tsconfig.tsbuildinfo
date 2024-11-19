@@ -1,1 +1,1 @@
-{"root":["./src/app.ts"],"version":"5.6.3"}
+{"root":["./src/app.ts","./src/constants/roomConstants.ts","./src/constants/serverConstants.ts","./src/constants/socketConstants.ts","./src/handlers/handleRoom.ts","./src/handlers/handleSignaling.ts","./src/handlers/handleSocket.ts","./src/middleware/cors.ts","./src/socket/initSocket.ts","./src/types/signaling.types.ts"],"version":"5.6.3"}

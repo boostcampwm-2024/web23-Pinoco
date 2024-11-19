@@ -14,6 +14,10 @@ const PORT = process.env.SIGNALING_SERVER_PORT || SERVER_CONSTANTS.port;
 
 app.use(cors(corsConfig));
 
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello');
+});
+
 const io = initSocket(httpServer);
 
 httpServer.listen(PORT, () => {

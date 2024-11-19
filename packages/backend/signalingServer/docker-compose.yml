@@ -1,9 +1,9 @@
+version: '3.8'
+
 services:
   signaling-server:
+    image: todayisfirst/signaling-server:latest
     container_name: signaling-server
-    build:
-      context: ../../..
-      dockerfile: packages/backend/signalingServer/Dockerfile
     ports:
       - '8080:8080'
     environment:
