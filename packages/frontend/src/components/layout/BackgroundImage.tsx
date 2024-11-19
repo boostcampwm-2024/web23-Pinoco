@@ -1,4 +1,4 @@
-import Background from '@/assets/images/BackgroundImage.svg';
+import Background from '@/assets/images/BackGroundImage.svg';
 
 interface IBackgroundImageProps {
   gradientClass: string;
