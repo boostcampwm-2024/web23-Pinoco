@@ -1,8 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/states/store/authStore';
-import { useRoomStore } from '@/states/store/roomStore';
-import { useSocketStore } from '@/states/store/socketStore';
-
 export default function useJoinRoom() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.userId);
@@ -19,13 +14,13 @@ export default function useJoinRoom() {
       navigate(`/game/${data.gsid}`);
     });
 
-    socket.on('join_room_fail', (data) => {
+    socket.on('error', (data) => {
       alert(`방 참가에 실패했습니다: ${data.errorMessage}`);
     });
 
     return () => {
       socket.off('join_room_success');
-      socket.off('join_room_fail');
+      socket.off('error');
     };
   }
 
