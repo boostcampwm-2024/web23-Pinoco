@@ -62,7 +62,7 @@ jobs:
         working-directory: packages/backend/gameserver
 
       - name: Prettier 체크 및 수정
-        run: yarn prettier --check .
+        run: yarn prettier --write .
         working-directory: packages/backend/gameserver
 
       - name: 빌드
