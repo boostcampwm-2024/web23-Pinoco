@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import http from 'http';
 import cors from 'cors';
 import { Server } from 'socket.io';
-import corsConfig from './middleware/cors';
+import corsConfig from '@/middleware/cors';
 import dotenv from 'dotenv';
 
 dotenv.config();

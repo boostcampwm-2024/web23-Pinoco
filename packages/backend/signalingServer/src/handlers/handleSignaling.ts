@@ -1,4 +1,4 @@
-import { ISignalingSocket, IWebRTCPayload } from '../types/signaling.types';
+import { ISignalingSocket, IWebRTCPayload } from '@/types/signaling.types';
 
 const handleSignaling = (socket: ISignalingSocket) => {
   // video-offer
