@@ -32,8 +32,8 @@ jobs:
         run: yarn lint
         working-directory: packages/frontend
 
-      - name: Prettier 체크
-        run: yarn format
+      - name: Prettier 체크 및 수정
+        run: yarn prettier --write .
         working-directory: packages/frontend
 
       - name: 빌드
@@ -61,8 +61,8 @@ jobs:
         run: yarn lint
         working-directory: packages/backend/gameserver
 
-      - name: Prettier 체크
-        run: yarn format
+      - name: Prettier 체크 및 수정
+        run: yarn prettier --check .
         working-directory: packages/backend/gameserver
 
       - name: 빌드
