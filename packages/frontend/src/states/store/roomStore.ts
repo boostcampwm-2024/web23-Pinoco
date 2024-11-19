@@ -7,15 +7,8 @@ interface IRoomState {
   setRoomData: (gsid: string, isHost: boolean) => void;
 }
 
-export const useRoomStore = create<IRoomState>()(
-  persist(
-    (set) => ({
-      isHost: null,
-      gsid: null,
-      setRoomData: (gsid, isHost) => set({ gsid, isHost }),
-    }),
-    {
-      name: 'room-storage',
-    },
-  ),
-);
+export const useRoomStore = create<IRoomState>()((set) => ({
+  isHost: null,
+  gsid: null,
+  setRoomData: (gsid, isHost) => set({ gsid, isHost }),
+}));
