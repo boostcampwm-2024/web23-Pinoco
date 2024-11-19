@@ -10,16 +10,15 @@ export interface IWebRTCPayload {
 }
 
 export interface IServerEventsType {
-  'video-offer': (payload: IWebRTCPayload) => void;
-  'video-answer': (payload: IWebRTCPayload) => void;
-  'new-ice-candidate': (payload: IWebRTCPayload) => void;
+  video_offer?: (payload: IWebRTCPayload) => void;
+  video_answer?: (payload: IWebRTCPayload) => void;
+  new_ice_candidate?: (payload: IWebRTCPayload) => void;
 }
 
 export interface IClientEventsType {
-  join_room: (roomId: string) => void;
-  'video-offer': (payload: IWebRTCPayload) => void;
-  'video-answer': (payload: IWebRTCPayload) => void;
-  'new-ice-candidate': (payload: IWebRTCPayload) => void;
+  video_offer?: (payload: IWebRTCPayload) => void;
+  video_answer?: (payload: IWebRTCPayload) => void;
+  new_ice_candidate?: (payload: IWebRTCPayload) => void;
 }
 
 export interface ISignalingSocket extends Socket<IServerEventsType, IClientEventsType> {}
