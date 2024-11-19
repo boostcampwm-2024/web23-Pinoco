@@ -2,21 +2,20 @@ import { useEffect } from 'react';
 import { useChatStore } from '@/states/store/chatStore';
 import { useSocketStore } from '@/states/store/socketStore';
 
-interface IChatMessage {
+interface IChatEntry {
   userId: string;
   message: string;
 }
 
 export const useChatSocket = (gsid: string, userId: string) => {
-  const addMessage = useChatStore((state) => state.addMessage);
+  const addChatEntry = useChatStore((state) => state.addChatEntry);
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {
     if (!socket) return;
 
-    // 새로운 메시지 수신
-    socket.on('receive_message', (data: IChatMessage) => {
-      addMessage(data);
+    socket.on('receive_message', (data: IChatEntry) => {
+      addChatEntry(data);
     });
 
     return () => {
@@ -24,12 +23,12 @@ export const useChatSocket = (gsid: string, userId: string) => {
     };
   }, [gsid, socket]);
 
-  const sendMessage = (message: string) => {
+  const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;
-    const newMessage = { userId, message };
-    addMessage(newMessage);
+    const newEntry = { userId, message };
+    addChatEntry(newEntry);
     socket.emit('send_message', { gsid, message });
   };
 
-  return { sendMessage };
+  return { sendChatEntry };
 };
