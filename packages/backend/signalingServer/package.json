@@ -2,8 +2,8 @@
   "name": "signaling-server",
   "packageManager": "yarn@4.5.1",
   "scripts": {
-    "build": "tsc --build",
     "start": "node ./dist/app.js",
+    "build": "tsc --build && tscpaths -p tsconfig.json -s ./src -o ./dist",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tscpaths": "^0.0.9",
     "typescript": "^5.6.3"
   }
 }
