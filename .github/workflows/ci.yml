@@ -55,16 +55,16 @@ jobs:
 
       - name: 의존성 설치
         run: yarn install
-        working-directory: packages/backend
+        working-directory: packages/backend/gameserver
 
       - name: Lint 검사
         run: yarn lint
-        working-directory: packages/backend
+        working-directory: packages/backend/gameserver
 
       - name: Prettier 체크
         run: yarn format
-        working-directory: packages/backend
+        working-directory: packages/backend/gameserver
 
       - name: 빌드
         run: yarn build
-        working-directory: packages/backend
+        working-directory: packages/backend/gameserver
