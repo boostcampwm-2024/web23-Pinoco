@@ -14,9 +14,6 @@ export const useSocketStore = create<ISocketStore>((set) => ({
       query: { userId, password },
       withCredentials: true,
       transports: ['polling', 'websocket'],
-      extraHeaders: {
-        'Access-Control-Allow-Origin': 'http://localhost:5173',
-      },
     });
     set({ socket });
   },
