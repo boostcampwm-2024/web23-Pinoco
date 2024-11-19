@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useChatStore } from '@/states/store/chatStore';
 import { useSocketStore } from '@/states/store/socketStore';
 
-
 interface IChatEntry {
   userId: string;
   message: string;
@@ -27,7 +26,6 @@ export const useChatSocket = (gsid: string, userId: string) => {
   const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;
     const newEntry = { userId, message };
-    addChatEntry(newEntry);
     socket.emit('send_message', { gsid, message });
   };
 

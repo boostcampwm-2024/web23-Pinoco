@@ -12,6 +12,11 @@ export const useSocketStore = create<ISocketStore>((set) => ({
   connectSocket: (userId: string, password: string) => {
     const socket = io('http://localhost:3000', {
       query: { userId, password },
+      withCredentials: true,
+      transports: ['polling', 'websocket'],
+      extraHeaders: {
+        'Access-Control-Allow-Origin': 'http://localhost:5173',
+      },
     });
     set({ socket });
   },
