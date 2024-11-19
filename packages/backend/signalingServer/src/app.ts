@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
 import http from 'http';
 import cors from 'cors';
-import { Server } from 'socket.io';
 import corsConfig from '@/middleware/cors';
 import dotenv from 'dotenv';
+import initSocket from '@/socket/initSocket';
 
 dotenv.config();
 
@@ -13,9 +13,7 @@ const PORT = process.env.SIGNALING_SERVER_PORT || 8080;
 
 app.use(cors(corsConfig));
 
-const io = new Server(httpServer, {
-  cors: corsConfig,
-});
+const io = initSocket(httpServer);
 
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
