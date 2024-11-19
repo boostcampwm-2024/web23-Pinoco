@@ -75,6 +75,7 @@ module.exports = {
     'no-shadow': 'off',
 
     '@typescript-eslint/no-unused-vars': 'off',
+    'react-hooks/exhaustive-deps': 'warn',
   },
   settings: {
     'import/resolver': {
