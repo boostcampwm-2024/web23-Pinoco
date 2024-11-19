@@ -58,14 +58,8 @@ export class GatewayGateway
       console.log('User left room:', { userId, gsid });
 
       // 다른 사용자들에게 알림
-      this.server.to(gsid).emit('user_left', { userId });
-
-      // 방장이 나갔을 경우 방장 변경
-      const newHostId = await this.roomService.getHostUserId(gsid);
-      if (newHostId) {
-        console.log('New host assigned:', { newHostId });
-        this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
-      }
+      const hostUserId = await this.roomService.getHostUserId(gsid);
+      this.server.to(gsid).emit('user_left', { userId, hostUserId });
     }
   }
 
