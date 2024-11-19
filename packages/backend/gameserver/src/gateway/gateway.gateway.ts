@@ -76,17 +76,13 @@ export class GatewayGateway
     client.data.gsid = null; // 클라이언트 세션에서 gsid 제거
 
     console.log('Room left successfully:', { gsid, userId });
-    client.emit('leave_room_success', { gsid });
 
     // 다른 사용자들에게 알림
     this.server.to(gsid).emit('user_left', { userId });
 
     // 방장이 나갔을 경우 방장 변경
-    const newHostId = await this.roomService.getHostUserId(gsid);
-    if (newHostId) {
-      console.log('New host assigned:', { newHostId });
-      this.server.to(gsid).emit('host_changed', { hostUserId: newHostId });
-    }
+    const hostUserId = await this.roomService.getHostUserId(gsid);
+    this.server.to(gsid).emit('user_left', { userId, hostUserId });
   }
 
   // 게임방 생성 요청 처리
@@ -105,7 +101,7 @@ export class GatewayGateway
       client.emit('create_room_success', { gsid, isHost: true });
     } catch (error) {
       console.error('Create room failed:', { userId, error });
-      client.emit('create_room_fail', { errorMessage: error.message });
+      client.emit('error', { errorMessage: error.message });
     }
   }
 
