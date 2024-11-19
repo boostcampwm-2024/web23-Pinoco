@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   signaling-server:
     image: todayisfirst/signaling-server:latest
@@ -9,5 +7,10 @@ services:
     environment:
       - NODE_ENV=production
       - SIGNALING_SERVER_PORT=8080
-      - ORIGIN=http://localhost:3000
+      - ORIGIN=*
+      - SSL_CERT_PATH=/etc/letsencrypt/live/pinoco.shop/fullchain.pem
+      - SSL_KEY_PATH=/etc/letsencrypt/live/pinoco.shop/privkey.pem
+    volumes:
+      # SSL 인증서 마운트
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     restart: always
