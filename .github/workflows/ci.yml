@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - feature/*
+  push:
+    branches:
+      - develop
+      - feature/*
+
+jobs:
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: 의존성 설치
+        run: yarn install
+        working-directory: packages/frontend
+
+      - name: Lint 검사
+        run: yarn lint
+        working-directory: packages/frontend
+
+      - name: Prettier 체크 및 수정
+        run: yarn prettier --write .
+        working-directory: packages/frontend
+
+      - name: 빌드
+        run: yarn build
+        working-directory: packages/frontend
+
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: 의존성 설치
+        run: yarn install
+        working-directory: packages/backend/gameserver
+
+      - name: Lint 검사
+        run: yarn lint
+        working-directory: packages/backend/gameserver
+
+      - name: Prettier 체크 및 수정
+        run: yarn prettier --check .
+        working-directory: packages/backend/gameserver
+
+      - name: 빌드
+        run: yarn build
+        working-directory: packages/backend/gameserver
