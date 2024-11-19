@@ -144,7 +144,7 @@ export default function MainDisplay() {
       <div className="flex-grow">
         {gamePhase === GAME_PHASE.WAITING && (
           <div className="flex flex-col items-center justify-center h-full">
-            {!isHost ? (
+            {isHost ? (
               <StartButton onStart={startGame} disabled={!canStartGame()} />
             ) : (
               <ReadyButton onReady={handleReady} />
