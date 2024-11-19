@@ -3,15 +3,18 @@ import { useSocketStore } from '@/states/store/socketStore';
 import CameraOn from '@/assets/images/CameraOn.svg?react';
 import MikeOn from '@/assets/images/MikeOn.svg?react';
 import Leave from '@/assets/images/Leave.svg?react';
+import { useChatStore } from '@/states/store/chatStore';
 
 export default function SettingSection() {
   const navigate = useNavigate();
   const socket = useSocketStore((state) => state.socket);
+  const setChatHistory = useChatStore((state) => state.setChatHistory);
 
   const handleLeave = () => {
     if (!socket) return;
 
     socket.emit('leave_room');
+    setChatHistory([]);
     navigate('/lobby');
   };
 
