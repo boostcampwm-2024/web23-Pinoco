@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc --build",
     "start": "node ./dist/app.js",
-    "dev": "nodemon --exec ts-node ./src/app.ts"
+    "dev": "nodemon -r tsconfig-paths/register src/app.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -20,6 +20,7 @@
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
   }
 }
