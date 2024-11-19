@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 interface ITimerProps {
-  initialTime: number; // seconds
-  onTimeEnd?: () => void;
+  initialTime: number;
+  onTimeEnd: () => void;
 }
 
 export default function Timer({ initialTime, onTimeEnd }: ITimerProps) {
@@ -10,7 +10,7 @@ export default function Timer({ initialTime, onTimeEnd }: ITimerProps) {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      onTimeEnd?.();
+      onTimeEnd();
       return;
     }
 

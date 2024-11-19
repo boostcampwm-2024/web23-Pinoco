@@ -1226,7 +1226,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:^10.0.0, @nestjs/core@npm:^10.4.6":
+"@nestjs/core@npm:^10.4.6":
   version: 10.4.6
   resolution: "@nestjs/core@npm:10.4.6"
   dependencies:
@@ -1251,6 +1251,34 @@ __metadata:
     "@nestjs/websockets":
       optional: true
   checksum: 10c0/7d43f0863799cbda52e616be9102af67363ceb3f56c69678be77630298ae09e1e0f92cef95d785f185262c2e00f80fd456f8df1328949417068b437a8fee04c1
+  languageName: node
+  linkType: hard
+
+"@nestjs/core@npm:^10.4.8":
+  version: 10.4.8
+  resolution: "@nestjs/core@npm:10.4.8"
+  dependencies:
+    "@nuxtjs/opencollective": "npm:0.3.2"
+    fast-safe-stringify: "npm:2.1.1"
+    iterare: "npm:1.2.1"
+    path-to-regexp: "npm:3.3.0"
+    tslib: "npm:2.7.0"
+    uid: "npm:2.0.2"
+  peerDependencies:
+    "@nestjs/common": ^10.0.0
+    "@nestjs/microservices": ^10.0.0
+    "@nestjs/platform-express": ^10.0.0
+    "@nestjs/websockets": ^10.0.0
+    reflect-metadata: ^0.1.12 || ^0.2.0
+    rxjs: ^7.1.0
+  peerDependenciesMeta:
+    "@nestjs/microservices":
+      optional: true
+    "@nestjs/platform-express":
+      optional: true
+    "@nestjs/websockets":
+      optional: true
+  checksum: 10c0/1ac652f9089ec82be8cb6ba86fc83dc228adaae516bee41f1f8dc7201551c8004e9555c3655c5d1bee933da99548ca6cda5523e8ceb1d3146e1c5963b11e041a
   languageName: node
   linkType: hard
 
@@ -3083,6 +3111,7 @@ __metadata:
     mysql2: "npm:^3.11.3"
     passport: "npm:^0.7.0"
     passport-google-oauth20: "npm:^2.0.0"
+    prettier: "npm:^3.3.3"
     redis: "npm:^4.7.0"
     typeorm: "npm:^0.3.20"
   languageName: unknown
@@ -4936,6 +4965,7 @@ __metadata:
     import: "npm:^0.0.6"
     plugin: "npm:^0.3.3"
     postcss: "npm:^8.4.47"
+    prettier: "npm:^3.3.3"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-error-boundary: "npm:^4.1.2"
@@ -5028,7 +5058,7 @@ __metadata:
     "@nestjs-modules/ioredis": "npm:^2.0.2"
     "@nestjs/cli": "npm:^10.0.0"
     "@nestjs/common": "npm:^10.0.0"
-    "@nestjs/core": "npm:^10.0.0"
+    "@nestjs/core": "npm:^10.4.8"
     "@nestjs/platform-express": "npm:^10.0.0"
     "@nestjs/platform-socket.io": "npm:^10.4.7"
     "@nestjs/schematics": "npm:^10.0.0"
@@ -5060,6 +5090,7 @@ __metadata:
     tsconfig-paths: "npm:^4.2.0"
     typeorm: "npm:^0.3.20"
     typescript: "npm:^5.1.3"
+    uuid: "npm:^11.0.3"
   languageName: unknown
   linkType: soft
 

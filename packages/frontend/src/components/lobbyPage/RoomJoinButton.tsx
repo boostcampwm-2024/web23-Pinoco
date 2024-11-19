@@ -1,11 +1,12 @@
 import useModal from '@/hooks/useModal';
-import Modal from '@/components/common/Modal';
+import GameEntryModal from '@/components/lobbyPage/GameEntryModal';
 import Button from '@/components/common/Button';
 import useJoinRoom from '@/hooks/useJoinRoom';
 
 export default function RoomJoinButton() {
   const { isOpen, openModal, closeModal } = useModal();
   const { handleJoinRoom } = useJoinRoom();
+
   return (
     <>
       <Button
@@ -14,10 +15,10 @@ export default function RoomJoinButton() {
         buttonText="게임 참가하기"
       />
       {isOpen && (
-        <Modal
+        <GameEntryModal
           title="게임 참가하기"
-          subtitle="게임코드 입력"
-          textForm="코드 입력"
+          subtitle="게임코드를 입력해주세요"
+          textForm="게임 코드 입력"
           onClose={closeModal}
           onConfirm={handleJoinRoom}
         />

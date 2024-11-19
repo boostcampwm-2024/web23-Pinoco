@@ -6,19 +6,18 @@ import { useChatStore } from '@/states/store/chatStore';
 
 export default function ChatSection() {
   const { gsid } = useParams();
-  const userId = useAuthStore((state) => state.userId);
-  const { messages } = useChatStore();
-  const { sendMessage } = useChatSocket(gsid!, userId!);
-  const [chat, setChat] = useState('');
+  const { userId } = useAuthStore();
+  const { chatHistory } = useChatStore();
+  const { sendChatEntry } = useChatSocket(gsid!, userId!);
+  const [chatInput, setChat] = useState('');
 
   const handleSend = () => {
-    if (chat.trim()) {
-      sendMessage(chat);
-      setChat('');
-    }
+    if (!chatInput.trim()) return;
+    sendChatEntry(chatInput);
+    setChat('');
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSend();
     }
@@ -27,18 +26,18 @@ export default function ChatSection() {
   return (
     <div className="flex flex-col flex-grow p-4 bg-black rounded-lg opacity-80 text-white-default">
       <div className="h-56 mt-2 space-y-2 overflow-y-auto grow">
-        {messages.map((msg, index) => (
+        {chatHistory.map((entry, index) => (
           <div key={index} className="text-sm">
-            <span className="font-semibold">{msg.userId}</span>: {msg.message}
+            <span className="font-semibold">{entry.userId}</span>: {entry.message}
           </div>
         ))}
       </div>
       <input
         className="w-full p-2 mt-4 bg-gray-600 rounded-lg outline-none"
         placeholder="채팅을 입력해주세요..."
-        value={chat}
+        value={chatInput}
         onChange={(e) => setChat(e.target.value)}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
       />
     </div>
   );

@@ -13,13 +13,19 @@ export default function useCreateRoom() {
     if (!userId || !socket) return;
 
     socket.emit('create_room', { usid: userId });
-    socket.on('create_room_success', (data) => {
+
+    socket.on('create_room_success', (data: { gsid: string; isHost: boolean }) => {
       setRoomData(data.gsid, data.isHost);
       navigate(`/game/${data.gsid}`);
     });
 
+    socket.on('error', (data: { errorMessage: string }) => {
+      alert(data.errorMessage);
+    });
+
     return () => {
       socket.off('create_room_success');
+      socket.off('error');
     };
   }
 

@@ -1,18 +1,18 @@
 import { create } from 'zustand';
 
-interface IChatMessage {
+interface IChatEntry {
   userId: string;
   message: string;
 }
 
 interface IChatState {
-  messages: IChatMessage[];
-  addMessage: (message: IChatMessage) => void;
-  setMessages: (messages: IChatMessage[]) => void;
+  chatHistory: IChatEntry[];
+  addChatEntry: (entry: IChatEntry) => void;
+  setChatHistory: (history: IChatEntry[]) => void;
 }
 
 export const useChatStore = create<IChatState>((set) => ({
-  messages: [],
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  setMessages: (messages) => set({ messages }),
+  chatHistory: [],
+  addChatEntry: (entry) => set((state) => ({ chatHistory: [...state.chatHistory, entry] })),
+  setChatHistory: (history) => set({ chatHistory: history }),
 }));
