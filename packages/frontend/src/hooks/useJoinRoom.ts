@@ -14,18 +14,18 @@ export default function useJoinRoom() {
 
     socket.emit('join_room', { usid: userId, gsid });
 
-    socket.on('join_room_success', (data) => {
+    socket.on('join_room_success', (data: { gsid: string; isHost: boolean }) => {
       setRoomData(data.gsid, data.isHost);
       navigate(`/game/${data.gsid}`);
     });
 
-    socket.on('join_room_fail', (data) => {
+    socket.on('error', (data: { errorMessage: string }) => {
       alert(`방 참가에 실패했습니다: ${data.errorMessage}`);
     });
 
     return () => {
       socket.off('join_room_success');
-      socket.off('join_room_fail');
+      socket.off('error');
     };
   }
 

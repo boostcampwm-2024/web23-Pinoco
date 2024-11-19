@@ -1,10 +1,10 @@
-import Background from '@/assets/images/BackgroundImage.svg';
+import Background from '@/assets/images/BackGroundImage.svg';
 
 interface IBackgroundImageProps {
   gradientClass: string;
 }
 
-export default function BackgroundImage({ gradientClass }: BackgroundImageProps) {
+export default function BackgroundImage({ gradientClass }: IBackgroundImageProps) {
   return (
     <div
       className="fixed inset-0 w-full h-full bg-center bg-cover -z-10"
