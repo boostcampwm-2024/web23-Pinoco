@@ -12,11 +12,11 @@ export default function useJoinRoom() {
   function handleJoinRoom(gsid: string) {
     if (!userId || !socket) return;
 
-    socket.emit('join_room', { usid: userId, gsid });
+    socket.emit('join_room', { gsid });
 
-    socket.on('join_room_success', (data: { gsid: string; isHost: boolean }) => {
-      setRoomData(data.gsid, data.isHost);
-      navigate(`/game/${data.gsid}`);
+    socket.on('join_room_success', (data) => {
+      setRoomData(gsid, data.isHost);
+      navigate(`/game/${gsid}`);
     });
 
     socket.on('error', (data: { errorMessage: string }) => {
