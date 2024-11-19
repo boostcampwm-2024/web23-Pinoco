@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.7",
-    "@nestjs/schematics": "^10.2.3"
+    "@nestjs/schematics": "^10.2.3",
+    "prettier": "^3.3.3"
   }
 }

@@ -4889,6 +4889,7 @@ const RAW_RUNTIME_STATE =
           ["mysql2", "npm:3.11.3"],\
           ["passport", "npm:0.7.0"],\
           ["passport-google-oauth20", "npm:2.0.0"],\
+          ["prettier", "npm:3.3.3"],\
           ["redis", "npm:4.7.0"],\
           ["typeorm", "virtual:aa59773ac87791c4813d53447077fcf8a847d6de5a301d34dc31286584b1dbb26d30d3adb5b4c41c1e8aea04371e926fda05c09c6253647c432e11d872a304ba#npm:0.3.20"]\
         ],\
@@ -7044,6 +7045,7 @@ const RAW_RUNTIME_STATE =
           ["import", "npm:0.0.6"],\
           ["plugin", "npm:0.3.3"],\
           ["postcss", "npm:8.4.47"],\
+          ["prettier", "npm:3.3.3"],\
           ["react", "npm:18.3.1"],\
           ["react-dom", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:18.3.1"],\
           ["react-error-boundary", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.1.2"],\
