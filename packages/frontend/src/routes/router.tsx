@@ -3,6 +3,8 @@ import Layout from '@/components/layout/Layout';
 import LandingPage from '@/pages/landingPage/index';
 import LobbyPage from '@/pages/lobbyPage/index';
 import GamePage from '@/pages/gamePage/index';
+import PrivateRoute from '@/components/layout/PrivateRoute';
+import PublicRoute from '@/components/layout/PublicRoute';
 
 export const router = createBrowserRouter([
   {
@@ -11,15 +13,27 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <LandingPage />,
+        element: (
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        ),
       },
       {
         path: 'lobby',
-        element: <LobbyPage />,
+        element: (
+          <PrivateRoute>
+            <LobbyPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: 'game/:gsid',
-        element: <GamePage />,
+        element: (
+          <PrivateRoute>
+            <GamePage />
+          </PrivateRoute>
+        ),
       },
     ],
   },
