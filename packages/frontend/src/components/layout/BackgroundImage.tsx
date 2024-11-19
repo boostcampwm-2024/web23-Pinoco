@@ -4,7 +4,7 @@ interface IBackgroundImageProps {
   gradientClass: string;
 }
 
-export default function BackgroundImage({ gradientClass }: BackgroundImageProps) {
+export default function BackgroundImage({ gradientClass }: IBackgroundImageProps) {
   return (
     <div
       className="fixed inset-0 w-full h-full bg-center bg-cover -z-10"
