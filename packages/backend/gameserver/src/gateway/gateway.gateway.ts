@@ -34,6 +34,7 @@ export class GatewayGateway
       password,
     );
     if (!isValid) {
+      this.emitError(client, '인증에 실패했습니다.');
       client.disconnect();
       return;
     }
@@ -88,7 +89,7 @@ export class GatewayGateway
       client.emit('join_room_success', roomInfo);
       this.emitUserJoined(data.gsid, client.data.userId);
     } catch (error) {
-      client.emit('join_room_fail', { errorMessage: error.message });
+      this.emitError(client, error.message);
     }
   }
 
