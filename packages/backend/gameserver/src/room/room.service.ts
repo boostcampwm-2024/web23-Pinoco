@@ -1,67 +1,69 @@
 import { Injectable } from '@nestjs/common';
-
-interface Room {
-  gsid: string;
-  hostUserId: string;
-  userIds: Set<string>;
-  readyUserIds: Set<string>;
-}
+import { IRoomInfo, IJoinRoomResponse } from './types/room.types';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class RoomService {
-  private rooms: Map<string, Room> = new Map();
+  private rooms: Map<string, IRoomInfo> = new Map();
+  private MAX_ROOM_SIZE = 6;
 
-  // 게임방 생성
-  async createRoom(hostUserId: string): Promise<string> {
-    const gsid = `room_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const newRoom: Room = {
+  async createRoom(userId: string): Promise<string> {
+    const gsid = uuidv4();
+    const roomInfo: IRoomInfo = {
       gsid,
-      hostUserId,
-      userIds: new Set([hostUserId]),
+      userIds: new Set([userId]),
       readyUserIds: new Set(),
+      hostUserId: userId,
     };
-    this.rooms.set(gsid, newRoom);
+
+    this.rooms.set(gsid, roomInfo);
     return gsid;
   }
 
-  // 게임방 참가
-  async joinRoom(gsid: string, userId: string): Promise<Room> {
+  async joinRoom(gsid: string, userId: string): Promise<IJoinRoomResponse> {
     const room = this.rooms.get(gsid);
     if (!room) {
-      throw new Error('방을 찾을 수 없습니다.');
+      throw new Error('존재하지 않는 방입니다.');
     }
+
+    if (room.userIds.size > this.MAX_ROOM_SIZE) {
+      throw new Error('방이 가득 찼습니다.');
+    }
+
     room.userIds.add(userId);
-    return room;
+
+    return {
+      userIds: Array.from(room.userIds),
+      readyUserIds: Array.from(room.readyUserIds),
+      isHost: room.hostUserId === userId,
+      hostUserId: room.hostUserId,
+    };
   }
 
-  // 게임방 나가기
-  async leaveRoom(gsid: string, userId: string): Promise<void> {
+  async leaveRoom(gsid: string, userId: string): Promise<string | null> {
     const room = this.rooms.get(gsid);
-    if (room) {
-      room.userIds.delete(userId);
-      room.readyUserIds.delete(userId);
-      // 방에 유저가 없으면 방 삭제
-      if (room.userIds.size === 0) {
-        this.rooms.delete(gsid);
-      } else if (room.hostUserId === userId) {
-        // 방장이 나가면 새로운 방장 지정
-        room.hostUserId = Array.from(room.userIds)[0];
-      }
+    if (!room) return null;
+
+    room.userIds.delete(userId);
+    room.readyUserIds.delete(userId);
+
+    // 방에 아무도 없으면 방 삭제
+    if (room.userIds.size === 0) {
+      this.rooms.delete(gsid);
+      return null;
     }
-  }
 
-  // 방 정보 가져오기
-  async getRoomInfo(gsid: string): Promise<Room> {
-    const room = this.rooms.get(gsid);
-    if (!room) {
-      throw new Error('방을 찾을 수 없습니다.');
+    // 호스트가 나간 경우 새로운 호스트 지정
+    if (room.hostUserId === userId) {
+      const newHost = Array.from(room.userIds)[0];
+      room.hostUserId = newHost;
+      return newHost;
     }
-    return room;
+
+    return room.hostUserId;
   }
 
-  // 현재 방장의 유저 ID 가져오기
-  async getHostUserId(gsid: string): Promise<string | null> {
-    const room = this.rooms.get(gsid);
-    return room ? room.hostUserId : null;
+  getRoom(gsid: string): IRoomInfo | undefined {
+    return this.rooms.get(gsid);
   }
 }
