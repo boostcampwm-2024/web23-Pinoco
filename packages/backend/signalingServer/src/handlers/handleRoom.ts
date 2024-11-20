@@ -5,22 +5,14 @@ import { ROOM_ERROR_MESSAGES, ROOM_CONSTANTS } from '@/constants/roomConstants';
 
 const handleRoom = (socket: Socket, io: Server) => {
   socket.on('create_room', () => {
-    const ssid = uuidv4();
-    socket.join(ssid);
-    socket.emit('create_room_success', {
-      ssid,
-      isHost: true,
-    });
+    const gsid = uuidv4();
+    socket.join(gsid);
   });
 
   socket.on('join_room', (payload: IWebRTCPayload) => {
-    const room = io.sockets.adapter.rooms.get(payload.ssid);
+    const room = io.sockets.adapter.rooms.get(payload.gsid);
     validateRoomJoin(socket, room);
-    socket.join(payload.ssid);
-    socket.emit('join_room_success', {
-      ssid: payload.ssid,
-      isHost: false,
-    });
+    socket.join(payload.gsid);
   });
 };
 

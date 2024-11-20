@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 
 export interface IWebRTCPayload {
-  ssid: string;
+  gsid: string;
   userID?: string;
   offer?: RTCSessionDescriptionInit;
   answer?: RTCSessionDescriptionInit;
