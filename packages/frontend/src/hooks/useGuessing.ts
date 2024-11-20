@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useSocketStore } from '@/states/store/socketStore';
-import { GAME_PHASE } from '@/constants';
+import { GAME_PHASE, GamePhase } from '@/constants';
 
-export default function useGuessing(isPinoco: boolean, setGamePhase: (phase: string) => void) {
+export default function useGuessing(
+  isPinoco: boolean,
+  setGamePhase: (phase: GamePhase) => void, 
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {
