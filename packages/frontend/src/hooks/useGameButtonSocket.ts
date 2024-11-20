@@ -79,6 +79,11 @@ export const useGameButtonSocket = (onPhaseChange?: (phase: GamePhase) => void) 
     socket.emit('end_speaking');
   };
 
+  const votePinoco = (voteUserId: string) => {
+    if (!socket) return;
+    socket.emit('vote_pinoco', { voteUserId });
+  };
+
   return {
     readyUsers,
     sendReady,
@@ -87,5 +92,6 @@ export const useGameButtonSocket = (onPhaseChange?: (phase: GamePhase) => void) 
     gameStartData,
     currentSpeaker,
     endSpeaking,
+    votePinoco,
   };
 };

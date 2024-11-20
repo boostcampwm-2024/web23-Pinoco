@@ -10,7 +10,7 @@ import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
 export default function MainDisplay() {
   const { isHost } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
-  const { readyUsers, gameStartData, currentSpeaker, endSpeaking } =
+  const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
     useGameButtonSocket(setGamePhase);
 
   const [countdown, setCountdown] = useState(3);
@@ -49,15 +49,11 @@ export default function MainDisplay() {
   const handleVote = () => {
     if (selectedVote === null) return;
 
+    votePinoco(selectedVote);
     setIsVoteSubmitted(true);
 
     setTimeout(() => {
       setIsTimerActive(false);
-
-      setTimeout(() => {
-        setGamePhase(GAME_PHASE.ENDING);
-        setIsVoteSubmitted(false);
-      }, 500);
     }, 1000);
   };
 
