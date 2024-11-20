@@ -26,10 +26,6 @@ export default function useCreateRoom() {
       alert(data.errorMessage);
     });
 
-    signalingSocket?.on('error', (data: { errorMessage: string }) => {
-      alert(`방 생성 시 화면 공유에 실패했습니다: ${data.errorMessage}`);
-    });
-
     return () => {
       socket.off('create_room_success');
       socket.off('error');
