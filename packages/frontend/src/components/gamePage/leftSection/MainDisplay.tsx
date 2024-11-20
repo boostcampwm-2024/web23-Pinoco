@@ -5,6 +5,8 @@ import ReadyButton from './GameButtons/ReadyButton';
 import { GAME_PHASE, GamePhase } from '@/constants';
 import Timer from './Timer';
 import Button from '@/components/common/Button';
+import GuessInput from './GuessInput';
+import useGuessing from '@/hooks/useGuessing';
 
 interface IPlayer {
   id: number;
@@ -13,7 +15,7 @@ interface IPlayer {
 }
 
 export default function MainDisplay() {
-  const { isHost } = useRoomStore();
+  const { isHost, isPinoco } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
@@ -22,21 +24,14 @@ export default function MainDisplay() {
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
-  // 임시 플레이어 데이터
-  const [players, setPlayers] = useState<IPlayer[]>([
-    { id: 1, name: '참가자1', isReady: false },
-    { id: 2, name: '참가자2', isReady: false },
-    { id: 3, name: '참가자3', isReady: false },
-  ]);
+  const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
   const handleReady = (isReady: boolean) => {
-    // 실제 구현시에는 소켓을 통해 서버에 준비 상태 전송
     console.log('Ready state changed:', isReady);
   };
 
   const canStartGame = () => {
     return true;
-    return players.every((player) => player.isReady); // 이부분 백에서 받아올 수 있을 것 같아요 (해당 방의 사용자가 모두 준비했는지)
   };
 
   const startGame = () => {
@@ -50,7 +45,7 @@ export default function MainDisplay() {
         if (prevCount <= 1) {
           clearInterval(countdownInterval);
           setGamePhase(GAME_PHASE.WORD_REVEAL);
-          setCurrentWord('제시어'); // 백엔드에서 받아와야 할듯합니다...
+          setCurrentWord('제시어');
 
           setTimeout(() => {
             setGamePhase(GAME_PHASE.SPEAKING);
@@ -63,7 +58,6 @@ export default function MainDisplay() {
   };
 
   const handleSpeakerChange = () => {
-    // 타이머 애니메이션이 완전히 끝날 때까지 대기
     setTimeout(() => {
       setIsTimerActive(false);
 
@@ -81,16 +75,14 @@ export default function MainDisplay() {
   const handleVote = () => {
     if (selectedVote === null) return;
 
-    setIsVoteSubmitted(true); // 투표 제출 상태 변경
+    setIsVoteSubmitted(true);
 
-    // 타이머 애니메이션이 완전히 끝날 때까지 대기
     setTimeout(() => {
       setIsTimerActive(false);
 
-      // 상태 변경 전 약간의 지연
       setTimeout(() => {
         setGamePhase(GAME_PHASE.RESULT);
-        setIsVoteSubmitted(false); // 결과 화면으로 넘어갈 때 리셋
+        setIsVoteSubmitted(false);
       }, 500);
     }, 1000);
   };
@@ -105,14 +97,11 @@ export default function MainDisplay() {
               key={player.id}
               onClick={() => !isVoteSubmitted && setSelectedVote(player.id)}
               disabled={isVoteSubmitted}
-              className={`w-full p-4 text-lg font-medium transition-colors rounded-lg
-                ${
-                  selectedVote === player.id
-                    ? 'bg-green-default text-white-default'
-                    : 'bg-white text-gray-800 hover:bg-gray-100'
-                }
-                ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}
-                `}
+              className={`w-full p-4 text-lg font-medium transition-colors rounded-lg ${
+                selectedVote === player.id
+                  ? 'bg-green-default text-white-default'
+                  : 'bg-white text-gray-800 hover:bg-gray-100'
+              } ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}`}
             >
               {player.name}
             </button>
@@ -181,6 +170,16 @@ export default function MainDisplay() {
             <p className="mt-4 text-xl text-white">
               {players.find((p) => p.id === selectedVote)?.name}가 지목되었습니다!
             </p>
+          </div>
+        )}
+
+        {gamePhase === GAME_PHASE.GUESSING && (
+          <div className="flex flex-col items-center justify-center h-full">
+            {isPinoco ? (
+              <GuessInput onSubmitGuess={submitGuess} />
+            ) : (
+              <p className="text-center text-xl text-white">피노코가 제시어를 추측 중입니다 🤔</p>
+            )}
           </div>
         )}
       </div>
