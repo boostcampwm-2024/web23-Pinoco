@@ -26,10 +26,6 @@ export default function useJoinRoom() {
       alert(`방 참가에 실패했습니다: ${data.errorMessage}`);
     });
 
-    signalingSocket.on('error', (data: { errorMessage: string }) => {
-      alert(`화면 공유에 실패했습니다: ${data.errorMessage}`);
-    });
-
     return () => {
       socket.off('join_room_success');
       socket.off('error');
