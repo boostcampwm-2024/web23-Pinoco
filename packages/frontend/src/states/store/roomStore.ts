@@ -5,6 +5,7 @@ interface IRoomState {
   gsid: string | null;
   isPinoco: boolean;
   setRoomData: (gsid: string | null, isHost: boolean, isPinoco: boolean) => void;
+  setIsPinoco: (isPinoco: boolean) => void;
 }
 export const useRoomStore = create<IRoomState>()(
   persist(
@@ -13,6 +14,7 @@ export const useRoomStore = create<IRoomState>()(
       gsid: null,
       isPinoco: false,
       setRoomData: (gsid, isHost, isPinoco) => set({ gsid, isHost, isPinoco }),
+      setIsPinoco: (isPinoco) => set({ isPinoco }),
     }),
     { name: 'room-storage' },
   ),

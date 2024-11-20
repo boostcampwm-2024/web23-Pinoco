@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoomStore } from '@/states/store/roomStore';
 import StartButton from './GameButtons/StartButton';
 import ReadyButton from './GameButtons/ReadyButton';
@@ -9,7 +9,7 @@ import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
 
 export default function MainDisplay() {
   const { isHost } = useRoomStore();
-  const { readyUsers } = useGameButtonSocket();
+  const { readyUsers, gameStartData } = useGameButtonSocket();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
@@ -17,6 +17,32 @@ export default function MainDisplay() {
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (gameStartData) {
+      setGamePhase(GAME_PHASE.COUNTDOWN);
+      setCurrentWord(gameStartData.word);
+      setCountdown(3);
+
+      const countdownInterval = setInterval(() => {
+        setCountdown((prevCount) => {
+          if (prevCount <= 1) {
+            clearInterval(countdownInterval);
+            setGamePhase(GAME_PHASE.WORD_REVEAL);
+
+            setTimeout(() => {
+              setGamePhase(GAME_PHASE.SPEAKING);
+            }, 3000);
+
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [gameStartData]);
 
   const handleSpeakerChange = () => {
     setTimeout(() => {
