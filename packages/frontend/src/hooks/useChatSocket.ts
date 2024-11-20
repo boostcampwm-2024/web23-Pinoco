@@ -7,6 +7,15 @@ interface IChatEntry {
   message: string;
 }
 
+interface IUserLeft {
+  userId: string;
+  hostUserId: string;
+}
+
+interface IUserJoined {
+  userId: string;
+}
+
 export const useChatSocket = (gsid: string, userId: string) => {
   const addChatEntry = useChatStore((state) => state.addChatEntry);
   const socket = useSocketStore((state) => state.socket);
@@ -18,14 +27,31 @@ export const useChatSocket = (gsid: string, userId: string) => {
       addChatEntry(data);
     });
 
+    socket.on('user_left', (data: IUserLeft) => {
+      addChatEntry({
+        userId: `[알림]`,
+        message: `${data.userId}님이 퇴장하셨습니다.`,
+      });
+    });
+
+    socket.on('user_joined', (data: IUserJoined) => {
+      addChatEntry({
+        userId: `[알림]`,
+        message: `${data.userId}님이 입장하셨습니다.`,
+      });
+    });
+
     return () => {
       socket.off('receive_message');
+      socket.off('user_left');
+      socket.off('user_joined');
     };
-  }, [gsid, socket]);
+  }, [gsid, socket, addChatEntry]);
 
   const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;
-    const newEntry = { userId, message };
+
+    // 서버로 메시지 전송
     socket.emit('send_message', { gsid, message });
   };
 

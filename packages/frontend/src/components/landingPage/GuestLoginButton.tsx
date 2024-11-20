@@ -12,8 +12,8 @@ export default function GuestLoginButton() {
   async function handleClick() {
     try {
       const { userId, password } = await postGuestLogin();
+      await connectSocket(userId, password);
       setUserData(userId, password);
-      connectSocket(userId, password);
       navigate('/lobby');
     } catch (error) {
       console.error('Guest login failed:', error);

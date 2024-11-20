@@ -52,7 +52,7 @@ export default function GameEntryModal({
           </button>
           <button
             onClick={handleConfirm}
-            className="w-32 py-2 bg-black rounded-lg text-white hover:bg-gray-800"
+            className="w-32 py-2 bg-black rounded-lg text-white-default hover:bg-gray-800"
           >
             확인
           </button>

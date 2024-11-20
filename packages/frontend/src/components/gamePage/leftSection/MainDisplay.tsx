@@ -6,7 +6,7 @@ import { GAME_PHASE, GamePhase } from '@/constants';
 import Timer from './Timer';
 import Button from '@/components/common/Button';
 
-interface Player {
+interface IPlayer {
   id: number;
   name: string;
   isReady: boolean;
@@ -23,7 +23,7 @@ export default function MainDisplay() {
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
   // 임시 플레이어 데이터
-  const [players, setPlayers] = useState<Player[]>([
+  const [players, setPlayers] = useState<IPlayer[]>([
     { id: 1, name: '참가자1', isReady: false },
     { id: 2, name: '참가자2', isReady: false },
     { id: 3, name: '참가자3', isReady: false },
@@ -144,7 +144,7 @@ export default function MainDisplay() {
       <div className="flex-grow">
         {gamePhase === GAME_PHASE.WAITING && (
           <div className="flex flex-col items-center justify-center h-full">
-            {!isHost ? (
+            {isHost ? (
               <StartButton onStart={startGame} disabled={!canStartGame()} />
             ) : (
               <ReadyButton onReady={handleReady} />

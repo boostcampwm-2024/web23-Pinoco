@@ -2,8 +2,11 @@ import GuestLoginButton from '@/components/landingPage/GuestLoginButton';
 import OAuthLoginButton from '@/components/landingPage/OAuthLoginButton';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
+import { useSocketStore } from '@/states/store/socketStore';
 
 export default function LandingPage() {
+  const { socket } = useSocketStore();
+  console.log('landingPage', socket?.connected);
   return (
     <>
       <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />
