@@ -14,7 +14,7 @@ export const useSocketStore = create<ISocketStore>((set) => ({
       const socket = io('http://localhost:3000', {
         query: { userId, password },
         withCredentials: true,
-        transports: ['polling', 'websocket'],
+        transports: ['websocket', 'polling'],
       });
 
       socket.on('connect', () => {
