@@ -17,7 +17,7 @@ export default function SettingSection() {
 
     socket.emit('leave_room');
     setChatHistory([]);
-    setRoomData(null, null);
+    setRoomData(null, false, false);
     navigate('/lobby');
   };
 
