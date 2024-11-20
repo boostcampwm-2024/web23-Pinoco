@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 interface IRoomState {
   isHost: boolean | null;
   gsid: string | null;
-  setRoomData: (gsid: string, isHost: boolean) => void;
+  setRoomData: (gsid: string | null, isHost: boolean | null) => void;
 }
 
 export const useRoomStore = create<IRoomState>()((set) => ({

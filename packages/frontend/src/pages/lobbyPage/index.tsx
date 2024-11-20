@@ -10,16 +10,8 @@ import Header from '@/components/layout/Header';
 import SettingSection from '@/components/lobbyPage/SettingSection';
 
 export default function LobbyPage() {
-  const { socket, connectSocket } = useSocketStore();
-  const { userId, password } = useAuthStore();
-
-  useEffect(() => {
-    // 소켓이 연결되어 있지 않고, 로그인 상태라면 재연결
-    if (!socket && userId && password) {
-      connectSocket(userId, password);
-    }
-  }, []);
-
+  const { socket } = useSocketStore();
+  console.log('lobbyPage', socket?.connected);
   return (
     <>
       <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />
