@@ -7,11 +7,14 @@ import {
   MessageBody,
   ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { AuthService } from '../auth/auth.service';
-import { RoomService } from '../room/room.service';
-import { GameService } from '../game/game.service';
-import { ChatService } from '../chat/chat.service';
+import { Server } from 'socket.io';
+import { GatewayService } from './gateway.service';
+import {
+  AuthenticatedSocket,
+  SendMessagePayload,
+  ErrorResponse,
+} from '../types/socket.types';
+import { RoomEventPayload, JoinRoomResponse } from '../room/types/room.types';
 
 @WebSocketGateway()
 export class GatewayGateway
@@ -20,19 +23,17 @@ export class GatewayGateway
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    private readonly authService: AuthService,
-    private readonly roomService: RoomService,
-    private readonly gameService: GameService,
-    private readonly chatService: ChatService,
-  ) {}
+  constructor(private readonly gatewayService: GatewayService) {}
 
-  // 소켓 연결 시 인증 처리
-  async handleConnection(@ConnectedSocket() client: Socket) {
+  async handleConnection(@ConnectedSocket() client: AuthenticatedSocket) {
     const userId = client.handshake.query.userId as string;
     const password = client.handshake.query.password as string;
 
-    if (!this.authService.isValidGuest(userId, password)) {
+    const isValid = await this.gatewayService.validateConnection(
+      userId,
+      password,
+    );
+    if (!isValid) {
       client.disconnect();
       return;
     }
@@ -40,140 +41,103 @@ export class GatewayGateway
     client.data.userId = userId;
   }
 
-  // 소켓 연결 해제 시 처리
-  async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const userId = client.data.userId;
-    const gsid = client.data.gsid;
+  async handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
+    const { userId, gsid } = client.data;
 
-    if (gsid) {
-      await this.roomService.leaveRoom(gsid, userId);
-      client.leave(gsid);
-
-      const hostUserId = await this.roomService.getHostUserId(gsid);
-      console.log('Event: user_left', {
-        event: 'user_left',
-        payload: { userId, hostUserId },
-      });
-      this.server.to(gsid).emit('user_left', { userId, hostUserId });
+    const result = await this.gatewayService.handleDisconnection(gsid, userId);
+    if (result) {
+      this.emitUserLeft(gsid, result);
     }
   }
 
-  // 게임방 나가기 요청 처리
   @SubscribeMessage('leave_room')
-  async handleLeaveRoom(@ConnectedSocket() client: Socket) {
-    const userId = client.data.userId;
-    const gsid = client.data.gsid;
+  async handleLeaveRoom(@ConnectedSocket() client: AuthenticatedSocket) {
+    const { userId, gsid } = client.data;
 
-    await this.roomService.leaveRoom(gsid, userId);
-    client.leave(gsid);
-    client.data.gsid = null;
+    const result = await this.gatewayService.handleLeaveRoom(gsid, userId);
+    if (result) {
+      this.emitUserLeft(gsid, result);
+    }
 
-    const hostUserId = await this.roomService.getHostUserId(gsid);
-    console.log('Event: user_left', {
-      event: 'user_left',
-      payload: { userId, hostUserId },
-    });
-    this.server.to(gsid).emit('user_left', { userId, hostUserId });
+    this.handleRoomLeave(client);
   }
 
-  // 게임방 생성 요청 처리
   @SubscribeMessage('create_room')
-  async handleCreateRoom(@ConnectedSocket() client: Socket) {
-    const userId = client.data.userId;
-
+  async handleCreateRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     try {
-      const gsid = await this.roomService.createRoom(userId);
-      client.join(gsid);
-      client.data.gsid = gsid;
-
-      console.log('Event: create_room_success', {
-        event: 'create_room_success',
-        payload: { gsid, isHost: true },
-      });
-      client.emit('create_room_success', { gsid, isHost: true });
+      const result = await this.gatewayService.createRoom(client.data.userId);
+      this.handleRoomJoin(client, result.gsid);
+      client.emit('create_room_success', result);
     } catch (error) {
-      console.log('Event: error', {
-        event: 'error',
-        payload: { errorMessage: error.message },
-      });
-      client.emit('error', { errorMessage: error.message });
+      this.emitError(client, error.message);
     }
   }
 
-  // 게임방 참가 요청 처리
   @SubscribeMessage('join_room')
   async handleJoinRoom(
     @MessageBody() data: { gsid: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    const userId = client.data.userId;
-    const { gsid } = data;
-
     try {
-      const roomInfo = await this.roomService.joinRoom(gsid, userId);
-      client.join(gsid);
-      client.data.gsid = gsid;
+      const roomInfo = await this.gatewayService.joinRoom(
+        data.gsid,
+        client.data.userId,
+      );
+      this.handleRoomJoin(client, data.gsid);
 
-      const joinRoomPayload = {
-        userIds: Array.from(roomInfo.userIds),
-        readyUserIds: Array.from(roomInfo.readyUserIds),
-        isHost: roomInfo.hostUserId === userId,
-        hostUserId: roomInfo.hostUserId,
-      };
-
-      console.log('Event: join_room_success', {
-        event: 'join_room_success',
-        payload: joinRoomPayload,
-      });
-      client.emit('join_room_success', joinRoomPayload);
-
-      console.log('Event: user_joined', {
-        event: 'user_joined',
-        payload: { userId },
-      });
-      client.to(gsid).emit('user_joined', { userId });
+      client.emit('join_room_success', roomInfo);
+      this.emitUserJoined(data.gsid, client.data.userId);
     } catch (error) {
-      console.log('Event: join_room_fail', {
-        event: 'join_room_fail',
-        payload: { errorMessage: error.message },
-      });
       client.emit('join_room_fail', { errorMessage: error.message });
     }
   }
 
-  // 채팅 메시지 보내기 처리
   @SubscribeMessage('send_message')
   async handleSendMessage(
     @MessageBody() data: { message: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    const userId = client.data.userId;
-    const gsid = client.data.gsid;
+    const { userId, gsid } = client.data;
 
     if (!gsid) {
-      console.log('Event: error', {
-        event: 'error',
-        payload: { errorMessage: '방에 참여되어 있지 않습니다.' },
-      });
-      client.emit('error', { errorMessage: '방에 참여되어 있지 않습니다.' });
+      this.emitError(client, '방에 참여되어 있지 않습니다.');
       return;
     }
 
-    const { message } = data;
-
     try {
-      await this.chatService.saveMessage(gsid, userId, message);
-      console.log('Event: receive_message', {
-        event: 'receive_message',
-        payload: { userId, message },
-      });
-      this.server.to(gsid).emit('receive_message', { userId, message });
+      await this.gatewayService.saveMessage(gsid, userId, data.message);
+      this.emitMessage(gsid, { userId, message: data.message });
     } catch (error) {
-      console.log('Event: error', {
-        event: 'error',
-        payload: { errorMessage: error.message },
-      });
-      client.emit('error', { errorMessage: error.message });
+      this.emitError(client, error.message);
     }
+  }
+
+  // Private helper methods
+  private handleRoomJoin(client: AuthenticatedSocket, gsid: string): void {
+    client.join(gsid);
+    client.data.gsid = gsid;
+  }
+
+  private handleRoomLeave(client: AuthenticatedSocket): void {
+    if (client.data.gsid) {
+      client.leave(client.data.gsid);
+      client.data.gsid = null;
+    }
+  }
+
+  private emitUserLeft(gsid: string, payload: RoomEventPayload): void {
+    this.server.to(gsid).emit('user_left', payload);
+  }
+
+  private emitUserJoined(gsid: string, userId: string): void {
+    this.server.to(gsid).emit('user_joined', { userId });
+  }
+
+  private emitMessage(gsid: string, payload: SendMessagePayload): void {
+    this.server.to(gsid).emit('receive_message', payload);
+  }
+
+  private emitError(client: AuthenticatedSocket, message: string): void {
+    client.emit('error', { errorMessage: message } as ErrorResponse);
   }
 }

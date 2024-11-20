@@ -1,19 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+interface GuestCredentials {
+  userId: string;
+  password: string;
+}
+
 @Injectable()
 export class AuthService {
-  //로그인 되어있는 유저들 세션 저장해야 할수도 있음
+  private guestSessions: Map<string, string> = new Map();
 
-  guestLogin(): { userId: string; password: string } {
+  guestLogin(): GuestCredentials {
     const userId = uuidv4();
     const password = '123';
 
+    this.guestSessions.set(userId, password);
     return { userId, password };
   }
 
   isValidGuest(userId: string, password: string): boolean {
-    //db에서 userId와 password 확인해서 검증
-    return true;
+    return this.guestSessions.get(userId) === password;
+  }
+
+  removeGuestSession(userId: string): void {
+    this.guestSessions.delete(userId);
   }
 }
