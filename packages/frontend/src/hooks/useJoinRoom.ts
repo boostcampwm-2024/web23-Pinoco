@@ -2,17 +2,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/states/store/authStore';
 import { useRoomStore } from '@/states/store/roomStore';
 import { useSocketStore } from '@/states/store/socketStore';
+import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
 
 export default function useJoinRoom() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.userId);
   const setRoomData = useRoomStore((state) => state.setRoomData);
   const socket = useSocketStore((state) => state.socket);
+  const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
   function handleJoinRoom(gsid: string) {
-    if (!userId || !socket) return;
+    if (!userId || !socket || !signalingSocket) return;
 
     socket.emit('join_room', { gsid });
+    signalingSocket.emit('join_room', { gsid });
 
     socket.on('join_room_success', (data) => {
       setRoomData(gsid, data.isHost);
