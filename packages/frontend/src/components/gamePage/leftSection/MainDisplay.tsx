@@ -24,6 +24,13 @@ export default function MainDisplay() {
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
+  // 임시 데이터 추가
+  const [players] = useState<IPlayer[]>([
+    { id: 1, name: '참가자1', isReady: false },
+    { id: 2, name: '참가자2', isReady: false },
+    { id: 3, name: '참가자3', isReady: false },
+  ]);
+
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
   const handleReady = (isReady: boolean) => {
@@ -81,7 +88,6 @@ export default function MainDisplay() {
       setIsTimerActive(false);
 
       setTimeout(() => {
-        setGamePhase(GAME_PHASE.RESULT);
         setIsVoteSubmitted(false);
       }, 500);
     }, 1000);
@@ -163,15 +169,6 @@ export default function MainDisplay() {
         )}
 
         {gamePhase === GAME_PHASE.VOTING && renderVotingUI()}
-
-        {gamePhase === GAME_PHASE.RESULT && (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h2 className="text-2xl font-bold text-white">투표 결과</h2>
-            <p className="mt-4 text-xl text-white">
-              {players.find((p) => p.id === selectedVote)?.name}가 지목되었습니다!
-            </p>
-          </div>
-        )}
 
         {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">
