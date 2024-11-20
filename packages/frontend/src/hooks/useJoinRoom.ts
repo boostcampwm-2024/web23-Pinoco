@@ -18,7 +18,7 @@ export default function useJoinRoom() {
     signalingSocket.emit('join_room', { gsid });
 
     socket.on('join_room_success', (data) => {
-      setRoomData(gsid, data.isHost);
+      setRoomData(gsid, data.isHost, false);
       navigate(`/game/${gsid}`);
     });
 

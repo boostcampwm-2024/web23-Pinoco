@@ -2,17 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface IRoomState {
-  isHost: boolean | null;
+  isHost: boolean;
   gsid: string | null;
-  setRoomData: (gsid: string | null, isHost: boolean | null) => void;
+  isPinoco: boolean;
+  setRoomData: (gsid: string | null, isHost: boolean, isPinoco: boolean) => void;
 }
 
 export const useRoomStore = create<IRoomState>()(
   persist(
     (set) => ({
-      isHost: null,
+      isHost: false,
       gsid: null,
-      setRoomData: (gsid, isHost) => set({ gsid, isHost }),
+      isPinoco: false,
+      setRoomData: (gsid, isHost, isPinoco) => set({ gsid, isHost, isPinoco }),
     }),
     {
       name: 'room-storage',
