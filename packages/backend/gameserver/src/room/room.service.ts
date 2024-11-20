@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { RoomInfo, JoinRoomResponse } from './types/room.types';
+import { IRoomInfo, IJoinRoomResponse } from './types/room.types';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class RoomService {
-  private rooms: Map<string, RoomInfo> = new Map();
+  private rooms: Map<string, IRoomInfo> = new Map();
+  private MAX_ROOM_SIZE = 6;
 
   async createRoom(userId: string): Promise<string> {
     const gsid = uuidv4();
-    const roomInfo: RoomInfo = {
+    const roomInfo: IRoomInfo = {
       gsid,
       userIds: new Set([userId]),
       readyUserIds: new Set(),
@@ -19,13 +20,13 @@ export class RoomService {
     return gsid;
   }
 
-  async joinRoom(gsid: string, userId: string): Promise<JoinRoomResponse> {
+  async joinRoom(gsid: string, userId: string): Promise<IJoinRoomResponse> {
     const room = this.rooms.get(gsid);
     if (!room) {
       throw new Error('존재하지 않는 방입니다.');
     }
 
-    if (room.userIds.size >= 4) {
+    if (room.userIds.size > this.MAX_ROOM_SIZE) {
       throw new Error('방이 가득 찼습니다.');
     }
 
@@ -62,7 +63,7 @@ export class RoomService {
     return room.hostUserId;
   }
 
-  getRoom(gsid: string): RoomInfo | undefined {
+  getRoom(gsid: string): IRoomInfo | undefined {
     return this.rooms.get(gsid);
   }
 }

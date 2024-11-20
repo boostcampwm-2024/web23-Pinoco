@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { RoomService } from '../room/room.service';
 import { ChatService } from '../chat/chat.service';
-import { RoomEventPayload, JoinRoomResponse } from '../room/types/room.types';
+import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
 import { CreateRoomResponse } from '../types/socket.types';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class GatewayService {
   async handleDisconnection(
     gsid: string,
     userId: string,
-  ): Promise<RoomEventPayload | null> {
+  ): Promise<IRoomEventPayload | null> {
     if (!gsid) return null;
 
     const newHostId = await this.roomService.leaveRoom(gsid, userId);
@@ -30,7 +30,7 @@ export class GatewayService {
   async handleLeaveRoom(
     gsid: string,
     userId: string,
-  ): Promise<RoomEventPayload | null> {
+  ): Promise<IRoomEventPayload | null> {
     const newHostId = await this.roomService.leaveRoom(gsid, userId);
     return newHostId ? { userId, hostUserId: newHostId } : null;
   }
@@ -40,7 +40,7 @@ export class GatewayService {
     return { gsid, isHost: true };
   }
 
-  async joinRoom(gsid: string, userId: string): Promise<JoinRoomResponse> {
+  async joinRoom(gsid: string, userId: string): Promise<IJoinRoomResponse> {
     return await this.roomService.joinRoom(gsid, userId);
   }
 

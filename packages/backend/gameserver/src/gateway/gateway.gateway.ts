@@ -14,7 +14,7 @@ import {
   SendMessagePayload,
   ErrorResponse,
 } from '../types/socket.types';
-import { RoomEventPayload, JoinRoomResponse } from '../room/types/room.types';
+import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
 import { LoggerService } from '../logger/logger.service';
 
 @WebSocketGateway()
@@ -195,7 +195,7 @@ export class GatewayGateway
     }
   }
 
-  private emitUserLeft(gsid: string, payload: RoomEventPayload): void {
+  private emitUserLeft(gsid: string, payload: IRoomEventPayload): void {
     this.server.to(gsid).emit('user_left', payload);
   }
 
