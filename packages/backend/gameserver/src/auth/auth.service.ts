@@ -12,7 +12,7 @@ export class AuthService {
 
   guestLogin(): GuestCredentials {
     const userId = uuidv4();
-    const password = '123';
+    const password = uuidv4();
 
     this.guestSessions.set(userId, password);
     return { userId, password };
