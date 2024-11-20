@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "import": "^0.0.6",
-    "plugin": "^0.3.3"
+    "plugin": "^0.3.3",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "msw": {
     "workerDirectory": [
