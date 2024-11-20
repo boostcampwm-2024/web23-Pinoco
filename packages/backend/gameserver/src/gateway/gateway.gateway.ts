@@ -32,17 +32,12 @@ export class GatewayGateway
     const userId = client.handshake.query.userId as string;
     const password = client.handshake.query.password as string;
 
-    console.log('New connection attempt:', { userId, password });
-
     if (!this.authService.isValidGuest(userId, password)) {
-      console.log('Authentication failed for user:', userId);
       client.disconnect();
       return;
     }
 
-    // 사용자 ID를 소켓 데이터에 저장
     client.data.userId = userId;
-    console.log('Connection successful for user:', userId);
   }
 
   // 소켓 연결 해제 시 처리
@@ -50,15 +45,15 @@ export class GatewayGateway
     const userId = client.data.userId;
     const gsid = client.data.gsid;
 
-    console.log('Disconnecting user:', { userId, gsid });
-
     if (gsid) {
       await this.roomService.leaveRoom(gsid, userId);
       client.leave(gsid);
-      console.log('User left room:', { userId, gsid });
 
-      // 다른 사용자들에게 알림
       const hostUserId = await this.roomService.getHostUserId(gsid);
+      console.log('Event: user_left', {
+        event: 'user_left',
+        payload: { userId, hostUserId },
+      });
       this.server.to(gsid).emit('user_left', { userId, hostUserId });
     }
   }
@@ -69,19 +64,15 @@ export class GatewayGateway
     const userId = client.data.userId;
     const gsid = client.data.gsid;
 
-    console.log('Leave room requested:', { userId, gsid });
-
     await this.roomService.leaveRoom(gsid, userId);
     client.leave(gsid);
-    client.data.gsid = null; // 클라이언트 세션에서 gsid 제거
+    client.data.gsid = null;
 
-    console.log('Room left successfully:', { gsid, userId });
-
-    // 다른 사용자들에게 알림
-    this.server.to(gsid).emit('user_left', { userId });
-
-    // 방장이 나갔을 경우 방장 변경
     const hostUserId = await this.roomService.getHostUserId(gsid);
+    console.log('Event: user_left', {
+      event: 'user_left',
+      payload: { userId, hostUserId },
+    });
     this.server.to(gsid).emit('user_left', { userId, hostUserId });
   }
 
@@ -90,17 +81,21 @@ export class GatewayGateway
   async handleCreateRoom(@ConnectedSocket() client: Socket) {
     const userId = client.data.userId;
 
-    console.log('Create room requested by user:', userId);
-
     try {
       const gsid = await this.roomService.createRoom(userId);
       client.join(gsid);
-      client.data.gsid = gsid; // 클라이언트 세션에 gsid 저장
+      client.data.gsid = gsid;
 
-      console.log('Room created successfully:', { gsid, userId });
+      console.log('Event: create_room_success', {
+        event: 'create_room_success',
+        payload: { gsid, isHost: true },
+      });
       client.emit('create_room_success', { gsid, isHost: true });
     } catch (error) {
-      console.error('Create room failed:', { userId, error });
+      console.log('Event: error', {
+        event: 'error',
+        payload: { errorMessage: error.message },
+      });
       client.emit('error', { errorMessage: error.message });
     }
   }
@@ -114,25 +109,34 @@ export class GatewayGateway
     const userId = client.data.userId;
     const { gsid } = data;
 
-    console.log('Join room requested:', { userId, gsid });
-
     try {
       const roomInfo = await this.roomService.joinRoom(gsid, userId);
       client.join(gsid);
-      client.data.gsid = gsid; // 클라이언트 세션에 gsid 저장
+      client.data.gsid = gsid;
 
-      console.log('Room joined successfully:', { gsid, userId, roomInfo });
-      client.emit('join_room_success', {
+      const joinRoomPayload = {
         userIds: Array.from(roomInfo.userIds),
         readyUserIds: Array.from(roomInfo.readyUserIds),
         isHost: roomInfo.hostUserId === userId,
         hostUserId: roomInfo.hostUserId,
-      });
+      };
 
-      // 다른 사용자들에게 참가 알림
+      console.log('Event: join_room_success', {
+        event: 'join_room_success',
+        payload: joinRoomPayload,
+      });
+      client.emit('join_room_success', joinRoomPayload);
+
+      console.log('Event: user_joined', {
+        event: 'user_joined',
+        payload: { userId },
+      });
       client.to(gsid).emit('user_joined', { userId });
     } catch (error) {
-      console.error('Join room failed:', { userId, gsid, error });
+      console.log('Event: join_room_fail', {
+        event: 'join_room_fail',
+        payload: { errorMessage: error.message },
+      });
       client.emit('join_room_fail', { errorMessage: error.message });
     }
   }
@@ -146,14 +150,11 @@ export class GatewayGateway
     const userId = client.data.userId;
     const gsid = client.data.gsid;
 
-    console.log('Message send requested:', {
-      userId,
-      gsid,
-      message: data.message,
-    });
-
     if (!gsid) {
-      console.error('User not in room:', { userId });
+      console.log('Event: error', {
+        event: 'error',
+        payload: { errorMessage: '방에 참여되어 있지 않습니다.' },
+      });
       client.emit('error', { errorMessage: '방에 참여되어 있지 않습니다.' });
       return;
     }
@@ -162,10 +163,16 @@ export class GatewayGateway
 
     try {
       await this.chatService.saveMessage(gsid, userId, message);
-      console.log('Message saved and broadcasted:', { userId, gsid, message });
+      console.log('Event: receive_message', {
+        event: 'receive_message',
+        payload: { userId, message },
+      });
       this.server.to(gsid).emit('receive_message', { userId, message });
     } catch (error) {
-      console.error('Message send failed:', { userId, gsid, error });
+      console.log('Event: error', {
+        event: 'error',
+        payload: { errorMessage: error.message },
+      });
       client.emit('error', { errorMessage: error.message });
     }
   }
