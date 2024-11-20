@@ -4,17 +4,20 @@ import CameraOn from '@/assets/images/CameraOn.svg?react';
 import MikeOn from '@/assets/images/MikeOn.svg?react';
 import Leave from '@/assets/images/Leave.svg?react';
 import { useChatStore } from '@/states/store/chatStore';
+import { useRoomStore } from '@/states/store/roomStore';
 
 export default function SettingSection() {
   const navigate = useNavigate();
   const socket = useSocketStore((state) => state.socket);
   const setChatHistory = useChatStore((state) => state.setChatHistory);
+  const setRoomData = useRoomStore((state) => state.setRoomData);
 
   const handleLeave = () => {
     if (!socket) return;
 
     socket.emit('leave_room');
     setChatHistory([]);
+    setRoomData(null, null);
     navigate('/lobby');
   };
 
