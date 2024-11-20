@@ -25,7 +25,7 @@ export default function useMediaStream() {
         });
         setLocalStream(stream);
       } catch (err) {
-        setState((prev) => ({ ...prev, error: '사용자의 카메라와 마이크에 접근하지 못했습니다.' }));
+        setState({ error: '사용자의 카메라와 마이크에 접근하지 못했습니다.' });
       }
     }
 
