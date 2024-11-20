@@ -9,15 +9,17 @@ import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
 
 export default function MainDisplay() {
   const { isHost } = useRoomStore();
-  const { readyUsers, gameStartData } = useGameButtonSocket();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
+  const { readyUsers, gameStartData, currentSpeaker, endSpeaking } =
+    useGameButtonSocket(setGamePhase);
+
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
-  const [currentSpeaker, setCurrentSpeaker] = useState(0);
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
+  // 게임 시작 시 카운트다운 및 단어 공개
   useEffect(() => {
     if (gameStartData) {
       setGamePhase(GAME_PHASE.COUNTDOWN);
@@ -43,21 +45,6 @@ export default function MainDisplay() {
       return () => clearInterval(countdownInterval);
     }
   }, [gameStartData]);
-
-  const handleSpeakerChange = () => {
-    setTimeout(() => {
-      setIsTimerActive(false);
-
-      if (currentSpeaker < readyUsers.length - 1) {
-        setCurrentSpeaker((prev) => prev + 1);
-        setIsTimerActive(true);
-      } else {
-        setGamePhase(GAME_PHASE.VOTING);
-        setCurrentSpeaker(0);
-        setIsTimerActive(true);
-      }
-    }, 1000);
-  };
 
   const handleVote = () => {
     if (selectedVote === null) return;
@@ -143,7 +130,7 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-xl text-white">현재 발언자: {readyUsers[currentSpeaker]}</p>
+            <p className="text-xl text-white">현재 발언자: {currentSpeaker}</p>
             <p className="mt-2 text-lg text-white">제시어: {currentWord}</p>
           </div>
         )}
@@ -158,19 +145,15 @@ export default function MainDisplay() {
         )}
       </div>
 
-      {(gamePhase === GAME_PHASE.SPEAKING || gamePhase === GAME_PHASE.VOTING) && isTimerActive && (
+      {gamePhase === GAME_PHASE.SPEAKING && isTimerActive && (
         <div className="w-full mt-auto">
-          <Timer
-            key={`${gamePhase}-${currentSpeaker}`}
-            initialTime={gamePhase === GAME_PHASE.SPEAKING ? 3 : 6}
-            onTimeEnd={() => {
-              if (gamePhase === GAME_PHASE.SPEAKING) {
-                handleSpeakerChange();
-              } else if (gamePhase === GAME_PHASE.VOTING) {
-                handleVote();
-              }
-            }}
-          />
+          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={endSpeaking} />
+        </div>
+      )}
+
+      {gamePhase === GAME_PHASE.VOTING && isTimerActive && (
+        <div className="w-full mt-auto">
+          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
         </div>
       )}
     </div>
