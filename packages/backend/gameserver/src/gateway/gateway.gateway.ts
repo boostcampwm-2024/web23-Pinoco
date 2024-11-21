@@ -192,6 +192,11 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { userId, gsid } = client.data;
+    this.logger.logSocketEvent('receive', 'send_ready', {
+      userId,
+      gsid,
+      isReady: data.isReady,
+    });
 
     try {
       const readyUsers = await this.gatewayService.handleReady(
@@ -199,6 +204,7 @@ export class GatewayGateway
         userId,
         data.isReady,
       );
+      this.logger.logSocketEvent('send', 'update_ready', { gsid, readyUsers });
       this.server.to(gsid).emit('update_ready', { readyUsers });
     } catch (error) {
       this.emitError(client, error.message);
@@ -208,11 +214,11 @@ export class GatewayGateway
   @SubscribeMessage('start_game')
   async handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
+    this.logger.logSocketEvent('receive', 'start_game', { userId, gsid });
 
     try {
       const gameState = await this.gatewayService.startGame(gsid, userId);
 
-      // 각 유저별로 다른 게임 정보 전송
       const room = this.roomService.getRoom(gsid);
       room.userIds.forEach((uid) => {
         const isPinoco = gameState.pinocoId === uid;
@@ -221,10 +227,26 @@ export class GatewayGateway
           word: isPinoco ? '' : gameState.word,
         };
 
+        this.logger.logSocketEvent('send', 'start_game_success', {
+          gsid,
+          userId: uid,
+          isPinoco,
+          hasWord: !isPinoco,
+        });
         this.server
           .to(this.getSocketIdByUserId(uid))
           .emit('start_game_success', personalGameState);
       });
+
+      setTimeout(() => {
+        this.logger.logSocketEvent('send', 'start_speaking', {
+          gsid,
+          speakerId: gameState.currentSpeakerId,
+        });
+        this.server.to(gsid).emit('start_speaking', {
+          speakerId: gameState.currentSpeakerId,
+        });
+      }, 3000);
     } catch (error) {
       this.emitError(client, error.message);
     }
@@ -274,7 +296,6 @@ export class GatewayGateway
       const gameState = this.gameService.getGameState(gsid);
       const room = await this.roomService.getRoom(gsid);
 
-      // 모든 사용자가 투표했는지 확인
       if (Object.keys(gameState.votes).length === room.userIds.size) {
         const result = await this.gatewayService.processVoteResult(gsid);
 
@@ -284,7 +305,6 @@ export class GatewayGateway
         });
         this.server.to(gsid).emit('receive_vote_result', result);
 
-        // 피노코가 지목된 경우
         if (result.deadPerson === gameState.pinocoId) {
           this.logger.logSocketEvent('send', 'start_guessing', {
             gsid,
