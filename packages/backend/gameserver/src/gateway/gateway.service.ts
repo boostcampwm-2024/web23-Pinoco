@@ -85,13 +85,10 @@ export class GatewayService {
     }
 
     const gameState = await this.gameService.startGame(gsid);
-    const isPinoco = gameState.pinocoId === userId;
 
     return {
       ...gameState,
       gsid,
-      isPinoco,
-      word: isPinoco ? '' : gameState.word,
     };
   }
 

@@ -211,7 +211,20 @@ export class GatewayGateway
 
     try {
       const gameState = await this.gatewayService.startGame(gsid, userId);
-      this.server.to(gsid).emit('start_game_success', gameState);
+
+      // 각 유저별로 다른 게임 정보 전송
+      const room = this.roomService.getRoom(gsid);
+      room.userIds.forEach((uid) => {
+        const isPinoco = gameState.pinocoId === uid;
+        const personalGameState = {
+          isPinoco,
+          word: isPinoco ? '' : gameState.word,
+        };
+
+        this.server
+          .to(this.getSocketIdByUserId(uid))
+          .emit('start_game_success', personalGameState);
+      });
     } catch (error) {
       this.emitError(client, error.message);
     }
@@ -379,5 +392,16 @@ export class GatewayGateway
       message,
     });
     client.emit('error', { errorMessage: message } as ErrorResponse);
+  }
+
+  // Socket ID를 찾기 위한 헬퍼 메소드 추가
+  private getSocketIdByUserId(userId: string): string {
+    const sockets = this.server.sockets.sockets;
+    for (const [socketId, socket] of sockets.entries()) {
+      if ((socket as AuthenticatedSocket).data.userId === userId) {
+        return socketId;
+      }
+    }
+    return null;
   }
 }
