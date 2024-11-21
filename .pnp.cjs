@@ -7542,7 +7542,6 @@ const RAW_RUNTIME_STATE =
           ["@vitejs/plugin-react", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.3.3"],\
           ["autoprefixer", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:10.4.20"],\
           ["axios", "npm:1.7.7"],\
-          ["dotenv", "npm:16.4.5"],\
           ["eslint", "virtual:ae089942055d638aaab05fc49bb661e7a3f0028643857fd3e85765611907c1693e8707ff622313cb7644a0124d4ab8b88a029c215f1e4abd014576c6e4e8da8c#npm:9.14.0"],\
           ["eslint-plugin-react-hooks", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.0.0"],\
           ["eslint-plugin-react-refresh", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:0.4.14"],\
