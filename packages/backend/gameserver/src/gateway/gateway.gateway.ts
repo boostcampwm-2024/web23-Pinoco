@@ -218,6 +218,7 @@ export class GatewayGateway
 
     try {
       const gameState = await this.gatewayService.startGame(gsid, userId);
+      console.log(gameState);
 
       const room = this.roomService.getRoom(gsid);
       room.userIds.forEach((uid) => {
@@ -225,28 +226,28 @@ export class GatewayGateway
         const personalGameState = {
           isPinoco,
           word: isPinoco ? '' : gameState.word,
+          speakerId: gameState.currentSpeakerId,
         };
 
         this.logger.logSocketEvent('send', 'start_game_success', {
-          gsid,
-          userId: uid,
-          isPinoco,
-          hasWord: !isPinoco,
+          personalGameState,
         });
         this.server
           .to(this.getSocketIdByUserId(uid))
           .emit('start_game_success', personalGameState);
       });
 
-      setTimeout(() => {
-        this.logger.logSocketEvent('send', 'start_speaking', {
-          gsid,
-          speakerId: gameState.currentSpeakerId,
-        });
-        this.server.to(gsid).emit('start_speaking', {
-          speakerId: gameState.currentSpeakerId,
-        });
-      }, 3000);
+      // setTimeout(async () => {
+      //   await this.gatewayService.handleSpeakingEnd(gsid, userId);
+      //   const gameState = this.gameService.getGameState(gsid);
+      //   console.log(gameState.currentSpeakerId);
+      //   this.logger.logSocketEvent('send', 'start_speaking', {
+      //     speakerId: gameState.currentSpeakerId,
+      //   });
+      //   this.server.to(gsid).emit('start_speaking', {
+      //     speakerId: gameState.currentSpeakerId,
+      //   });
+      // }, 3000);
     } catch (error) {
       this.emitError(client, error.message);
     }
@@ -269,6 +270,7 @@ export class GatewayGateway
           gsid,
           speakerId: gameState.currentSpeakerId,
         });
+        console.log('from start_speaking', gameState.currentSpeakerId);
         this.server.to(gsid).emit('start_speaking', {
           speakerId: gameState.currentSpeakerId,
         });

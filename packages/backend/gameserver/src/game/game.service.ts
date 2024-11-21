@@ -22,6 +22,7 @@ export class GameService {
       word,
       pinocoId: userIds[pinocoIndex],
       speakerQueue: [...userIds],
+      currentSpeakerId: userIds[0],
       votes: {},
     };
 
