@@ -1,31 +1,27 @@
-import { IWebRTCPayload } from '@/types/signaling.types';
+import { IRoomPayload, ISignalingLogType } from '@/types/signaling.types';
 import { Socket, Server } from 'socket.io';
 import { ROOM_ERROR_MESSAGES, ROOM_CONSTANTS } from '@/constants/roomConstants';
-import { logRoomStatus, LogType } from '@/util/logUtils';
-import { getRoom, getRoomList } from '@/util/handlerUtils';
+import handleLog from '@/util/logUtils';
+import { getRoom } from '@/util/handlerUtils';
 
 const handleRoom = (socket: Socket, io: Server) => {
-  socket.on('create_room', (payload: IWebRTCPayload) => {
+  socket.on('create_room', (payload: IRoomPayload) => {
     const room = getRoom(io, payload.gsid);
     validateRoomCreate(socket, room);
     socket.join(payload.gsid);
-    logRoomStatus({
-      roomList: getRoomList(io),
-      room: getRoom(io, payload.gsid),
-      type: LogType.create,
-      gsid: payload.gsid,
-    });
+    console.log(`[Server][🎮] create_room: from ${socket.data.userId} to ${payload.gsid}`);
   });
 
-  socket.on('join_room', (payload: IWebRTCPayload) => {
+  socket.on('join_room', (payload: IRoomPayload) => {
     const room = getRoom(io, payload.gsid);
     validateRoomJoin(socket, room);
     socket.join(payload.gsid);
-    logRoomStatus({
-      roomList: getRoomList(io),
-      room: getRoom(io, payload.gsid),
-      type: LogType.join,
+    console.log(
+      `[Server][🚪] join_room: from ${socket.data.userId} to ${payload.gsid} (roomSize: ${getRoom(io, payload.gsid)?.size})`,
+    );
+    socket.to(payload.gsid).emit('user_joined', {
       gsid: payload.gsid,
+      fromUserId: socket.data.userId,
     });
   });
 };
@@ -41,7 +37,7 @@ const validateRoomJoin = (socket: Socket, room: Set<string> | undefined) => {
 };
 
 const validateRoomCreate = (socket: Socket, room: Set<string> | undefined) => {
-  if (!room) return;
+  if (room) return;
   socket.emit('error', {
     errorMessage: ROOM_ERROR_MESSAGES.alreadyExists,
   });

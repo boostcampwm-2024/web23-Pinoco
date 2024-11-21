@@ -14,7 +14,9 @@ export default function initSocket(httpServer: HttpServer) {
   });
 
   io.on('connection', (socket: ISignalingSocket) => {
-    console.log(SOCKET_MESSAGES.connection, socket.id);
+    const userId = socket.handshake.query.userId;
+    socket.data.userId = userId;
+    console.log(SOCKET_MESSAGES.connection, socket.data.userId);
     handleSignaling(socket);
     handleSocket(socket);
     handleRoom(socket, io);
