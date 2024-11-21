@@ -27,12 +27,7 @@ export default function MainDisplay() {
 
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
-  const { voteResult, deadPerson } = useVoteResult(
-    setGamePhase,
-    remainingPlayers,
-    isPinoco,
-    setRemainingPlayers,
-  );
+  const { voteResult, deadPerson } = useVoteResult(setRemainingPlayers);
 
   useEffect(() => {
     if (gameStartData) {
@@ -72,7 +67,7 @@ export default function MainDisplay() {
 
   const renderVotingUI = () => (
     <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
-      <h2 className="text-2xl font-bold text-white-default">라이어를 지목해주세요!</h2>
+      <h2 className="text-2xl font-bold text-white-default">피노코를 지목해주세요!</h2>
       <div className="flex flex-col w-full max-w-md space-y-3">
         {readyUsers.map((userId: string) => (
           <button
@@ -92,7 +87,7 @@ export default function MainDisplay() {
       {isVoteSubmitted ? (
         <div className="flex flex-col items-center space-y-2">
           <p className="text-lg font-medium text-white-default">
-            {selectedVote}님을 라이어로 지목하였습니다
+            {selectedVote}님을 피노코로 지목하였습니다
           </p>
           <p className="text-sm text-white-default">잠시 후 결과가 공개됩니다</p>
         </div>
