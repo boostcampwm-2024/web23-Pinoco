@@ -23,7 +23,7 @@ export default function MainDisplay() {
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
-  const [remainingPlayers, setRemainingPlayers] = useState(readyUsers.length);
+  const [remainingPlayers, setRemainingPlayers] = useState<number>(readyUsers.length);
 
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
