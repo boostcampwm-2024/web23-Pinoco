@@ -72,7 +72,7 @@ export default function MainDisplay() {
             disabled={isVoteSubmitted}
             className={`w-full p-4 text-lg font-medium transition-colors rounded-lg ${
               selectedVote === userId
-                ? 'bg-green-default text-white-default-default'
+                ? 'bg-green-default text-white-default'
                 : 'bg-white text-gray-800 hover:bg-gray-100'
             } ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}`}
           >
@@ -155,7 +155,7 @@ export default function MainDisplay() {
             {isPinoco ? (
               <GuessInput onSubmitGuess={submitGuess} />
             ) : (
-              <p className="text-center text-xl text-white-default">
+              <p className="text-xl text-center text-white-default">
                 피노코가 제시어를 추측 중입니다 🤔
               </p>
             )}
@@ -163,6 +163,18 @@ export default function MainDisplay() {
         )}
 
         {gamePhase === GAME_PHASE.ENDING && renderEndingUI()}
+
+        {gamePhase === GAME_PHASE.SPEAKING && (
+          <div className="w-full mt-auto">
+            <Timer key={currentSpeaker} initialTime={30} onTimeEnd={endSpeaking} />
+          </div>
+        )}
+
+        {gamePhase === GAME_PHASE.VOTING && (
+          <div className="w-full mt-auto">
+            <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
+          </div>
+        )}
       </div>
     </div>
   );

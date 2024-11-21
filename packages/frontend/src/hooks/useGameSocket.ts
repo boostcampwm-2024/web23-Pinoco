@@ -47,6 +47,9 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
 
     socket.on('start_speaking', (data: ISpeakingStart) => {
       setCurrentSpeaker(data.speakerId);
+      if (onPhaseChange) {
+        onPhaseChange(GAME_PHASE.SPEAKING);
+      }
     });
 
     socket.on('start_vote', () => {
