@@ -9,6 +9,7 @@ import GuessInput from './GuessInput';
 import { useGameSocket } from '@/hooks/useGameSocket';
 import useGuessing from '@/hooks/useGuessing';
 import useEnding from '@/hooks/useEnding';
+import useVoteResult from '@/hooks/useVoteResult';
 
 export default function MainDisplay() {
   const { isHost, isPinoco } = useRoomStore();
@@ -22,9 +23,17 @@ export default function MainDisplay() {
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
+  const [remainingPlayers, setRemainingPlayers] = useState(readyUsers.length);
+
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
-  // 게임 시작 시 카운트다운 및 단어 공개
+  const { voteResult, deadPerson } = useVoteResult(
+    setGamePhase,
+    remainingPlayers,
+    isPinoco,
+    setRemainingPlayers,
+  );
+
   useEffect(() => {
     if (gameStartData) {
       setGamePhase(GAME_PHASE.COUNTDOWN);
@@ -118,6 +127,24 @@ export default function MainDisplay() {
     );
   };
 
+  const renderVoteResultUI = () => (
+    <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
+      <h2 className="text-2xl font-bold text-white-default">투표 결과</h2>
+      {deadPerson === 'none' ? (
+        <p className="text-xl text-white-default">동점입니다. 아무도 제거되지 않았습니다.</p>
+      ) : (
+        <p className="text-xl text-white-default">{deadPerson}님이 제거되었습니다.</p>
+      )}
+      <ul className="mt-4 space-y-2">
+        {Object.entries(voteResult).map(([userId, votes]) => (
+          <li key={userId} className="text-lg text-white-default">
+            {userId}: {votes}표
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
   return (
     <div className="relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg bg-green-default/40">
       <div className="flex-grow">
@@ -161,6 +188,8 @@ export default function MainDisplay() {
             )}
           </div>
         )}
+
+        {gamePhase === GAME_PHASE.VOTE_RESULT && renderVoteResultUI()}
 
         {gamePhase === GAME_PHASE.ENDING && renderEndingUI()}
 
