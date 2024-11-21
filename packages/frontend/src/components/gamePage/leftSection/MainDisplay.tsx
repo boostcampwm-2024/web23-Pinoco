@@ -5,10 +5,18 @@ import ReadyButton from './GameButtons/ReadyButton';
 import { GAME_PHASE, GamePhase } from '@/constants';
 import Timer from './Timer';
 import Button from '@/components/common/Button';
+import GuessInput from './GuessInput';
+import useGuessing from '@/hooks/useGuessing';
 import { useGameSocket } from '@/hooks/useGameSocket';
 
+interface IPlayer {
+  id: number;
+  name: string;
+  isReady: boolean;
+}
+
 export default function MainDisplay() {
-  const { isHost } = useRoomStore();
+  const { isHost, isPinoco } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
     useGameSocket(setGamePhase);
@@ -18,6 +26,8 @@ export default function MainDisplay() {
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
+
+  const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
   // 게임 시작 시 카운트다운 및 단어 공개
   useEffect(() => {
@@ -41,7 +51,6 @@ export default function MainDisplay() {
           return prevCount - 1;
         });
       }, 1000);
-
       return () => clearInterval(countdownInterval);
     }
   }, [gameStartData]);
@@ -62,7 +71,7 @@ export default function MainDisplay() {
       <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
         <h2 className="text-2xl font-bold text-white">라이어를 지목해주세요!</h2>
         <div className="flex flex-col w-full max-w-md space-y-3">
-          {readyUsers.map((userId) => (
+          {readyUsers.map((userId: string) => (
             <button
               key={userId}
               onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
@@ -133,10 +142,13 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.VOTING && renderVotingUI()}
 
-        {gamePhase === GAME_PHASE.ENDING && (
+        {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">
-            <h2 className="text-2xl font-bold text-white">투표 결과</h2>
-            <p className="mt-4 text-xl text-white">{selectedVote}가 지목되었습니다!</p>
+            {isPinoco ? (
+              <GuessInput onSubmitGuess={submitGuess} />
+            ) : (
+              <p className="text-center text-xl text-white">피노코가 제시어를 추측 중입니다 🤔</p>
+            )}
           </div>
         )}
       </div>
