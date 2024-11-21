@@ -1,97 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoomStore } from '@/states/store/roomStore';
 import StartButton from './GameButtons/StartButton';
 import ReadyButton from './GameButtons/ReadyButton';
 import { GAME_PHASE, GamePhase } from '@/constants';
 import Timer from './Timer';
 import Button from '@/components/common/Button';
-
-interface IPlayer {
-  id: number;
-  name: string;
-  isReady: boolean;
-}
+import { useGameSocket } from '@/hooks/useGameSocket';
 
 export default function MainDisplay() {
   const { isHost } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
+  const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
+    useGameSocket(setGamePhase);
+
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
-  const [currentSpeaker, setCurrentSpeaker] = useState(0);
-  const [selectedVote, setSelectedVote] = useState<number | null>(null);
+  const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
 
-  // 임시 플레이어 데이터
-  const [players, setPlayers] = useState<IPlayer[]>([
-    { id: 1, name: '참가자1', isReady: false },
-    { id: 2, name: '참가자2', isReady: false },
-    { id: 3, name: '참가자3', isReady: false },
-  ]);
+  // 게임 시작 시 카운트다운 및 단어 공개
+  useEffect(() => {
+    if (gameStartData) {
+      setGamePhase(GAME_PHASE.COUNTDOWN);
+      setCurrentWord(gameStartData.word);
+      setCountdown(3);
 
-  const handleReady = (isReady: boolean) => {
-    // 실제 구현시에는 소켓을 통해 서버에 준비 상태 전송
-    console.log('Ready state changed:', isReady);
-  };
+      const countdownInterval = setInterval(() => {
+        setCountdown((prevCount) => {
+          if (prevCount <= 1) {
+            clearInterval(countdownInterval);
+            setGamePhase(GAME_PHASE.WORD_REVEAL);
 
-  const canStartGame = () => {
-    return true;
-    return players.every((player) => player.isReady); // 이부분 백에서 받아올 수 있을 것 같아요 (해당 방의 사용자가 모두 준비했는지)
-  };
+            setTimeout(() => {
+              setGamePhase(GAME_PHASE.SPEAKING);
+            }, 3000);
 
-  const startGame = () => {
-    if (!canStartGame()) return;
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
 
-    setGamePhase(GAME_PHASE.COUNTDOWN);
-    setCountdown(3);
-
-    const countdownInterval = setInterval(() => {
-      setCountdown((prevCount) => {
-        if (prevCount <= 1) {
-          clearInterval(countdownInterval);
-          setGamePhase(GAME_PHASE.WORD_REVEAL);
-          setCurrentWord('제시어'); // 백엔드에서 받아와야 할듯합니다...
-
-          setTimeout(() => {
-            setGamePhase(GAME_PHASE.SPEAKING);
-          }, 3000);
-          return 0;
-        }
-        return prevCount - 1;
-      });
-    }, 1000);
-  };
-
-  const handleSpeakerChange = () => {
-    // 타이머 애니메이션이 완전히 끝날 때까지 대기
-    setTimeout(() => {
-      setIsTimerActive(false);
-
-      if (currentSpeaker < players.length - 1) {
-        setCurrentSpeaker((prev) => prev + 1);
-        setIsTimerActive(true);
-      } else {
-        setGamePhase(GAME_PHASE.VOTING);
-        setCurrentSpeaker(0);
-        setIsTimerActive(true);
-      }
-    }, 1000);
-  };
+      return () => clearInterval(countdownInterval);
+    }
+  }, [gameStartData]);
 
   const handleVote = () => {
     if (selectedVote === null) return;
 
-    setIsVoteSubmitted(true); // 투표 제출 상태 변경
+    votePinoco(selectedVote);
+    setIsVoteSubmitted(true);
 
-    // 타이머 애니메이션이 완전히 끝날 때까지 대기
     setTimeout(() => {
       setIsTimerActive(false);
-
-      // 상태 변경 전 약간의 지연
-      setTimeout(() => {
-        setGamePhase(GAME_PHASE.RESULT);
-        setIsVoteSubmitted(false); // 결과 화면으로 넘어갈 때 리셋
-      }, 500);
     }, 1000);
   };
 
@@ -100,28 +62,28 @@ export default function MainDisplay() {
       <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
         <h2 className="text-2xl font-bold text-white">라이어를 지목해주세요!</h2>
         <div className="flex flex-col w-full max-w-md space-y-3">
-          {players.map((player) => (
+          {readyUsers.map((userId) => (
             <button
-              key={player.id}
-              onClick={() => !isVoteSubmitted && setSelectedVote(player.id)}
+              key={userId}
+              onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
               disabled={isVoteSubmitted}
               className={`w-full p-4 text-lg font-medium transition-colors rounded-lg
                 ${
-                  selectedVote === player.id
+                  selectedVote === userId
                     ? 'bg-green-default text-white-default'
                     : 'bg-white text-gray-800 hover:bg-gray-100'
                 }
                 ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}
-                `}
+              `}
             >
-              {player.name}
+              {userId}
             </button>
           ))}
         </div>
         {isVoteSubmitted ? (
           <div className="flex flex-col items-center space-y-2">
             <p className="text-lg font-medium text-white">
-              {players.find((p) => p.id === selectedVote)?.name}님을 라이어로 지목하였습니다
+              {selectedVote}님을 라이어로 지목하였습니다
             </p>
             <p className="text-sm text-white">잠시 후 결과가 공개됩니다</p>
           </div>
@@ -144,11 +106,7 @@ export default function MainDisplay() {
       <div className="flex-grow">
         {gamePhase === GAME_PHASE.WAITING && (
           <div className="flex flex-col items-center justify-center h-full">
-            {isHost ? (
-              <StartButton onStart={startGame} disabled={!canStartGame()} />
-            ) : (
-              <ReadyButton onReady={handleReady} />
-            )}
+            {isHost ? <StartButton /> : <ReadyButton />}
           </div>
         )}
 
@@ -168,36 +126,30 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-xl text-white">현재 발언자: {players[currentSpeaker]?.name}</p>
+            <p className="text-xl text-white">현재 발언자: {currentSpeaker}</p>
             <p className="mt-2 text-lg text-white">제시어: {currentWord}</p>
           </div>
         )}
 
         {gamePhase === GAME_PHASE.VOTING && renderVotingUI()}
 
-        {gamePhase === GAME_PHASE.RESULT && (
+        {gamePhase === GAME_PHASE.ENDING && (
           <div className="flex flex-col items-center justify-center h-full">
             <h2 className="text-2xl font-bold text-white">투표 결과</h2>
-            <p className="mt-4 text-xl text-white">
-              {players.find((p) => p.id === selectedVote)?.name}가 지목되었습니다!
-            </p>
+            <p className="mt-4 text-xl text-white">{selectedVote}가 지목되었습니다!</p>
           </div>
         )}
       </div>
 
-      {(gamePhase === GAME_PHASE.SPEAKING || gamePhase === GAME_PHASE.VOTING) && isTimerActive && (
+      {gamePhase === GAME_PHASE.SPEAKING && isTimerActive && (
         <div className="w-full mt-auto">
-          <Timer
-            key={`${gamePhase}-${currentSpeaker}`}
-            initialTime={gamePhase === GAME_PHASE.SPEAKING ? 3 : 6}
-            onTimeEnd={() => {
-              if (gamePhase === GAME_PHASE.SPEAKING) {
-                handleSpeakerChange();
-              } else if (gamePhase === GAME_PHASE.VOTING) {
-                handleVote();
-              }
-            }}
-          />
+          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={endSpeaking} />
+        </div>
+      )}
+
+      {gamePhase === GAME_PHASE.VOTING && isTimerActive && (
+        <div className="w-full mt-auto">
+          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
         </div>
       )}
     </div>
