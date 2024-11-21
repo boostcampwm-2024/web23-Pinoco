@@ -29,13 +29,11 @@ export default function useVoteResult(
           socket.emit('start_speaking');
           setGamePhase(GAME_PHASE.SPEAKING);
         } else if (data.deadPerson === 'pinoco') {
-          if (isPinoco) {
-            socket.emit('start_guessing');
-          }
+          if (isPinoco) socket.emit('start_guessing');
           setGamePhase(GAME_PHASE.GUESSING);
         } else {
-          setRemainingPlayers((prev) => prev - 1);
-          if (remainingPlayers <= 3) {
+          setRemainingPlayers((prev: number) => prev - 1);
+          if (remainingPlayers <= 2) {
             socket.emit('start_ending');
             setGamePhase(GAME_PHASE.ENDING);
           } else {
@@ -51,8 +49,5 @@ export default function useVoteResult(
     };
   }, [socket, setGamePhase, remainingPlayers, isPinoco, setRemainingPlayers]);
 
-  return {
-    voteResult,
-    deadPerson,
-  };
+  return { voteResult, deadPerson };
 }
