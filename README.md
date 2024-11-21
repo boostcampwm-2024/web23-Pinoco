@@ -4,7 +4,7 @@
 
 
 
-## 👉🏻 [Pinoco 보러가기](https://pinoco.shop/)
+## 👉🏻 [Pinoco 보러가기](https://pinoco.site/)
 
 <p align=center>
   <a href="https://lush-collision-539.notion.site/Pinoco-12fb0f9caa698078bcc1eeb19b3a301c?pvs=74"> 📒 팀 노션</a>
