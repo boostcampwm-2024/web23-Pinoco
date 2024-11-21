@@ -7,6 +7,7 @@ import Timer from './Timer';
 import Button from '@/components/common/Button';
 import GuessInput from './GuessInput';
 import useGuessing from '@/hooks/useGuessing';
+import { useGameSocket } from '@/hooks/useGameSocket';
 
 interface IPlayer {
   id: number;
@@ -25,6 +26,8 @@ export default function MainDisplay() {
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
+
+  const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
   // 게임 시작 시 카운트다운 및 단어 공개
   useEffect(() => {
@@ -68,7 +71,7 @@ export default function MainDisplay() {
       <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
         <h2 className="text-2xl font-bold text-white">라이어를 지목해주세요!</h2>
         <div className="flex flex-col w-full max-w-md space-y-3">
-          {readyUsers.map((userId) => (
+          {readyUsers.map((userId: string) => (
             <button
               key={userId}
               onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
