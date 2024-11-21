@@ -14,6 +14,7 @@ interface IGameErrorMessage {
 interface IGameStart {
   isPinoco: boolean;
   word: string;
+  speakerId: string;
 }
 
 interface ISpeakingStart {
@@ -41,11 +42,14 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     });
 
     socket.on('start_game_success', (data: IGameStart) => {
+      console.log('확인 id', data.speakerId);
       setGameStartData(data);
+      setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
     });
 
     socket.on('start_speaking', (data: ISpeakingStart) => {
+      console.log('백엔드에서 speakerId 오나 확인', data.speakerId);
       setCurrentSpeaker(data.speakerId);
       if (onPhaseChange) {
         onPhaseChange(GAME_PHASE.SPEAKING);
@@ -77,9 +81,12 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     socket.emit('start_game');
   };
 
-  const endSpeaking = () => {
+  const endSpeaking = (userId: string) => {
     if (!socket) return;
-    socket.emit('end_speaking');
+    if (userId === currentSpeaker) {
+      console.log('보내지는지 확인');
+      socket.emit('end_speaking');
+    }
   };
 
   const votePinoco = (voteUserId: string) => {
