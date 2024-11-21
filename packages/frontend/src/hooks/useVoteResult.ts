@@ -16,7 +16,6 @@ export default function useVoteResult(
   const socket = useSocketStore((state) => state.socket);
   const [voteResult, setVoteResult] = useState<Record<string, number>>({});
   const [deadPerson, setDeadPerson] = useState<string | null>(null);
-
   useEffect(() => {
     if (!socket) return;
 
@@ -32,14 +31,17 @@ export default function useVoteResult(
           if (isPinoco) socket.emit('start_guessing');
           setGamePhase(GAME_PHASE.GUESSING);
         } else {
-          setRemainingPlayers((prev: number) => prev - 1);
-          if (remainingPlayers <= 2) {
-            socket.emit('start_ending');
-            setGamePhase(GAME_PHASE.ENDING);
-          } else {
-            socket.emit('start_speaking');
-            setGamePhase(GAME_PHASE.SPEAKING);
-          }
+          setRemainingPlayers((prev: number) => {
+            const updatedPlayers = prev - 1;
+            if (updatedPlayers <= 2) {
+              socket.emit('start_ending');
+              setGamePhase(GAME_PHASE.ENDING);
+            } else {
+              socket.emit('start_speaking');
+              setGamePhase(GAME_PHASE.SPEAKING);
+            }
+            return updatedPlayers;
+          });
         }
       }, 5000);
     });
@@ -47,7 +49,7 @@ export default function useVoteResult(
     return () => {
       socket.off('receive_vote_result');
     };
-  }, [socket, setGamePhase, remainingPlayers, isPinoco, setRemainingPlayers]);
+  }, [socket, setGamePhase, isPinoco, setRemainingPlayers]);
 
   return { voteResult, deadPerson };
 }

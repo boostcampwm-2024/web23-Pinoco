@@ -175,7 +175,7 @@ export default function MainDisplay() {
           </div>
         )}
 
-        {gamePhase === GAME_PHASE.VOTING && (deadPerson ? renderVoteResult() : renderVotingUI())}
+        {gamePhase === GAME_PHASE.VOTING && (deadPerson ? renderVoteResultUI() : renderVotingUI())}
 
         {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">
