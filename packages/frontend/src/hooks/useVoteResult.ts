@@ -16,6 +16,7 @@ export default function useVoteResult(
   const socket = useSocketStore((state) => state.socket);
   const [voteResult, setVoteResult] = useState<Record<string, number>>({});
   const [deadPerson, setDeadPerson] = useState<string | null>(null);
+
   useEffect(() => {
     if (!socket) return;
 
