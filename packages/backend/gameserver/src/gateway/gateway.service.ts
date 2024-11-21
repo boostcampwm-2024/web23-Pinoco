@@ -91,7 +91,7 @@ export class GatewayService {
       ...gameState,
       gsid,
       isPinoco,
-      word: isPinoco ? undefined : gameState.word,
+      word: isPinoco ? '' : gameState.word,
     };
   }
 
