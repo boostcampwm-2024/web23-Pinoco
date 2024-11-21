@@ -63,7 +63,7 @@ export default function MainDisplay() {
 
   const renderVotingUI = () => (
     <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
-      <h2 className="text-2xl font-bold text-white">라이어를 지목해주세요!</h2>
+      <h2 className="text-2xl font-bold text-white-default">라이어를 지목해주세요!</h2>
       <div className="flex flex-col w-full max-w-md space-y-3">
         {readyUsers.map((userId: string) => (
           <button
@@ -72,7 +72,7 @@ export default function MainDisplay() {
             disabled={isVoteSubmitted}
             className={`w-full p-4 text-lg font-medium transition-colors rounded-lg ${
               selectedVote === userId
-                ? 'bg-green-default text-white-default'
+                ? 'bg-green-default text-white-default-default'
                 : 'bg-white text-gray-800 hover:bg-gray-100'
             } ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}`}
           >
@@ -82,10 +82,10 @@ export default function MainDisplay() {
       </div>
       {isVoteSubmitted ? (
         <div className="flex flex-col items-center space-y-2">
-          <p className="text-lg font-medium text-white">
+          <p className="text-lg font-medium text-white-default">
             {selectedVote}님을 라이어로 지목하였습니다
           </p>
-          <p className="text-sm text-white">잠시 후 결과가 공개됩니다</p>
+          <p className="text-sm text-white-default">잠시 후 결과가 공개됩니다</p>
         </div>
       ) : (
         <Button
@@ -106,11 +106,11 @@ export default function MainDisplay() {
     const { isPinocoWin, pinoco, isGuessed, guessingWord } = endingResult;
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-white-default">
           {isPinocoWin ? '피노코가 승리했습니다 🤥' : '제페토가 승리했습니다 🔨'}
         </h2>
         {isGuessed && (
-          <p className="text-xl text-white">
+          <p className="text-xl text-white-default">
             피노코 {pinoco}가 제출한 제시어: {guessingWord}
           </p>
         )}
@@ -130,21 +130,21 @@ export default function MainDisplay() {
         {gamePhase === GAME_PHASE.COUNTDOWN && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="flex items-center justify-center bg-black rounded-full size-32 bg-opacity-70">
-              <p className="text-6xl font-bold text-white-default">{countdown}</p>
+              <p className="text-6xl font-bold text-white-default-default">{countdown}</p>
             </div>
           </div>
         )}
 
         {gamePhase === GAME_PHASE.WORD_REVEAL && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-3xl font-bold text-white">제시어: {currentWord}</p>
+            <p className="text-3xl font-bold text-white-default">제시어: {currentWord}</p>
           </div>
         )}
 
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-xl text-white">현재 발언자: {currentSpeaker}</p>
-            <p className="mt-2 text-lg text-white">제시어: {currentWord}</p>
+            <p className="text-xl text-white-default">현재 발언자: {currentSpeaker}</p>
+            <p className="mt-2 text-lg text-white-default">제시어: {currentWord}</p>
           </div>
         )}
 
@@ -155,7 +155,9 @@ export default function MainDisplay() {
             {isPinoco ? (
               <GuessInput onSubmitGuess={submitGuess} />
             ) : (
-              <p className="text-center text-xl text-white">피노코가 제시어를 추측 중입니다 🤔</p>
+              <p className="text-center text-xl text-white-default">
+                피노코가 제시어를 추측 중입니다 🤔
+              </p>
             )}
           </div>
         )}
