@@ -10,8 +10,10 @@ import { useGameSocket } from '@/hooks/useGameSocket';
 import useGuessing from '@/hooks/useGuessing';
 import useEnding from '@/hooks/useEnding';
 import useVoteResult from '@/hooks/useVoteResult';
+import { useAuthStore } from '@/states/store/authStore';
 
 export default function MainDisplay() {
+  const { userId } = useAuthStore();
   const { isHost, isPinoco } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
@@ -188,7 +190,7 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="w-full mt-auto">
-            <Timer key={currentSpeaker} initialTime={30} onTimeEnd={endSpeaking} />
+            <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
           </div>
         )}
 
