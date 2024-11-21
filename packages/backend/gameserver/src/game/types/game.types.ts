@@ -6,7 +6,7 @@ export type GamePhase =
   | 'GUESSING'
   | 'ENDING';
 
-export interface GameState {
+export interface IGameState {
   phase: GamePhase;
   word?: string;
   pinocoId?: string;
@@ -17,7 +17,7 @@ export interface GameState {
   guessingWord?: string;
 }
 
-export interface GameInfo extends GameState {
+export interface IGameInfo extends IGameState {
   gsid: string;
   isPinoco?: boolean;
 }

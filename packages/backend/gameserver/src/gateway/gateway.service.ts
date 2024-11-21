@@ -3,7 +3,7 @@ import { AuthService } from '../auth/auth.service';
 import { RoomService } from '../room/room.service';
 import { ChatService } from '../chat/chat.service';
 import { GameService } from '../game/game.service';
-import { GameInfo } from '../game/types/game.types';
+import { IGameInfo } from '../game/types/game.types';
 import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
 import { CreateRoomResponse } from '../types/socket.types';
 
@@ -72,7 +72,7 @@ export class GatewayService {
     return Array.from(room.readyUserIds);
   }
 
-  async startGame(gsid: string, userId: string): Promise<GameInfo> {
+  async startGame(gsid: string, userId: string): Promise<IGameInfo> {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 

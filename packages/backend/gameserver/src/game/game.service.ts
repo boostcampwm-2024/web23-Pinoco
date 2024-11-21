@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { GameState, GamePhase } from './types/game.types';
+import { IGameState, GamePhase } from './types/game.types';
 import { RoomService } from '../room/room.service';
 
 @Injectable()
 export class GameService {
-  private games: Map<string, GameState> = new Map();
+  private games: Map<string, IGameState> = new Map();
   private words = ['사과', '바나나', '자동차', '컴퓨터']; // 예시 단어들
 
   constructor(private readonly roomService: RoomService) {}
 
-  async startGame(gsid: string): Promise<GameState> {
+  async startGame(gsid: string): Promise<IGameState> {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 
@@ -17,7 +17,7 @@ export class GameService {
     const pinocoIndex = Math.floor(Math.random() * userIds.length);
     const word = this.words[Math.floor(Math.random() * this.words.length)];
 
-    const gameState: GameState = {
+    const gameState: IGameState = {
       phase: 'GAMESTART',
       word,
       pinocoId: userIds[pinocoIndex],
@@ -29,7 +29,7 @@ export class GameService {
     return gameState;
   }
 
-  getGameState(gsid: string): GameState | undefined {
+  getGameState(gsid: string): IGameState | undefined {
     return this.games.get(gsid);
   }
 
