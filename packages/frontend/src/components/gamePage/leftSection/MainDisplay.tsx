@@ -27,7 +27,7 @@ export default function MainDisplay() {
 
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
 
-  const { voteResult, deadPerson } = useVoteResult(setRemainingPlayers);
+  const { voteResult, deadPerson } = useVoteResult(remainingPlayers, setRemainingPlayers);
 
   useEffect(() => {
     if (gameStartData) {

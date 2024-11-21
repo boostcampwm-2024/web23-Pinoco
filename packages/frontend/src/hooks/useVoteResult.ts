@@ -6,7 +6,10 @@ interface IVoteResult {
   deadPerson: string;
 }
 
-export default function useVoteResult(setRemainingPlayers: (value: number) => void) {
+export default function useVoteResult(
+  remainingPlayers: number,
+  setRemainingPlayers: (value: number) => void,
+) {
   const socket = useSocketStore((state) => state.socket);
   const [voteResult, setVoteResult] = useState<Record<string, number>>({});
   const [deadPerson, setDeadPerson] = useState<string | null>(null);
@@ -19,15 +22,14 @@ export default function useVoteResult(setRemainingPlayers: (value: number) => vo
       setDeadPerson(data.deadPerson);
 
       if (data.deadPerson !== 'none' && data.deadPerson) {
-        const updatedPlayers = remainingPlayers - 1;
-        setRemainingPlayers(updatedPlayers);
+        setRemainingPlayers(remainingPlayers - 1);
       }
     });
 
     return () => {
       socket.off('receive_vote_result');
     };
-  }, [socket, setRemainingPlayers]);
+  }, [socket, remainingPlayers, setRemainingPlayers]);
 
   return { voteResult, deadPerson };
 }
