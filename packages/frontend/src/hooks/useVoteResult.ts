@@ -32,17 +32,14 @@ export default function useVoteResult(
           if (isPinoco) socket.emit('start_guessing');
           setGamePhase(GAME_PHASE.GUESSING);
         } else {
-          setRemainingPlayers((prev: number) => {
-            const updatedPlayers = prev - 1;
-            if (updatedPlayers <= 2) {
-              socket.emit('start_ending');
-              setGamePhase(GAME_PHASE.ENDING);
-            } else {
-              socket.emit('start_speaking');
-              setGamePhase(GAME_PHASE.SPEAKING);
-            }
-            return updatedPlayers;
-          });
+          setRemainingPlayers(remainingPlayers - 1);
+          if (remainingPlayers - 1 <= 2) {
+            socket.emit('start_ending');
+            setGamePhase(GAME_PHASE.ENDING);
+          } else {
+            socket.emit('start_speaking');
+            setGamePhase(GAME_PHASE.SPEAKING);
+          }
         }
       }, 5000);
     });
@@ -50,7 +47,7 @@ export default function useVoteResult(
     return () => {
       socket.off('receive_vote_result');
     };
-  }, [socket, setGamePhase, isPinoco, setRemainingPlayers]);
+  }, [socket, setGamePhase, isPinoco, remainingPlayers, setRemainingPlayers]);
 
   return { voteResult, deadPerson };
 }
