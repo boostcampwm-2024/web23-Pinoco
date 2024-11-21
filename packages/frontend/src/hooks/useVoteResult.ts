@@ -19,7 +19,7 @@ export default function useVoteResult(setRemainingPlayers: (value: number) => vo
       setDeadPerson(data.deadPerson);
 
       if (data.deadPerson !== 'none' && data.deadPerson) {
-        setRemainingPlayers((prev) => prev - 1);
+        setRemainingPlayers((prev: number) => prev - 1);
       }
     });
 
