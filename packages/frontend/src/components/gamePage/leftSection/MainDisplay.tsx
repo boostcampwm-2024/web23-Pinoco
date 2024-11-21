@@ -5,13 +5,13 @@ import ReadyButton from './GameButtons/ReadyButton';
 import { GAME_PHASE, GamePhase } from '@/constants';
 import Timer from './Timer';
 import Button from '@/components/common/Button';
-import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
+import { useGameSocket } from '@/hooks/useGameSocket';
 
 export default function MainDisplay() {
   const { isHost } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
-    useGameButtonSocket(setGamePhase);
+    useGameSocket(setGamePhase);
 
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');

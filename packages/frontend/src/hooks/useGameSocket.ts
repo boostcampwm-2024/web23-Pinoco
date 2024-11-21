@@ -20,7 +20,7 @@ interface ISpeakingStart {
   speakerId: string;
 }
 
-export const useGameButtonSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
+export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   const socket = useSocketStore((state) => state.socket);
   const { setIsPinoco } = useRoomStore();
   const [readyUsers, setReadyUsers] = useState<string[]>([]);

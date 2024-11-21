@@ -1,8 +1,8 @@
-import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
+import { useGameSocket } from '@/hooks/useGameSocket';
 import Button from '@/components/common/Button';
 
 export default function StartButton() {
-  const { startGame, error } = useGameButtonSocket();
+  const { startGame, error } = useGameSocket();
 
   return (
     <div className="flex flex-col items-center w-full space-y-2">

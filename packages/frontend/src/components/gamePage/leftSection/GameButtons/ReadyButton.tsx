@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useGameButtonSocket } from '@/hooks/useGameButtonSocket';
+import { useGameSocket } from '@/hooks/useGameSocket';
 import Button from '@/components/common/Button';
 
 export default function ReadyButton() {
   const [isReady, setIsReady] = useState(false);
-  const { sendReady } = useGameButtonSocket();
+  const { sendReady } = useGameSocket();
 
   const handleReady = () => {
     const newReadyState = !isReady;
