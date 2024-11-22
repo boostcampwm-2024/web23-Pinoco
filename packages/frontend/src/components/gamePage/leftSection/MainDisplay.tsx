@@ -187,19 +187,18 @@ export default function MainDisplay() {
         )}
 
         {gamePhase === GAME_PHASE.ENDING && renderEndingUI()}
-
-        {gamePhase === GAME_PHASE.SPEAKING && (
-          <div className="w-full mt-auto">
-            <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
-          </div>
-        )}
-
-        {gamePhase === GAME_PHASE.VOTING && (
-          <div className="w-full mt-auto">
-            <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
-          </div>
-        )}
       </div>
+      {gamePhase === GAME_PHASE.SPEAKING && (
+        <div className="w-full mt-auto">
+          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
+        </div>
+      )}
+
+      {gamePhase === GAME_PHASE.VOTING && (
+        <div className="w-full mt-auto">
+          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
+        </div>
+      )}
     </div>
   );
 }
