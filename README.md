@@ -81,13 +81,9 @@
 
 
 ## 시스템 아키텍처
+![image](https://github.com/user-attachments/assets/2ddfb0db-d10d-407c-93a5-6a63349bb833)
 
 <br />
-
-## FE 기술적 도전
-
-
-## BE 기술적 도전
 
 # 🤼 팀원 소개
 
