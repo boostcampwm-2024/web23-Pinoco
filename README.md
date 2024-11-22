@@ -75,7 +75,7 @@
 |------|---|
 |공통|[![My Skills](https://skillicons.dev/icons?i=ts)](https://skillicons.dev)
 |FE|[![My Skills](https://skillicons.dev/icons?i=react,vite,tailwind,)](https://skillicons.dev)
-|BE|[![My Skills](https://skillicons.dev/icons?i=express,mysql)](https://skillicons.dev)
+|BE|[![My Skills](https://skillicons.dev/icons?i=express,mysql,nest)](https://skillicons.dev)
 |배포|[![My Skills](https://skillicons.dev/icons?i=githubactions,docker,nginx)](https://skillicons.dev)
 |협업| [![My Skills](https://skillicons.dev/icons?i=figma,git,github,notion)](https://skillicons.dev)
 
