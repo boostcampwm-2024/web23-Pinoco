@@ -32,6 +32,28 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   useEffect(() => {
     if (!socket) return;
 
+    const handleStartSpeaking = (data: ISpeakingStart) => {
+      console.log('백엔드에서 speakerId 오나 확인 [start_speaking]', data.speakerId);
+      setCurrentSpeaker(data.speakerId);
+      if (onPhaseChange) {
+        onPhaseChange(GAME_PHASE.SPEAKING);
+      }
+    };
+
+    const handleStartGame = (data: IGameStart) => {
+      console.log('초기 발언자 id [start_game_success]', data.speakerId);
+      setGameStartData(data);
+      setCurrentSpeaker(data.speakerId);
+      setIsPinoco(data.isPinoco);
+    };
+
+    const handleStartVote = () => {
+      console.log('투표 시작 이벤트 수신!');
+      if (onPhaseChange) {
+        onPhaseChange(GAME_PHASE.VOTING);
+      }
+    };
+
     socket.on('update_ready', (data: IReadyUsers) => {
       setReadyUsers(data.readyUsers);
     });
@@ -41,35 +63,18 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
       setTimeout(() => setError(null), 3000);
     });
 
-    socket.on('start_game_success', (data: IGameStart) => {
-      console.log('확인 id', data.speakerId);
-      setGameStartData(data);
-      setCurrentSpeaker(data.speakerId);
-      setIsPinoco(data.isPinoco);
-    });
-
-    socket.on('start_speaking', (data: ISpeakingStart) => {
-      console.log('백엔드에서 speakerId 오나 확인', data.speakerId);
-      setCurrentSpeaker(data.speakerId);
-      if (onPhaseChange) {
-        onPhaseChange(GAME_PHASE.SPEAKING);
-      }
-    });
-
-    socket.on('start_vote', () => {
-      if (onPhaseChange) {
-        onPhaseChange(GAME_PHASE.VOTING);
-      }
-    });
+    socket.on('start_game_success', handleStartGame);
+    socket.on('start_speaking', handleStartSpeaking);
+    socket.on('start_vote', handleStartVote);
 
     return () => {
       socket.off('update_ready');
       socket.off('error');
-      socket.off('start_game_success');
-      socket.off('start_speaking');
-      socket.off('start_vote');
+      socket.off('start_game_success', handleStartGame);
+      socket.off('start_speaking', handleStartSpeaking);
+      socket.off('start_vote', handleStartVote);
     };
-  }, [socket, setIsPinoco, onPhaseChange]);
+  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker]);
 
   const sendReady = (isReady: boolean) => {
     if (!socket) return;
@@ -84,7 +89,7 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   const endSpeaking = (userId: string) => {
     if (!socket) return;
     if (userId === currentSpeaker) {
-      console.log('보내지는지 확인');
+      console.log('endSpeaking 호출');
       socket.emit('end_speaking');
     }
   };
