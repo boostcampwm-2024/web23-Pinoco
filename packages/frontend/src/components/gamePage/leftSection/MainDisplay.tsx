@@ -22,13 +22,10 @@ export default function MainDisplay() {
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
-  const [isTimerActive, setIsTimerActive] = useState(true);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
-
   const [remainingPlayers, setRemainingPlayers] = useState<number>(readyUsers.length);
 
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
-
   const { voteResult, deadPerson } = useVoteResult(remainingPlayers, setRemainingPlayers);
 
   useEffect(() => {
@@ -61,10 +58,6 @@ export default function MainDisplay() {
 
     votePinoco(selectedVote);
     setIsVoteSubmitted(true);
-
-    setTimeout(() => {
-      setIsTimerActive(false);
-    }, 1000);
   };
 
   const renderVotingUI = () => (
@@ -190,13 +183,13 @@ export default function MainDisplay() {
       </div>
       {gamePhase === GAME_PHASE.SPEAKING && (
         <div className="w-full mt-auto">
-          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
+          <Timer key={currentSpeaker} initialTime={5} onTimeEnd={() => endSpeaking(userId!)} />
         </div>
       )}
 
       {gamePhase === GAME_PHASE.VOTING && (
         <div className="w-full mt-auto">
-          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
+          <Timer key="voting" initialTime={10} onTimeEnd={handleVote} />
         </div>
       )}
     </div>
