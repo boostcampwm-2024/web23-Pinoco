@@ -24,6 +24,7 @@ export class GameService {
       speakerQueue: [...userIds],
       currentSpeakerId: userIds[0],
       votes: {},
+      spokenUsers: new Set(),
     };
 
     this.games.set(gsid, gameState);
@@ -47,12 +48,27 @@ export class GameService {
     const game = this.games.get(gsid);
     if (!game) return false;
 
-    if (game.speakerQueue.length === 0) {
+    const room = this.roomService.getRoom(gsid);
+    if (!room) return false;
+
+    // 현재 발언자를 발언 완료 목록에 추가
+    if (game.currentSpeakerId) {
+      game.spokenUsers.add(game.currentSpeakerId);
+    }
+
+    // 모든 사용자가 발언을 마쳤는지 확인
+    const totalUsers = room.userIds.size;
+    if (game.spokenUsers.size === totalUsers) {
       game.phase = 'VOTING';
       return true;
     }
 
-    game.currentSpeakerId = game.speakerQueue.shift() || null;
+    // 아직 발언하지 않은 다음 발언자 찾기
+    const nextSpeaker = Array.from(room.userIds).find(
+      (userId) => !game.spokenUsers.has(userId),
+    );
+
+    game.currentSpeakerId = nextSpeaker || null;
     return false;
   }
 
