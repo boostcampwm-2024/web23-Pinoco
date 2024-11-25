@@ -8,14 +8,14 @@ export type GamePhase =
 
 export interface IGameState {
   phase: GamePhase;
+  userIds: string[];
   word?: string;
   pinocoId?: string;
-  currentSpeakerId?: string;
   speakerQueue: string[];
   votes: Record<string, string>;
+  liveUserIds: string[];
   isGuessed?: boolean;
   guessingWord?: string;
-  spokenUsers: Set<string>;
 }
 
 export interface IGameInfo extends IGameState {

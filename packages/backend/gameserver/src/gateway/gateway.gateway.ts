@@ -218,7 +218,6 @@ export class GatewayGateway
 
     try {
       const gameState = await this.gatewayService.startGame(gsid, userId);
-      console.log(gameState);
 
       const room = this.roomService.getRoom(gsid);
       room.userIds.forEach((uid) => {
@@ -226,7 +225,8 @@ export class GatewayGateway
         const personalGameState = {
           isPinoco,
           word: isPinoco ? '' : gameState.word,
-          speakerId: gameState.currentSpeakerId,
+          speakerId: gameState.speakerQueue[0],
+          allUserIds: gameState.userIds,
         };
 
         this.logger.logSocketEvent('send', 'start_game_success', {
@@ -236,18 +236,6 @@ export class GatewayGateway
           .to(this.getSocketIdByUserId(uid))
           .emit('start_game_success', personalGameState);
       });
-
-      // setTimeout(async () => {
-      //   await this.gatewayService.handleSpeakingEnd(gsid, userId);
-      //   const gameState = this.gameService.getGameState(gsid);
-      //   console.log(gameState.currentSpeakerId);
-      //   this.logger.logSocketEvent('send', 'start_speaking', {
-      //     speakerId: gameState.currentSpeakerId,
-      //   });
-      //   this.server.to(gsid).emit('start_speaking', {
-      //     speakerId: gameState.currentSpeakerId,
-      //   });
-      // }, 3000);
     } catch (error) {
       this.emitError(client, error.message);
     }
@@ -259,34 +247,20 @@ export class GatewayGateway
     this.logger.logSocketEvent('receive', 'end_speaking', { userId, gsid });
 
     try {
-      const isAllSpoken = await this.gatewayService.handleSpeakingEnd(
-        gsid,
-        userId,
-      );
+      await this.gatewayService.handleSpeakingEnd(gsid, userId);
       const gameState = this.gameService.getGameState(gsid);
-      console.log('Game state after speaking end:', {
-        phase: gameState.phase,
-        isAllSpoken,
-        spokenUsers: Array.from(gameState.spokenUsers),
-        totalUsers: this.roomService.getRoom(gsid)?.userIds.size,
-      });
 
-      if (isAllSpoken) {
-        console.log('모든 사용자가 발언을 마쳤습니다. 투표를 시작합니다.');
+      if (gameState.phase === 'VOTING') {
         this.logger.logSocketEvent('send', 'start_vote', { gsid });
-        // 룸의 모든 소켓에 직접 이벤트 전송
-        const sockets = await this.server.in(gsid).fetchSockets();
-        sockets.forEach((socket) => {
-          socket.emit('start_vote');
-        });
+        this.server.to(gsid).emit('start_vote');
       } else {
         this.logger.logSocketEvent('send', 'start_speaking', {
           gsid,
-          speakerId: gameState.currentSpeakerId,
-          spokenUsers: Array.from(gameState.spokenUsers),
+          speakerId: gameState.speakerQueue[0],
         });
+
         this.server.to(gsid).emit('start_speaking', {
-          speakerId: gameState.currentSpeakerId,
+          speakerId: gameState.speakerQueue[0],
         });
       }
     } catch (error) {
@@ -309,7 +283,7 @@ export class GatewayGateway
 
     try {
       await this.gatewayService.submitVote(gsid, userId, data.voteUserId);
-      const gameState = this.gameService.getGameState(gsid);
+      let gameState = this.gameService.getGameState(gsid);
       const room = await this.roomService.getRoom(gsid);
 
       if (Object.keys(gameState.votes).length === room.userIds.size) {
@@ -321,24 +295,39 @@ export class GatewayGateway
         });
         this.server.to(gsid).emit('receive_vote_result', result);
 
-        if (result.deadPerson === gameState.pinocoId) {
+        gameState = this.gameService.getGameState(gsid);
+        if (gameState.phase === 'GUESSING') {
           this.logger.logSocketEvent('send', 'start_guessing', {
             gsid,
             guessingUserId: gameState.pinocoId,
           });
-          this.server.to(gsid).emit('start_guessing', {
-            guessingUserId: gameState.pinocoId,
-          });
-        } else {
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_guessing', {
+              guessingUserId: gameState.pinocoId,
+            });
+          }, 3000);
+        } else if (gameState.phase === 'SPEAKING') {
           // 다음 라운드 시작
-          const nextSpeaker = gameState.currentSpeakerId;
+          const nextSpeaker = gameState.speakerQueue[0];
           this.logger.logSocketEvent('send', 'start_speaking', {
             gsid,
             speakerId: nextSpeaker,
           });
-          this.server.to(gsid).emit('start_speaking', {
-            speakerId: nextSpeaker,
-          });
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_speaking', {
+              speakerId: nextSpeaker,
+            });
+          }, 3000);
+        } else if (gameState.phase === 'ENDING') {
+          this.logger.logSocketEvent('send', 'start_ending', { gsid });
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_ending', {
+              isPinocoWin: true,
+              pinoco: gameState.pinocoId,
+              isGuessed: false,
+              guessingWord: '',
+            });
+          }, 3000);
         }
       }
     } catch (error) {

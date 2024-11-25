@@ -19,57 +19,50 @@ export class GameService {
 
     const gameState: IGameState = {
       phase: 'GAMESTART',
+      userIds,
       word,
       pinocoId: userIds[pinocoIndex],
-      speakerQueue: [...userIds],
-      currentSpeakerId: userIds[0],
+      liveUserIds: [...userIds],
+      speakerQueue: [],
       votes: {},
-      spokenUsers: new Set(),
     };
 
     this.games.set(gsid, gameState);
+    this.startSpeakingPhase(gsid);
     return gameState;
+  }
+
+  startSpeakingPhase(gsid: string): void {
+    const game = this.games.get(gsid);
+    if (!game) return;
+
+    const shuffledUserIds = [...game.liveUserIds];
+    for (let i = shuffledUserIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledUserIds[i], shuffledUserIds[j]] = [
+        shuffledUserIds[j],
+        shuffledUserIds[i],
+      ];
+    }
+    game.speakerQueue = shuffledUserIds;
+
+    game.phase = 'SPEAKING';
   }
 
   getGameState(gsid: string): IGameState | undefined {
     return this.games.get(gsid);
   }
 
-  async startSpeaking(gsid: string): Promise<string | null> {
+  async endSpeaking(gsid: string): Promise<string | null> {
     const game = this.games.get(gsid);
-    if (!game) return null;
+    if (!game) return;
 
-    game.phase = 'SPEAKING';
-    game.currentSpeakerId = game.speakerQueue.shift() || null;
-    return game.currentSpeakerId;
-  }
-
-  async endSpeaking(gsid: string): Promise<boolean> {
-    const game = this.games.get(gsid);
-    if (!game) return false;
-
-    const room = this.roomService.getRoom(gsid);
-    if (!room) return false;
-
-    // 현재 발언자를 발언 완료 목록에 추가
-    if (game.currentSpeakerId) {
-      game.spokenUsers.add(game.currentSpeakerId);
-    }
-
-    // 모든 사용자가 발언을 마쳤는지 확인
-    const totalUsers = room.userIds.size;
-    if (game.spokenUsers.size === totalUsers) {
+    game.speakerQueue.shift();
+    if (game.speakerQueue.length === 0) {
       game.phase = 'VOTING';
-      return true;
+      return;
     }
-
-    // 아직 발언하지 않은 다음 발언자 찾기
-    const nextSpeaker = Array.from(room.userIds).find(
-      (userId) => !game.spokenUsers.has(userId),
-    );
-
-    game.currentSpeakerId = nextSpeaker || null;
-    return false;
+    return;
   }
 
   async submitVote(
@@ -96,18 +89,28 @@ export class GameService {
     });
 
     const maxVotes = Math.max(...Object.values(voteCount));
-    const deadPerson =
-      Object.entries(voteCount).find(([, count]) => count === maxVotes)?.[0] ||
-      'none';
 
+    const maxVotedUsers = Object.entries(voteCount).filter(
+      ([, count]) => count === maxVotes,
+    );
+
+    const deadPerson =
+      maxVotedUsers.length > 1 ? '' : maxVotedUsers[0]?.[0] || '';
+
+    //동점인경우
+    if (deadPerson !== '') {
+      game.liveUserIds = game.liveUserIds.filter((id) => id !== deadPerson);
+    }
+
+    // 피노코가 죽은 경우 => GUESSING 시작
     if (deadPerson === game.pinocoId) {
       game.phase = 'GUESSING';
     } else {
-      game.phase = 'SPEAKING';
-      // 발언 순서 재설정
-      const room = this.roomService.getRoom(gsid);
-      if (room) {
-        game.speakerQueue = Array.from(room.userIds);
+      // 피노코가 아닌 경우 인원이 2명이하라면 게임종료, 아니라면 SPEAKING 시작
+      if (game.liveUserIds.length <= 2) {
+        game.phase = 'ENDING';
+      } else {
+        this.startSpeakingPhase(gsid);
       }
     }
 

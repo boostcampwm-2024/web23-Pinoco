@@ -92,15 +92,15 @@ export class GatewayService {
     };
   }
 
-  async handleSpeakingEnd(gsid: string, userId: string): Promise<boolean> {
+  async handleSpeakingEnd(gsid: string, userId: string): Promise<void> {
     const game = this.gameService.getGameState(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
-    if (game.currentSpeakerId !== userId) {
+    if (game.speakerQueue[0] !== userId) {
       throw new Error('현재 발언 차례가 아닙니다.');
     }
 
-    return await this.gameService.endSpeaking(gsid);
+    await this.gameService.endSpeaking(gsid);
   }
 
   async submitVote(
