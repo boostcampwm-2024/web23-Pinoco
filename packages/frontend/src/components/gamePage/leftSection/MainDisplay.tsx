@@ -16,21 +16,14 @@ export default function MainDisplay() {
   const { userId } = useAuthStore();
   const { isHost, isPinoco, allUsers } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
-  const { endingResult } = useEnding(setGamePhase);
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
-  const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
-    useGameSocket(setGamePhase);
-  const [remainingPlayers, setRemainingPlayers] = useState<number>(readyUsers.length);
-
+  const { gameStartData, currentSpeaker, endSpeaking, votePinoco } = useGameSocket(setGamePhase);
+  const { endingResult } = useEnding(setGamePhase);
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
-  const { voteResult, deadPerson } = useVoteResult(
-    remainingPlayers,
-    setRemainingPlayers,
-    setIsVoteSubmitted,
-  );
+  const { voteResult, deadPerson } = useVoteResult(setIsVoteSubmitted, setGamePhase);
 
   useEffect(() => {
     if (gameStartData) {
@@ -103,24 +96,6 @@ export default function MainDisplay() {
     </div>
   );
 
-  const renderEndingUI = () => {
-    if (!endingResult) return;
-
-    const { isPinocoWin, pinoco, isGuessed, guessingWord } = endingResult;
-    return (
-      <div className="flex flex-col items-center justify-center h-full space-y-4">
-        <h2 className="text-2xl font-bold text-white-default">
-          {isPinocoWin ? '피노코가 승리했습니다 🤥' : '제페토가 승리했습니다 🔨'}
-        </h2>
-        {isGuessed && (
-          <p className="text-xl text-white-default">
-            피노코 {pinoco}가 제출한 제시어: {guessingWord}
-          </p>
-        )}
-      </div>
-    );
-  };
-
   const renderVoteResultUI = () => (
     <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
       <h2 className="text-2xl font-bold text-white-default">투표 결과</h2>
@@ -138,6 +113,24 @@ export default function MainDisplay() {
       </ul>
     </div>
   );
+
+  const renderEndingUI = () => {
+    if (!endingResult) return;
+
+    const { isPinocoWin, pinoco, isGuessed, guessingWord } = endingResult;
+    return (
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <h2 className="text-2xl font-bold text-white-default">
+          {isPinocoWin ? '피노코가 승리했습니다 🤥' : '제페토가 승리했습니다 🔨'}
+        </h2>
+        {isGuessed && (
+          <p className="text-xl text-white-default">
+            피노코 {pinoco}가 제출한 제시어: {guessingWord}
+          </p>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg bg-green-default/40">
@@ -169,7 +162,9 @@ export default function MainDisplay() {
           </div>
         )}
 
-        {gamePhase === GAME_PHASE.VOTING && (deadPerson ? renderVoteResultUI() : renderVotingUI())}
+        {gamePhase === GAME_PHASE.VOTING && renderVotingUI()}
+
+        {gamePhase === GAME_PHASE.VOTING_RESULT && renderVoteResultUI()}
 
         {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">

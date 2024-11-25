@@ -9,7 +9,6 @@ export default function useGuessing(isPinoco: boolean, setGamePhase: (phase: Gam
     if (!socket) return;
 
     socket.on('start_guessing', () => {
-      console.log('GUESSING 단계 돌입');
       setGamePhase(GAME_PHASE.GUESSING);
     });
 

@@ -17,7 +17,6 @@ export default function useEnding(setGamePhase: (phase: GamePhase) => void) {
     if (!socket) return;
 
     const handleStartEnding = (data: IEndingResult) => {
-      if (endingResult) return;
       setEndingResult(data);
       setGamePhase(GAME_PHASE.ENDING);
     };
