@@ -23,7 +23,11 @@ export default function MainDisplay() {
   const { gameStartData, currentSpeaker, endSpeaking, votePinoco } = useGameSocket(setGamePhase);
   const { endingResult } = useEnding(setGamePhase);
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
-  const { voteResult, deadPerson } = useVoteResult(setIsVoteSubmitted, setGamePhase);
+  const { voteResult, deadPerson } = useVoteResult(
+    setIsVoteSubmitted,
+    setGamePhase,
+    setSelectedVote,
+  );
 
   useEffect(() => {
     if (gameStartData) {

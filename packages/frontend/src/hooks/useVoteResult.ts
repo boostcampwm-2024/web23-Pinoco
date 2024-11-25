@@ -11,6 +11,7 @@ interface IVoteResult {
 export default function useVoteResult(
   onIsVotedChange?: (isVoted: boolean) => void,
   onPhaseChange?: (phase: GamePhase) => void,
+  setSelectedVote?: (vote: string | null) => void,
 ) {
   const socket = useSocketStore((state) => state.socket);
   const { removeUser } = useRoomStore();
@@ -27,9 +28,13 @@ export default function useVoteResult(
       if (data.deadPerson !== '') {
         removeUser(data.deadPerson);
       }
+
       setVoteResult(data.voteResult);
       setDeadPerson(data.deadPerson);
 
+      if (setSelectedVote) {
+        setSelectedVote(null);
+      }
       if (onPhaseChange) {
         onPhaseChange(GAME_PHASE.VOTING_RESULT);
       }
@@ -38,7 +43,7 @@ export default function useVoteResult(
     return () => {
       socket.off('receive_vote_result');
     };
-  }, [socket, onIsVotedChange, onPhaseChange, removeUser]);
+  }, [socket, onIsVotedChange, onPhaseChange, removeUser, setSelectedVote]);
 
   return { voteResult, deadPerson };
 }
