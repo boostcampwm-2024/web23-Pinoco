@@ -8,7 +8,7 @@ export default function useJoinRoom() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.userId);
   const setRoomData = useRoomStore((state) => state.setRoomData);
-  const setAllUsers = useRoomStore((state) => state.setAllUsers);
+  const { setAllUsers } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
   const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
