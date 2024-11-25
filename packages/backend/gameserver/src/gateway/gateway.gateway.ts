@@ -283,7 +283,7 @@ export class GatewayGateway
 
     try {
       await this.gatewayService.submitVote(gsid, userId, data.voteUserId);
-      const gameState = this.gameService.getGameState(gsid);
+      let gameState = this.gameService.getGameState(gsid);
       const room = await this.roomService.getRoom(gsid);
 
       if (Object.keys(gameState.votes).length === room.userIds.size) {
@@ -295,7 +295,8 @@ export class GatewayGateway
         });
         this.server.to(gsid).emit('receive_vote_result', result);
 
-        if (result.deadPerson === gameState.pinocoId) {
+        gameState = this.gameService.getGameState(gsid);
+        if (gameState.phase === 'GUESSING') {
           this.logger.logSocketEvent('send', 'start_guessing', {
             gsid,
             guessingUserId: gameState.pinocoId,
@@ -303,7 +304,7 @@ export class GatewayGateway
           this.server.to(gsid).emit('start_guessing', {
             guessingUserId: gameState.pinocoId,
           });
-        } else {
+        } else if (gameState.phase === 'SPEAKING') {
           // 다음 라운드 시작
           const nextSpeaker = gameState.speakerQueue[0];
           this.logger.logSocketEvent('send', 'start_speaking', {
@@ -312,6 +313,14 @@ export class GatewayGateway
           });
           this.server.to(gsid).emit('start_speaking', {
             speakerId: nextSpeaker,
+          });
+        } else if (gameState.phase === 'ENDING') {
+          this.logger.logSocketEvent('send', 'start_ending', { gsid });
+          this.server.to(gsid).emit('start_ending', {
+            isPinocoWin: true,
+            pinoco: gameState.pinocoId,
+            isGuessed: false,
+            guessingWord: '',
           });
         }
       }

@@ -13,6 +13,7 @@ export interface IGameState {
   pinocoId?: string;
   speakerQueue: string[];
   votes: Record<string, string>;
+  liveUserIds: string[];
   isGuessed?: boolean;
   guessingWord?: string;
 }

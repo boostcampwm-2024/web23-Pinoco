@@ -22,6 +22,7 @@ export class GameService {
       userIds,
       word,
       pinocoId: userIds[pinocoIndex],
+      liveUserIds: [...userIds],
       speakerQueue: [],
       votes: {},
     };
@@ -35,7 +36,7 @@ export class GameService {
     const game = this.games.get(gsid);
     if (!game) return;
 
-    const shuffledUserIds = [...game.userIds];
+    const shuffledUserIds = [...game.liveUserIds];
     for (let i = shuffledUserIds.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledUserIds[i], shuffledUserIds[j]] = [
@@ -88,18 +89,28 @@ export class GameService {
     });
 
     const maxVotes = Math.max(...Object.values(voteCount));
-    const deadPerson =
-      Object.entries(voteCount).find(([, count]) => count === maxVotes)?.[0] ||
-      'none';
 
+    const maxVotedUsers = Object.entries(voteCount).filter(
+      ([, count]) => count === maxVotes,
+    );
+
+    const deadPerson =
+      maxVotedUsers.length > 1 ? '' : maxVotedUsers[0]?.[0] || '';
+
+    //동점인경우
+    if (deadPerson !== '') {
+      game.liveUserIds = game.liveUserIds.filter((id) => id !== deadPerson);
+    }
+
+    // 피노코가 죽은 경우 => GUESSING 시작
     if (deadPerson === game.pinocoId) {
       game.phase = 'GUESSING';
     } else {
-      game.phase = 'SPEAKING';
-      // 발언 순서 재설정
-      const room = this.roomService.getRoom(gsid);
-      if (room) {
-        game.speakerQueue = Array.from(room.userIds);
+      // 피노코가 아닌 경우 인원이 2명이하라면 게임종료, 아니라면 SPEAKING 시작
+      if (game.liveUserIds.length <= 2) {
+        game.phase = 'ENDING';
+      } else {
+        this.startSpeakingPhase(gsid);
       }
     }
 
