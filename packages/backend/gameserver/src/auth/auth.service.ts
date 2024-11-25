@@ -9,9 +9,10 @@ interface GuestCredentials {
 @Injectable()
 export class AuthService {
   private guestSessions: Map<string, string> = new Map();
+  private guestCounter: number = 1;
 
   guestLogin(): GuestCredentials {
-    const userId = uuidv4();
+    const userId = `게스트_${this.guestCounter++}`;
     const password = uuidv4();
 
     this.guestSessions.set(userId, password);

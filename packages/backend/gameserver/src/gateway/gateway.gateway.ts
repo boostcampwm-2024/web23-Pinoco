@@ -259,32 +259,18 @@ export class GatewayGateway
     this.logger.logSocketEvent('receive', 'end_speaking', { userId, gsid });
 
     try {
-      const isAllSpoken = await this.gatewayService.handleSpeakingEnd(
-        gsid,
-        userId,
-      );
+      await this.gatewayService.handleSpeakingEnd(gsid, userId);
       const gameState = this.gameService.getGameState(gsid);
-      console.log('Game state after speaking end:', {
-        phase: gameState.phase,
-        isAllSpoken,
-        spokenUsers: Array.from(gameState.spokenUsers),
-        totalUsers: this.roomService.getRoom(gsid)?.userIds.size,
-      });
 
-      if (isAllSpoken) {
-        console.log('모든 사용자가 발언을 마쳤습니다. 투표를 시작합니다.');
+      if (gameState.phase === 'VOTING') {
         this.logger.logSocketEvent('send', 'start_vote', { gsid });
-        // 룸의 모든 소켓에 직접 이벤트 전송
-        const sockets = await this.server.in(gsid).fetchSockets();
-        sockets.forEach((socket) => {
-          socket.emit('start_vote');
-        });
+        this.server.to(gsid).emit('start_vote');
       } else {
         this.logger.logSocketEvent('send', 'start_speaking', {
           gsid,
           speakerId: gameState.currentSpeakerId,
-          spokenUsers: Array.from(gameState.spokenUsers),
         });
+
         this.server.to(gsid).emit('start_speaking', {
           speakerId: gameState.currentSpeakerId,
         });
