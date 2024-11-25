@@ -83,9 +83,7 @@ export class GameService {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
-    if (targetId !== '') {
-      game.votes[voterId] = targetId;
-    }
+    game.votes[voterId] = targetId;
   }
 
   async processVoteResult(gsid: string): Promise<{

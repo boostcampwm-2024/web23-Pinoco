@@ -115,10 +115,6 @@ export class GatewayService {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 
-    if (!room.userIds.has(targetId)) {
-      throw new Error('존재하지 않는 사용자입니다.');
-    }
-
     await this.gameService.submitVote(gsid, voterId, targetId);
   }
 
