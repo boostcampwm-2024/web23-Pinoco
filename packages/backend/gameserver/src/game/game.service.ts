@@ -103,15 +103,13 @@ export class GameService {
     }
 
     // 피노코가 죽은 경우 => GUESSING 시작
+    game.votes = {};
     if (deadPerson === game.pinocoId) {
       game.phase = 'GUESSING';
+    } else if (game.liveUserIds.length <= 2) {
+      game.phase = 'ENDING';
     } else {
-      // 피노코가 아닌 경우 인원이 2명이하라면 게임종료, 아니라면 SPEAKING 시작
-      if (game.liveUserIds.length <= 2) {
-        game.phase = 'ENDING';
-      } else {
-        this.startSpeakingPhase(gsid);
-      }
+      this.startSpeakingPhase(gsid);
     }
 
     return { voteResult: voteCount, deadPerson };
