@@ -14,7 +14,7 @@ import { useAuthStore } from '@/states/store/authStore';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
-  const { isHost, isPinoco } = useRoomStore();
+  const { isHost, isPinoco, allUsers } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
   const { endingResult } = useEnding(setGamePhase);
   const [countdown, setCountdown] = useState(3);
@@ -68,7 +68,7 @@ export default function MainDisplay() {
     <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
       <h2 className="text-2xl font-bold text-white-default">피노코를 지목해주세요!</h2>
       <div className="flex flex-col w-full max-w-md space-y-3">
-        {readyUsers.map((userId: string) => (
+        {allUsers.map((userId: string) => (
           <button
             key={userId}
             onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
