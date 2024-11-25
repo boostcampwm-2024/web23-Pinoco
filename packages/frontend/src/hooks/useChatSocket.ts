@@ -19,7 +19,7 @@ interface IUserJoined {
 
 export const useChatSocket = (gsid: string, userId: string) => {
   const addChatEntry = useChatStore((state) => state.addChatEntry);
-  const { addUser, removeUser } = useRoomStore();
+  const { addUser, removeUser, setIsHost } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {
@@ -31,6 +31,11 @@ export const useChatSocket = (gsid: string, userId: string) => {
 
     socket.on('user_left', (data: IUserLeft) => {
       removeUser(data.userId);
+      if (data.hostUserId === userId) {
+        setIsHost(true);
+      } else {
+        setIsHost(false);
+      }
       addChatEntry({
         userId: `[알림]`,
         message: `${data.userId}님이 퇴장하셨습니다.`,
@@ -50,7 +55,7 @@ export const useChatSocket = (gsid: string, userId: string) => {
       socket.off('user_left');
       socket.off('user_joined');
     };
-  }, [gsid, socket, addChatEntry, addUser, removeUser]);
+  }, [gsid, socket, addChatEntry, addUser, removeUser, setIsHost, userId]);
 
   const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;

@@ -10,6 +10,7 @@ interface IRoomState {
   setAllUsers: (allUsers: string[]) => void;
   addUser: (userId: string) => void;
   removeUser: (userId: string) => void;
+  setIsHost: (isHost: boolean) => void;
 }
 export const useRoomStore = create<IRoomState>()(
   persist(
@@ -29,6 +30,7 @@ export const useRoomStore = create<IRoomState>()(
         set((state) => ({
           allUsers: new Set([...state.allUsers].filter((id) => id !== userId)),
         })),
+      setIsHost: (isHost) => set({ isHost }),
     }),
     { name: 'room-storage' },
   ),
