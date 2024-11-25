@@ -55,10 +55,14 @@ export default function MainDisplay() {
   }, [gameStartData]);
 
   const handleVote = () => {
-    if (selectedVote === null) return;
-
-    votePinoco(selectedVote);
-    setIsVoteSubmitted(true);
+    if (!isVoteSubmitted) {
+      if (selectedVote === null) {
+        votePinoco('');
+      } else {
+        votePinoco(selectedVote);
+      }
+      setIsVoteSubmitted(true);
+    }
   };
 
   const renderVotingUI = () => (

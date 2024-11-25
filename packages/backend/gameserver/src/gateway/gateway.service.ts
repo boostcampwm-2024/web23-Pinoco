@@ -80,6 +80,10 @@ export class GatewayService {
       throw new Error('방장만 게임을 시작할 수 있습니다.');
     }
 
+    if (room.userIds.size < 3) {
+      throw new Error('게임을 시작하려면 최소 3명의 플레이어가 필요합니다.');
+    }
+
     if (room.readyUserIds.size !== room.userIds.size - 1) {
       throw new Error('모든 참가자가 준비되어야 합니다.');
     }
@@ -110,10 +114,6 @@ export class GatewayService {
   ): Promise<void> {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
-
-    if (!room.userIds.has(targetId)) {
-      throw new Error('존재하지 않는 사용자입니다.');
-    }
 
     await this.gameService.submitVote(gsid, voterId, targetId);
   }

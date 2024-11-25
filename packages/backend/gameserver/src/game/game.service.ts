@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { IGameState, GamePhase } from './types/game.types';
 import { RoomService } from '../room/room.service';
+import { GAME_WORDS } from './constants/words';
 
 @Injectable()
 export class GameService {
   private games: Map<string, IGameState> = new Map();
-  private words = ['사과', '바나나', '자동차', '컴퓨터']; // 예시 단어들
 
   constructor(private readonly roomService: RoomService) {}
 
@@ -15,12 +15,22 @@ export class GameService {
 
     const userIds = Array.from(room.userIds);
     const pinocoIndex = Math.floor(Math.random() * userIds.length);
-    const word = this.words[Math.floor(Math.random() * this.words.length)];
+
+    // 랜덤하게 테마 선택
+    const themeIndex = Math.floor(Math.random() * GAME_WORDS.length);
+    const selectedTheme = GAME_WORDS[themeIndex];
+
+    // 선택된 테마에서 랜덤하게 단어 선택
+    const word =
+      selectedTheme.words[
+        Math.floor(Math.random() * selectedTheme.words.length)
+      ];
 
     const gameState: IGameState = {
       phase: 'GAMESTART',
       userIds,
       word,
+      theme: selectedTheme.theme, // 테마 정보 추가
       pinocoId: userIds[pinocoIndex],
       liveUserIds: [...userIds],
       speakerQueue: [],
@@ -95,7 +105,7 @@ export class GameService {
     );
 
     const deadPerson =
-      maxVotedUsers.length > 1 ? '' : maxVotedUsers[0]?.[0] || '';
+      maxVotedUsers.length !== 1 ? '' : maxVotedUsers[0]?.[0] || '';
 
     //동점인경우
     if (deadPerson !== '') {
