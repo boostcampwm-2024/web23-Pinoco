@@ -68,7 +68,7 @@ export default function MainDisplay() {
     <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
       <h2 className="text-2xl font-bold text-white-default">피노코를 지목해주세요!</h2>
       <div className="flex flex-col w-full max-w-md space-y-3">
-        {allUsers.map((userId: string) => (
+        {Array.from(allUsers).map((userId: string) => (
           <button
             key={userId}
             onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
