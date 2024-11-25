@@ -15,6 +15,7 @@ interface IGameStart {
   isPinoco: boolean;
   word: string;
   speakerId: string;
+  allUserIds: string[];
 }
 
 interface ISpeakingStart {
@@ -23,7 +24,7 @@ interface ISpeakingStart {
 
 export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   const socket = useSocketStore((state) => state.socket);
-  const { setIsPinoco } = useRoomStore();
+  const { setIsPinoco, setAllUsers } = useRoomStore();
   const [readyUsers, setReadyUsers] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [gameStartData, setGameStartData] = useState<IGameStart | null>(null);
@@ -40,6 +41,8 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     };
 
     const handleStartGame = (data: IGameStart) => {
+      console.log('start_game_success시 서버로 부터 받는 데이터', data);
+      setAllUsers(data.allUserIds);
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
@@ -71,7 +74,7 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
       socket.off('start_speaking', handleStartSpeaking);
       socket.off('start_vote', handleStartVote);
     };
-  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker]);
+  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker, setAllUsers]);
 
   const sendReady = (isReady: boolean) => {
     if (!socket) return;
