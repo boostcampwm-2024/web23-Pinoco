@@ -19,41 +19,49 @@ export class GameService {
 
     const gameState: IGameState = {
       phase: 'GAMESTART',
+      userIds,
       word,
       pinocoId: userIds[pinocoIndex],
-      speakerQueue: [...userIds.slice(1)],
-      currentSpeakerId: userIds[0],
+      speakerQueue: [],
       votes: {},
     };
 
     this.games.set(gsid, gameState);
+    this.startSpeakingPhase(gsid);
     return gameState;
+  }
+
+  startSpeakingPhase(gsid: string): void {
+    const game = this.games.get(gsid);
+    if (!game) return;
+
+    const shuffledUserIds = [...game.userIds];
+    for (let i = shuffledUserIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledUserIds[i], shuffledUserIds[j]] = [
+        shuffledUserIds[j],
+        shuffledUserIds[i],
+      ];
+    }
+    game.speakerQueue = shuffledUserIds;
+
+    game.phase = 'SPEAKING';
   }
 
   getGameState(gsid: string): IGameState | undefined {
     return this.games.get(gsid);
   }
 
-  async startSpeaking(gsid: string): Promise<string | null> {
+  async endSpeaking(gsid: string): Promise<string | null> {
     const game = this.games.get(gsid);
-    if (!game) return null;
+    if (!game) return;
 
-    game.phase = 'SPEAKING';
-    game.currentSpeakerId = game.speakerQueue.shift() || null;
-    return game.currentSpeakerId;
-  }
-
-  async endSpeaking(gsid: string): Promise<boolean> {
-    const game = this.games.get(gsid);
-    if (!game) return false;
-
+    game.speakerQueue.shift();
     if (game.speakerQueue.length === 0) {
       game.phase = 'VOTING';
-      return true;
+      return;
     }
-
-    game.currentSpeakerId = game.speakerQueue.shift() || null;
-    return false;
+    return;
   }
 
   async submitVote(

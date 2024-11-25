@@ -8,9 +8,9 @@ export type GamePhase =
 
 export interface IGameState {
   phase: GamePhase;
+  userIds: string[];
   word?: string;
   pinocoId?: string;
-  currentSpeakerId?: string;
   speakerQueue: string[];
   votes: Record<string, string>;
   isGuessed?: boolean;

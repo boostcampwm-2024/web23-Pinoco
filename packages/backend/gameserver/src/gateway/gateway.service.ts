@@ -96,7 +96,7 @@ export class GatewayService {
     const game = this.gameService.getGameState(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
-    if (game.currentSpeakerId !== userId) {
+    if (game.speakerQueue[0] !== userId) {
       throw new Error('현재 발언 차례가 아닙니다.');
     }
 
