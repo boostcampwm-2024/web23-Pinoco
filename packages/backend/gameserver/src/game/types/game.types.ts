@@ -1,5 +1,4 @@
 export type GamePhase =
-  | 'WAITING'
   | 'GAMESTART'
   | 'SPEAKING'
   | 'VOTING'
@@ -9,13 +8,14 @@ export type GamePhase =
 export interface IGameState {
   phase: GamePhase;
   userIds: string[];
-  word?: string;
-  pinocoId?: string;
+  word: string;
+  theme: string;
+  pinocoId: string;
+  liveUserIds: string[];
   speakerQueue: string[];
   votes: Record<string, string>;
-  liveUserIds: string[];
-  isGuessed?: boolean;
   guessingWord?: string;
+  isGuessed?: boolean;
 }
 
 export interface IGameInfo extends IGameState {
