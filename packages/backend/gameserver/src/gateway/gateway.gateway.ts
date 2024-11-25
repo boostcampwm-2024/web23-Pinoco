@@ -301,9 +301,11 @@ export class GatewayGateway
             gsid,
             guessingUserId: gameState.pinocoId,
           });
-          this.server.to(gsid).emit('start_guessing', {
-            guessingUserId: gameState.pinocoId,
-          });
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_guessing', {
+              guessingUserId: gameState.pinocoId,
+            });
+          }, 3000);
         } else if (gameState.phase === 'SPEAKING') {
           // 다음 라운드 시작
           const nextSpeaker = gameState.speakerQueue[0];
@@ -311,17 +313,21 @@ export class GatewayGateway
             gsid,
             speakerId: nextSpeaker,
           });
-          this.server.to(gsid).emit('start_speaking', {
-            speakerId: nextSpeaker,
-          });
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_speaking', {
+              speakerId: nextSpeaker,
+            });
+          }, 3000);
         } else if (gameState.phase === 'ENDING') {
           this.logger.logSocketEvent('send', 'start_ending', { gsid });
-          this.server.to(gsid).emit('start_ending', {
-            isPinocoWin: true,
-            pinoco: gameState.pinocoId,
-            isGuessed: false,
-            guessingWord: '',
-          });
+          setTimeout(() => {
+            this.server.to(gsid).emit('start_ending', {
+              isPinocoWin: true,
+              pinoco: gameState.pinocoId,
+              isGuessed: false,
+              guessingWord: '',
+            });
+          }, 3000);
         }
       }
     } catch (error) {
