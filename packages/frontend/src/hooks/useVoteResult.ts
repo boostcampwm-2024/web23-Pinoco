@@ -24,7 +24,7 @@ export default function useVoteResult(
       if (onIsVotedChange) {
         onIsVotedChange(false);
       }
-      if (data.deadPerson !== 'none') {
+      if (data.deadPerson !== '') {
         removeUser(data.deadPerson);
       }
       setVoteResult(data.voteResult);

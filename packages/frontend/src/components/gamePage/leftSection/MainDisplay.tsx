@@ -99,7 +99,7 @@ export default function MainDisplay() {
   const renderVoteResultUI = () => (
     <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
       <h2 className="text-2xl font-bold text-white-default">투표 결과</h2>
-      {deadPerson === 'none' ? (
+      {deadPerson === '' ? (
         <p className="text-xl text-white-default">동점입니다. 아무도 제거되지 않았습니다.</p>
       ) : (
         <p className="text-xl text-white-default">{deadPerson}님이 제거되었습니다.</p>
