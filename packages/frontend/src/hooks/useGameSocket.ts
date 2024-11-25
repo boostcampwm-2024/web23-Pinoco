@@ -33,7 +33,6 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     if (!socket) return;
 
     const handleStartSpeaking = (data: ISpeakingStart) => {
-      console.log('백엔드에서 speakerId 오나 확인 [start_speaking]', data.speakerId);
       setCurrentSpeaker(data.speakerId);
       if (onPhaseChange) {
         onPhaseChange(GAME_PHASE.SPEAKING);
@@ -41,14 +40,12 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     };
 
     const handleStartGame = (data: IGameStart) => {
-      console.log('초기 발언자 id [start_game_success]', data.speakerId);
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
     };
 
     const handleStartVote = () => {
-      console.log('투표 시작 이벤트 수신!');
       if (onPhaseChange) {
         onPhaseChange(GAME_PHASE.VOTING);
       }

@@ -16,17 +16,21 @@ export default function MainDisplay() {
   const { userId } = useAuthStore();
   const { isHost, isPinoco } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
-  const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
-    useGameSocket(setGamePhase);
   const { endingResult } = useEnding(setGamePhase);
   const [countdown, setCountdown] = useState(3);
   const [currentWord, setCurrentWord] = useState('');
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
+  const { readyUsers, gameStartData, currentSpeaker, endSpeaking, votePinoco } =
+    useGameSocket(setGamePhase);
   const [remainingPlayers, setRemainingPlayers] = useState<number>(readyUsers.length);
 
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
-  const { voteResult, deadPerson } = useVoteResult(remainingPlayers, setRemainingPlayers);
+  const { voteResult, deadPerson } = useVoteResult(
+    remainingPlayers,
+    setRemainingPlayers,
+    setIsVoteSubmitted,
+  );
 
   useEffect(() => {
     if (gameStartData) {

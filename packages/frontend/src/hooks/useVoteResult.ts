@@ -9,6 +9,7 @@ interface IVoteResult {
 export default function useVoteResult(
   remainingPlayers: number,
   setRemainingPlayers: (value: number) => void,
+  onIsVotedChange?: (isVoted: boolean) => void,
 ) {
   const socket = useSocketStore((state) => state.socket);
   const [voteResult, setVoteResult] = useState<Record<string, number>>({});
@@ -18,6 +19,9 @@ export default function useVoteResult(
     if (!socket) return;
 
     socket.on('receive_vote_result', (data: IVoteResult) => {
+      if (onIsVotedChange) {
+        onIsVotedChange(false);
+      }
       setVoteResult(data.voteResult);
       setDeadPerson(data.deadPerson);
 
@@ -29,7 +33,7 @@ export default function useVoteResult(
     return () => {
       socket.off('receive_vote_result');
     };
-  }, [socket, remainingPlayers, setRemainingPlayers]);
+  }, [socket, remainingPlayers, setRemainingPlayers, onIsVotedChange]);
 
   return { voteResult, deadPerson };
 }
