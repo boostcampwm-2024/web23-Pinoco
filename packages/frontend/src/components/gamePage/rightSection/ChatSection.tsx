@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import { useAuthStore } from '@/states/store/authStore';
@@ -14,6 +14,30 @@ export default function ChatSection() {
 
   const [chatInput, setChat] = useState('');
   const [isComposing, setIsComposing] = useState(false);
+
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+
+  useEffect(() => {
+    if (!isScrolledUp && chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory, isScrolledUp]);
+
+  const handleScroll = () => {
+    if (!chatContainerRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const isAtBottom = scrollHeight - clientHeight - scrollTop <= 50;
+    setIsScrolledUp(!isAtBottom);
+  };
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      setIsScrolledUp(false);
+    }
+  };
 
   const handleSend = () => {
     if (!chatInput.trim() || isComposing) return;
@@ -38,7 +62,11 @@ export default function ChatSection() {
 
   return (
     <div className="flex flex-col flex-grow p-4 bg-black rounded-lg opacity-80 text-white-default">
-      <div className="h-56 mt-2 space-y-2 overflow-y-auto grow">
+      <div
+        ref={chatContainerRef}
+        onScroll={handleScroll}
+        className="relative h-56 mt-2 space-y-2 overflow-y-auto grow"
+      >
         {chatHistory.map((entry, index) => (
           <div
             key={entry.userId + index}
@@ -66,8 +94,14 @@ export default function ChatSection() {
             </div>
           </div>
         ))}
-        <ArrowDownIcon className="p-2 bg-gray-500 rounded-full opacity-70 size-8 text-white-default" />
       </div>
+      {isScrolledUp && (
+        <div className="relative">
+          <button onClick={scrollToBottom} className="absolute z-50 bottom-8 right-6">
+            <ArrowDownIcon className="p-2 transition-all bg-gray-500 rounded-full size-8 text-white-default hover:opacity-100 hover:bg-gray-600" />
+          </button>
+        </div>
+      )}
       <input
         className="w-full p-2 mt-4 bg-gray-600 rounded-lg outline-none"
         placeholder="채팅을 입력해주세요..."
