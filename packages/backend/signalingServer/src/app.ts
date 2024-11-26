@@ -10,13 +10,17 @@ import fs from 'fs';
 dotenv.config();
 
 interface IOptions {
-  cert?: Buffer;
-  key?: Buffer;
+  cert: Buffer;
+  key: Buffer;
 }
-
+const isWindows = process.platform === 'win32';
 const options: IOptions = {
-  cert: process.env.SSL_CERT_PATH ? fs.readFileSync(process.env.SSL_CERT_PATH) : undefined,
-  key: process.env.SSL_KEY_PATH ? fs.readFileSync(process.env.SSL_KEY_PATH) : undefined,
+  cert: isWindows
+    ? fs.readFileSync(process.env.WIN_SSL_CERT_PATH || '')
+    : fs.readFileSync(process.env.SSL_CERT_PATH || ''),
+  key: isWindows
+    ? fs.readFileSync(process.env.WIN_SSL_KEY_PATH || '')
+    : fs.readFileSync(process.env.SSL_KEY_PATH || ''),
 };
 
 const app = express();

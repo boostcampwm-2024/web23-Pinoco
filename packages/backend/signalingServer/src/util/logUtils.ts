@@ -1,16 +1,37 @@
-export enum LogType {
-  create = 'create_room',
-  join = 'join_room',
-}
+import { Socket } from 'socket.io';
+import { ISignalingLogType, ILogData } from '@/types/signaling.types';
 
-interface ILogRoomStatus {
-  type: LogType;
-  roomList: Map<string, Set<string>>;
-  room?: Set<string>;
-  gsid: string;
-}
-
-export const logRoomStatus = ({ type, roomList, room = new Set(), gsid }: ILogRoomStatus) => {
-  console.log(`[ROOMS] ${JSON.stringify(Array.from(roomList.entries()))}`);
-  console.log(`[${type}] gsid: ${gsid}, room: ${JSON.stringify(Array.from(room))}`);
+const icons = {
+  [ISignalingLogType.offer]: '📢',
+  [ISignalingLogType.answer]: '🔗',
+  [ISignalingLogType.candidate]: '🔍',
+  [ISignalingLogType.joined]: '👥',
+  [ISignalingLogType.left]: '👋',
+  [ISignalingLogType.error]: '❌',
+  [ISignalingLogType.createRoom]: '🎮',
+  [ISignalingLogType.joinRoom]: '🚪',
 };
+
+export const formatLogMessage = (logData: ILogData) => {
+  const prefix = logData.isClient ? '[Client]' : '[Server]';
+  const icon = icons[logData.type as keyof typeof icons] || '❓';
+  return logData.gsid
+    ? `${prefix}[${icon}] ${logData.type}: from ${logData.from} to ${logData.to} (room: ${logData.gsid})`
+    : `${prefix}[${icon}] ${logData.type}: from ${logData.from} to ${logData.to}`;
+};
+
+const handleLog = (socket: Socket, logData: ILogData) => {
+  // 서버 자체 로그
+  const serverLog = () => {
+    console.log(formatLogMessage({ ...logData, isClient: false }));
+  };
+
+  // 클라이언트 로그 수신
+  socket.on('client_log', () => {
+    console.log(formatLogMessage(logData));
+  });
+
+  return serverLog;
+};
+
+export default handleLog;

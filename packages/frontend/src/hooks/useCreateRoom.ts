@@ -12,15 +12,15 @@ export default function useCreateRoom() {
   const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
   function handleCreateRoom() {
-    if (!userId || !socket) return;
+    if (!userId || !socket || !signalingSocket) return;
 
     socket.emit('create_room');
 
     socket.on('create_room_success', (data: { gsid: string; isHost: boolean }) => {
       setRoomData(data.gsid, data.isHost, false);
       setAllUsers([userId]);
+      signalingSocket.emit('create_room', { gsid: data.gsid });
       navigate(`/game/${data.gsid}`);
-      signalingSocket?.emit('create_room', { gsid: data.gsid });
     });
 
     socket.on('error', (data: { errorMessage: string }) => {

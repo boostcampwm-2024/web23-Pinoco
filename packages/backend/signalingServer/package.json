@@ -14,9 +14,10 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "@types/cors": "^2",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.9.0",
+    "@types/node": "^22.9.3",
+    "@types/socket.io": "^3.0.2",
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",

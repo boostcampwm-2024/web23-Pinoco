@@ -3,9 +3,11 @@ import OAuthLoginButton from '@/components/landingPage/OAuthLoginButton';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
 import { useSocketStore } from '@/states/store/socketStore';
+import useMediaStream from '@/hooks/useMediaStream';
 
 export default function LandingPage() {
   const { socket } = useSocketStore();
+  const { error } = useMediaStream();
   console.log('landingPage', socket?.connected);
   return (
     <>

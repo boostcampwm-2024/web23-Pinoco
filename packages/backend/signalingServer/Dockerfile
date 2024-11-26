@@ -7,7 +7,7 @@ RUN corepack enable \
     && corepack prepare yarn@4.5.1 --activate
 
 # 패키지 파일 복사
-COPY package.json ./
+COPY package.json yarn.lock ./
 
 # 소스 코드 복사
 COPY . .
