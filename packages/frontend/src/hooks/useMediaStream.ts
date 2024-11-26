@@ -39,7 +39,7 @@ export default function useMediaStream() {
         setLocalStream(null);
       }
     };
-  });
+  }, []);
 
   return state;
 }
