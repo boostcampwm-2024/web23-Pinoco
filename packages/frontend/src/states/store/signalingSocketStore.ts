@@ -2,13 +2,14 @@ import { create } from 'zustand';
 import { Socket, io } from 'socket.io-client';
 import { useLocalStreamStore } from '@/states/store/localStreamStore';
 import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
+import { getVideoStream } from '@/utils/videoStreamUtils';
 
 interface ISignalingSocketStore {
   userId: string | null;
   signalingSocket: Socket | null;
   connectSignalingSocket: (userId: string) => Promise<void>;
   disconnectSignalingSocket: () => void;
-  setupEventHandlers: (signalingSocket: Socket, localStream: MediaStream | null) => void;
+  setupEventHandlers: (signalingSocket: Socket) => void;
   removeEventHandlers: () => void;
 }
 
@@ -19,7 +20,6 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
   connectSignalingSocket: (userId: string) => {
     return new Promise((resolve, reject) => {
       set({ userId });
-      const localStream = useLocalStreamStore.getState().localStream;
       const signalingSocket = io(import.meta.env.VITE_SIGNALING_SERVER_URL, {
         query: { userId },
         withCredentials: true,
@@ -34,7 +34,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       signalingSocket.on('connect_error', (error) => {
         reject(error);
       });
-      get().setupEventHandlers(signalingSocket, localStream);
+      get().setupEventHandlers(signalingSocket);
     });
   },
 
@@ -45,13 +45,14 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
     });
   },
 
-  setupEventHandlers: (signalingSocket: Socket, localStream: MediaStream | null) => {
+  setupEventHandlers: async (signalingSocket: Socket) => {
     const userId = get().userId;
     const { createPeerConnection, setPeerConnection, removePeerConnection, removeRemoteStream } =
       usePeerConnectionStore.getState();
 
     signalingSocket.on('user_joined', async ({ fromUserId, gsid }) => {
       console.log('[Client][📢] user_joined', fromUserId, gsid);
+      const localStream = await getVideoStream();
       const peerConnection = createPeerConnection({
         fromUserId,
         signalingSocket,
@@ -75,18 +76,13 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
     });
 
     signalingSocket.on('video_offer', async ({ offer, fromUserId, gsid }) => {
-      const peerConnections = usePeerConnectionStore.getState().peerConnections;
-      let peerConnection = peerConnections.get(fromUserId)?.connection;
-
-      if (!peerConnection) {
-        console.log('Creating new peer connection');
-        peerConnection = createPeerConnection({
-          fromUserId,
-          signalingSocket,
-          gsid,
-          localUserId: userId,
-        });
-      }
+      const localStream = await getVideoStream();
+      const peerConnection = createPeerConnection({
+        fromUserId,
+        signalingSocket,
+        gsid,
+        localUserId: userId,
+      });
 
       localStream?.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
@@ -106,27 +102,27 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       console.log('[Client][📢] video_answer sent to', fromUserId);
     });
 
-    signalingSocket.on('video_answer', ({ answer, fromUserId }) => {
+    signalingSocket.on('video_answer', async ({ answer, fromUserId }) => {
       const peerConnections = usePeerConnectionStore.getState().peerConnections;
       const peerConnection = peerConnections.get(fromUserId)?.connection;
       if (!peerConnection) return;
-      peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
       console.log('[Client][📢] video_answer from', fromUserId);
     });
 
-    signalingSocket.on('new_ice_candidate', ({ candidate, fromUserId }) => {
+    signalingSocket.on('new_ice_candidate', async ({ candidate, fromUserId }) => {
       const peerConnections = usePeerConnectionStore.getState().peerConnections;
       const peerConnection = peerConnections.get(fromUserId)?.connection;
       if (!peerConnection) return;
-      peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       console.log('[Client][📢] new_ice_candidate', fromUserId);
     });
 
-    signalingSocket.on('user_left', ({ fromUserId }) => {
+    signalingSocket.on('user_left', async ({ fromUserId }) => {
       const peerConnections = usePeerConnectionStore.getState().peerConnections;
       const peerConnection = peerConnections.get(fromUserId)?.connection;
       if (!peerConnection) return;
-      peerConnection.close();
+      await peerConnection.close();
       removePeerConnection(fromUserId);
       removeRemoteStream(fromUserId);
       console.log('[Client][📢] user_left', fromUserId);
@@ -134,6 +130,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
 
     console.log('[Client][🔔] setupEventHandlers');
   },
+
   removeEventHandlers: () => {
     console.log('[Client][🔔] removeEventHandlers');
     const { peerConnections, clearConnections } = usePeerConnectionStore.getState();
@@ -144,7 +141,6 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
     signalingSocket.off('video_answer');
     signalingSocket.off('new_ice_candidate');
     signalingSocket.off('user_left');
-    signalingSocket.off('ping');
     peerConnections.forEach((peer) => {
       peer.connection.close();
     });

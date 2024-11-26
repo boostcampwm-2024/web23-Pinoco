@@ -10,13 +10,15 @@ import Header from '@/components/layout/Header';
 import SettingSection from '@/components/lobbyPage/SettingSection';
 import { useRoomStore } from '@/states/store/roomStore';
 import { useChatStore } from '@/states/store/chatStore';
-import useMediaStream from '@/hooks/useMediaStream';
+import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { getVideoStream } from '@/utils/videoStreamUtils';
 
 export default function LobbyPage() {
   const { gsid, setRoomData } = useRoomStore();
   const { socket } = useSocketStore();
   const { setChatHistory } = useChatStore();
-  const { error } = useMediaStream();
+  const localStream = useLocalStreamStore((state) => state.localStream);
+  if (!localStream) getVideoStream();
 
   useEffect(() => {
     if (gsid) {
