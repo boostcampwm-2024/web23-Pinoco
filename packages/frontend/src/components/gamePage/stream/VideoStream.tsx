@@ -19,18 +19,6 @@ export default function VideoStream({ userName, stream, isLocal }: VideoStreamPr
         audioTracks: stream?.getAudioTracks().length,
         videoTracks: stream?.getVideoTracks().length,
       });
-
-      // 원격 스트림인 경우 추가 디버깅
-      if (!isLocal) {
-        console.log('[Client][🎥] Remote stream details:', {
-          active: stream.active,
-          tracks: stream.getTracks().map((track) => ({
-            kind: track.kind,
-            enabled: track.enabled,
-            readyState: track.readyState,
-          })),
-        });
-      }
     }
   }, [stream]);
 

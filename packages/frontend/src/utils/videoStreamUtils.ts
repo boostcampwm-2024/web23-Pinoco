@@ -17,7 +17,6 @@ export async function getVideoStream() {
     useLocalStreamStore.getState().setLocalStream(localStream);
     return localStream;
   } catch (error) {
-    console.error('[Client][🎥] getVideoStream error', error);
     return null;
   }
 }
