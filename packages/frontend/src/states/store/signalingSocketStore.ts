@@ -8,7 +8,7 @@ interface ISignalingSocketStore {
   signalingSocket: Socket | null;
   connectSignalingSocket: (userId: string) => Promise<void>;
   disconnectSignalingSocket: () => void;
-  setupEventHandlers: (signalingSocket: Socket, localStream: MediaStream) => void;
+  setupEventHandlers: (signalingSocket: Socket) => void;
   removeEventHandlers: () => void;
 }
 
@@ -19,7 +19,6 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
   connectSignalingSocket: (userId: string) => {
     return new Promise((resolve, reject) => {
       set({ userId });
-      const localStream = useLocalStreamStore.getState().localStream;
       const signalingSocket = io(import.meta.env.VITE_SIGNALING_SERVER_URL, {
         query: { userId },
         withCredentials: true,
@@ -34,13 +33,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       signalingSocket.on('connect_error', (error) => {
         reject(error);
       });
-
-      if (!localStream) {
-        reject(new Error('No local stream available'));
-        return;
-      }
-
-      get().setupEventHandlers(signalingSocket, localStream);
+      get().setupEventHandlers(signalingSocket);
     });
   },
 
@@ -50,10 +43,12 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       return { signalingSocket: null };
     });
   },
-  setupEventHandlers: (signalingSocket: Socket, localStream: MediaStream) => {
+  setupEventHandlers: (signalingSocket: Socket) => {
     const userId = get().userId;
+    const localStream = useLocalStreamStore.getState().localStream;
     const { createPeerConnection, setPeerConnection, removePeerConnection, removeRemoteStream } =
       usePeerConnectionStore.getState();
+    if (!localStream) return;
 
     signalingSocket.on('user_joined', async ({ fromUserId, gsid }) => {
       console.log('[Client][📢] user_joined', fromUserId, gsid);
@@ -63,6 +58,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         gsid,
         localUserId: userId,
       });
+
       localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
       });
