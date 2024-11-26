@@ -15,6 +15,9 @@ export default function GuestLoginButton() {
     try {
       localStorage.removeItem('auth-storage');
       localStorage.removeItem('room-storage');
+      localStorage.removeItem('lobbyPageVisited');
+      localStorage.removeItem('roomCreateTooltipShown');
+      localStorage.removeItem('modalTooltipShown');
 
       const { userId, password } = await postGuestLogin();
       await connectSocket(userId, password);
