@@ -9,16 +9,27 @@ export default function ChatSection() {
   const { userId } = useAuthStore();
   const { chatHistory } = useChatStore();
   const { sendChatEntry } = useChatSocket(gsid!, userId!);
+
   const [chatInput, setChat] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
 
   const handleSend = () => {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || isComposing) return;
     sendChatEntry(chatInput);
     setChat('');
   };
 
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(false);
+    setChat(e.currentTarget.value);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isComposing) {
       handleSend();
     }
   };
@@ -37,6 +48,8 @@ export default function ChatSection() {
         placeholder="채팅을 입력해주세요..."
         value={chatInput}
         onChange={(e) => setChat(e.target.value)}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         onKeyDown={handleKeyDown}
       />
     </div>
