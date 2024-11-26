@@ -30,15 +30,6 @@ export default function useMediaStream() {
     }
 
     getMediaStream();
-
-    return () => {
-      if (localStream) {
-        localStream.getTracks().forEach((track) => {
-          track.stop();
-        });
-        setLocalStream(null);
-      }
-    };
   }, []);
 
   return state;
