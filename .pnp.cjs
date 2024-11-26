@@ -3583,6 +3583,14 @@ const RAW_RUNTIME_STATE =
           ["undici-types", "npm:6.19.8"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:22.9.3", {\
+        "packageLocation": "./.yarn/cache/@types-node-npm-22.9.3-bc9b3f960a-954ec72bf2.zip/node_modules/@types/node/",\
+        "packageDependencies": [\
+          ["@types/node", "npm:22.9.3"],\
+          ["undici-types", "npm:6.19.8"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@types/prop-types", [\
@@ -3652,6 +3660,16 @@ const RAW_RUNTIME_STATE =
           ["@types/http-errors", "npm:2.0.4"],\
           ["@types/node", "npm:22.9.0"],\
           ["@types/send", "npm:0.17.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@types/socket.io", [\
+      ["npm:3.0.2", {\
+        "packageLocation": "./.yarn/cache/@types-socket.io-npm-3.0.2-745ac428ad-581b02b3e1.zip/node_modules/@types/socket.io/",\
+        "packageDependencies": [\
+          ["@types/socket.io", "npm:3.0.2"],\
+          ["socket.io", "npm:4.8.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -11907,7 +11925,8 @@ const RAW_RUNTIME_STATE =
           ["signaling-server", "workspace:packages/backend/signalingServer"],\
           ["@types/cors", "npm:2.8.17"],\
           ["@types/express", "npm:5.0.0"],\
-          ["@types/node", "npm:22.9.0"],\
+          ["@types/node", "npm:22.9.3"],\
+          ["@types/socket.io", "npm:3.0.2"],\
           ["@types/uuid", "npm:10.0.0"],\
           ["cors", "npm:2.8.5"],\
           ["dotenv", "npm:16.4.5"],\
@@ -12952,7 +12971,7 @@ const RAW_RUNTIME_STATE =
           ["@tsconfig/node12", "npm:1.0.11"],\
           ["@tsconfig/node14", "npm:1.0.3"],\
           ["@tsconfig/node16", "npm:1.0.4"],\
-          ["@types/node", "npm:22.9.0"],\
+          ["@types/node", "npm:22.9.3"],\
           ["@types/swc__core", null],\
           ["@types/swc__wasm", null],\
           ["@types/typescript", null],\
