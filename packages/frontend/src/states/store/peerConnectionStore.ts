@@ -15,10 +15,10 @@ interface CreatePeerConnectionParams {
 
 interface IPeerConnectionState {
   peerConnections: Map<string, IPeerConnection>;
-  remoteStreams: Map<string, MediaStream>;
+  remoteStreams: Map<string, MediaStream | null>;
   createPeerConnection: (params: CreatePeerConnectionParams) => RTCPeerConnection;
   setPeerConnection: (fromUserId: string, connection: RTCPeerConnection) => void;
-  setRemoteStream: (fromUserId: string, stream: MediaStream) => void;
+  setRemoteStream: (fromUserId: string, stream: MediaStream | null) => void;
   removePeerConnection: (fromUserId: string) => void;
   removeRemoteStream: (fromUserId: string) => void;
   clearConnections: () => void;

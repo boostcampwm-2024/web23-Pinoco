@@ -53,6 +53,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
     signalingSocket.on('user_joined', async ({ fromUserId, gsid }) => {
       console.log('[Client][📢] user_joined', fromUserId, gsid);
       const localStream = await getVideoStream();
+      const { setRemoteStream } = usePeerConnectionStore.getState();
       const peerConnection = createPeerConnection({
         fromUserId,
         signalingSocket,
@@ -63,6 +64,15 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       localStream?.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
       });
+
+      const dataChannel = peerConnection.createDataChannel('data');
+      dataChannel.onmessage = (event) => {
+        console.log('[Client][📢] dataChannel message', event.data);
+      };
+      dataChannel.onopen = () => {
+        console.log('[Client][📢] dataChannel opened');
+        setRemoteStream(fromUserId, null);
+      };
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
@@ -77,6 +87,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
 
     signalingSocket.on('video_offer', async ({ offer, fromUserId, gsid }) => {
       const localStream = await getVideoStream();
+      const { setRemoteStream } = usePeerConnectionStore.getState();
       const peerConnection = createPeerConnection({
         fromUserId,
         signalingSocket,
@@ -88,6 +99,17 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         peerConnection.addTrack(track, localStream);
       });
 
+      peerConnection.ondatachannel = (event) => {
+        const dataChannel = event.channel;
+        dataChannel.onmessage = (event) => {
+          console.log('[Client][📢] dataChannel message', event.data);
+        };
+        dataChannel.onopen = () => {
+          console.log('[Client][📢] dataChannel opened');
+          setRemoteStream(fromUserId, null);
+        };
+      };
+
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
@@ -98,7 +120,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         fromUserId: userId,
         gsid,
       });
-      setPeerConnection(fromUserId, peerConnection);
+
       console.log('[Client][📢] video_answer sent to', fromUserId);
     });
 
