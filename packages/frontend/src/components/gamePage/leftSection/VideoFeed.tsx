@@ -1,39 +1,28 @@
 import { useRef, useEffect } from 'react';
+import VideoStream from '@/components/gamePage/stream/VideoStream';
+import { useAuthStore } from '@/states/store/authStore';
+import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
 
-interface VideoFeedProps {
-  userName: string | null;
-  stream: MediaStream | null;
-  isLocal?: boolean;
-}
-
-export default function VideoFeed({ userName, stream, isLocal }: VideoFeedProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export default function VideoFeed() {
+  const localStream = useLocalStreamStore((state) => state.localStream);
+  const remoteStreams = usePeerConnectionStore((state) => state.remoteStreams);
+  const { userId } = useAuthStore();
 
   useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
-      console.log('[Client][🎥] VideoFeed stream: ', {
-        stream,
-        tracks: stream?.getTracks(),
-        active: stream?.active,
-        audioTracks: stream?.getAudioTracks().length,
-        videoTracks: stream?.getVideoTracks().length,
-      });
-    }
-  }, [stream]);
+    console.log('[Client][🎥] VideoFeed', { localStream, remoteStreams, userId });
+  }, [localStream, remoteStreams, userId]);
 
   return (
-    <div className="aspect-video relative w-full overflow-hidden bg-gray-700 rounded-lg min-h-32">
-      <video
-        ref={videoRef}
-        muted={isLocal}
-        autoPlay
-        playsInline
-        className="object-cover w-full h-full"
-      />
-      <div className="absolute bottom-0 left-0 p-2 text-sm bg-black bg-opacity-50 text-white-default">
-        {userName}
-      </div>
-    </div>
+    <>
+      <VideoStream stream={localStream} userName={userId} isLocal={true} />
+      {Array.from(remoteStreams).map(([userId, stream]) => {
+        console.log('[Client][🎥] VideoFeed Component', { userId, stream });
+        return <VideoStream key={userId} stream={stream} userName={userId} isLocal={false} />;
+      })}
+      {[...Array(Math.max(0, 5 - remoteStreams.size))].map((_, idx) => (
+        <VideoStream key={`empty-${idx}`} stream={null} userName={`빈 슬롯 ${idx + 1}`} />
+      ))}
+    </>
   );
 }

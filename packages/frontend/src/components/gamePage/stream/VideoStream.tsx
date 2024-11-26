@@ -1,17 +1,61 @@
 import { useRef, useEffect } from 'react';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
-import useMediaStream from '@/hooks/useMediaStream';
 
-export default function VideoStream() {
-  const { localStream } = useLocalStreamStore();
-  const { error } = useMediaStream();
+interface VideoStreamProps {
+  userName: string | null;
+  stream: MediaStream | null;
+  isLocal?: boolean;
+}
+
+export default function VideoStream({ userName, stream, isLocal }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && localStream) {
-      videoRef.current.srcObject = localStream;
-    }
-  }, [localStream]);
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      console.log('[Client][🎥] VideoStream stream: ', {
+        stream,
+        tracks: stream?.getTracks(),
+        active: stream?.active,
+        audioTracks: stream?.getAudioTracks().length,
+        videoTracks: stream?.getVideoTracks().length,
+      });
 
-  return <div>{error ? <p>{error}</p> : <video ref={videoRef} autoPlay />}</div>;
+      // 원격 스트림인 경우 추가 디버깅
+      if (!isLocal) {
+        console.log('[Client][🎥] Remote stream details:', {
+          active: stream.active,
+          tracks: stream.getTracks().map((track) => ({
+            kind: track.kind,
+            enabled: track.enabled,
+            readyState: track.readyState,
+          })),
+        });
+      }
+    }
+  }, [stream]);
+
+  return (
+    <div className="aspect-video relative w-full overflow-hidden bg-gray-700 rounded-lg min-h-32">
+      <video
+        ref={videoRef}
+        muted={isLocal}
+        autoPlay
+        playsInline
+        controls={true}
+        onLoadedMetadata={() => {
+          console.log('[Client][🎥] Video metadata loaded for:', userName);
+        }}
+        onPlay={() => {
+          console.log('[Client][🎥] Video started playing for:', userName);
+        }}
+        onError={(e) => {
+          console.error('[Client][🎥] Video error for:', userName, e);
+        }}
+        className="object-cover w-full h-full"
+      />
+      <div className="absolute bottom-0 left-0 p-2 text-sm bg-black bg-opacity-50 text-white-default">
+        {userName}
+      </div>
+    </div>
+  );
 }
