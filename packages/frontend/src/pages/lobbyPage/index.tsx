@@ -8,9 +8,11 @@ import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import Header from '@/components/layout/Header';
 import SettingSection from '@/components/lobbyPage/SettingSection';
+import useMediaStream from '@/hooks/useMediaStream';
 
 export default function LobbyPage() {
   const { socket } = useSocketStore();
+  const { error } = useMediaStream();
   console.log('lobbyPage', socket?.connected);
   return (
     <>
