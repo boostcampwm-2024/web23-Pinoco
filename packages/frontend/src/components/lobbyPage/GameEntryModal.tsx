@@ -47,7 +47,6 @@ export default function GameEntryModal({
             place="top"
             content="방에 들어가있는 친구에게 game/ 뒤의 코드를 공유받으세요!"
             isOpen
-            appendTo="body"
             style={{
               backgroundColor: '#B4C25D',
               color: '#000000',
