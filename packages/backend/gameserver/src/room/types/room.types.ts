@@ -7,7 +7,7 @@ export interface IRoomInfo {
 
 export interface IRoomEventPayload {
   userId: string;
-  hostUserId?: string;
+  hostUserId: string;
 }
 
 export interface IJoinRoomResponse {

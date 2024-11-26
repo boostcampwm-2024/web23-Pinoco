@@ -8,12 +8,26 @@ import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import Header from '@/components/layout/Header';
 import SettingSection from '@/components/lobbyPage/SettingSection';
+import { useRoomStore } from '@/states/store/roomStore';
+import { useChatStore } from '@/states/store/chatStore';
 import useMediaStream from '@/hooks/useMediaStream';
 
 export default function LobbyPage() {
+  const { gsid, setRoomData } = useRoomStore();
   const { socket } = useSocketStore();
+  const { setChatHistory } = useChatStore();
   const { error } = useMediaStream();
+
+  useEffect(() => {
+    if (gsid) {
+      socket?.emit('leave_room');
+      setChatHistory([]);
+      setRoomData(null, false, false);
+    }
+  }, []);
+
   console.log('lobbyPage', socket?.connected);
+
   return (
     <>
       <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />

@@ -4,7 +4,7 @@
 
 
 
-## 👉🏻 [Pinoco 보러가기](https://pinoco.shop/)
+## 👉🏻 [Pinoco 보러가기](https://pinoco.site/)
 
 <p align=center>
   <a href="https://lush-collision-539.notion.site/Pinoco-12fb0f9caa698078bcc1eeb19b3a301c?pvs=74"> 📒 팀 노션</a>
@@ -75,19 +75,15 @@
 |------|---|
 |공통|[![My Skills](https://skillicons.dev/icons?i=ts)](https://skillicons.dev)
 |FE|[![My Skills](https://skillicons.dev/icons?i=react,vite,tailwind,)](https://skillicons.dev)
-|BE|[![My Skills](https://skillicons.dev/icons?i=express,mysql)](https://skillicons.dev)
+|BE|[![My Skills](https://skillicons.dev/icons?i=express,mysql,nest)](https://skillicons.dev)
 |배포|[![My Skills](https://skillicons.dev/icons?i=githubactions,docker,nginx)](https://skillicons.dev)
 |협업| [![My Skills](https://skillicons.dev/icons?i=figma,git,github,notion)](https://skillicons.dev)
 
 
 ## 시스템 아키텍처
+![image](https://github.com/user-attachments/assets/2ddfb0db-d10d-407c-93a5-6a63349bb833)
 
 <br />
-
-## FE 기술적 도전
-
-
-## BE 기술적 도전
 
 # 🤼 팀원 소개
 

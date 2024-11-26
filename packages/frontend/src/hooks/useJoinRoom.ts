@@ -8,6 +8,7 @@ export default function useJoinRoom() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.userId);
   const setRoomData = useRoomStore((state) => state.setRoomData);
+  const { setAllUsers } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
   const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
@@ -17,7 +18,8 @@ export default function useJoinRoom() {
     socket.emit('join_room', { gsid });
     signalingSocket.emit('join_room', { gsid });
     socket.on('join_room_success', (data) => {
-      setRoomData(gsid, data.isHost);
+      setRoomData(gsid, data.isHost, false);
+      setAllUsers(data.userIds);
       navigate(`/game/${gsid}`);
     });
 
