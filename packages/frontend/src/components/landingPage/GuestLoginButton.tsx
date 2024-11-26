@@ -13,6 +13,9 @@ export default function GuestLoginButton() {
 
   async function handleClick() {
     try {
+      localStorage.removeItem('auth-storage');
+      localStorage.removeItem('room-storage');
+
       const { userId, password } = await postGuestLogin();
       await connectSocket(userId, password);
       await connectSignalingSocket(userId);
