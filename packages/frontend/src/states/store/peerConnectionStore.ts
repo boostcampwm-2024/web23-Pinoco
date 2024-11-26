@@ -6,26 +6,35 @@ interface IPeerConnection {
   connection: RTCPeerConnection;
 }
 
+interface CreatePeerConnectionParams {
+  fromUserId: string;
+  signalingSocket: Socket;
+  gsid: string;
+  localUserId: string | null;
+}
+
 interface IPeerConnectionState {
   peerConnections: Map<string, IPeerConnection>;
   remoteStreams: Map<string, MediaStream>;
-  createPeerConnection: (userId: string, signalingSocket: Socket) => RTCPeerConnection;
-  setPeerConnection: (userId: string, connection: RTCPeerConnection) => void;
-  setRemoteStream: (userId: string, stream: MediaStream) => void;
-  removePeerConnection: (userId: string) => void;
-  removeRemoteStream: (userId: string) => void;
+  createPeerConnection: (params: CreatePeerConnectionParams) => RTCPeerConnection;
+  setPeerConnection: (fromUserId: string, connection: RTCPeerConnection) => void;
+  setRemoteStream: (fromUserId: string, stream: MediaStream) => void;
+  removePeerConnection: (fromUserId: string) => void;
+  removeRemoteStream: (fromUserId: string) => void;
   clearConnections: () => void;
 }
 
 export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) => ({
   peerConnections: new Map(),
   remoteStreams: new Map(),
-  createPeerConnection: (userId: string, signalingSocket: Socket) => {
-    const existingConnection = get().peerConnections.get(userId)?.connection;
+  createPeerConnection: (params: CreatePeerConnectionParams) => {
+    const { fromUserId, signalingSocket, gsid, localUserId } = params;
+    const existingConnection = get().peerConnections.get(fromUserId)?.connection;
     if (existingConnection) return existingConnection;
 
     const peerConnection = new RTCPeerConnection({
       iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
         {
           urls: import.meta.env.VITE_TURN_URL,
           username: import.meta.env.VITE_TURN_USERNAME,
@@ -38,48 +47,57 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
       if (event.candidate) {
         signalingSocket?.emit('new_ice_candidate', {
           candidate: event.candidate,
-          fromUserId: userId,
+          fromUserId: localUserId,
+          targetUserId: fromUserId,
+          gsid,
         });
+        console.log('[Client][🎥] Sent ICE candidate to:', fromUserId);
       }
     };
 
     peerConnection.ontrack = (event) => {
-      get().setRemoteStream(userId, event.streams[0]);
+      if (fromUserId) {
+        get().setRemoteStream(fromUserId, event.streams[0]);
+        console.log('[Client][🎥] Received remote stream for: ', event.streams);
+      }
     };
 
     peerConnection.onconnectionstatechange = () => {
-      console.log(`연결 상태 (${userId}):`, peerConnection.connectionState);
+      console.log(`[Client][🎥] 연결 상태 (${fromUserId}):`, peerConnection.connectionState);
     };
 
-    get().setPeerConnection(userId, peerConnection);
+    if (fromUserId) get().setPeerConnection(fromUserId, peerConnection);
+    console.log('[Client][🎥] createPeerConnection', fromUserId);
     return peerConnection;
   },
 
-  setPeerConnection: (userId, connection) =>
+  setPeerConnection: (fromUserId, connection) => {
     set((state) => {
       const newConnections = new Map(state.peerConnections);
-      newConnections.set(userId, { userId, connection });
+      newConnections.set(fromUserId, { userId: fromUserId, connection });
+      console.log('[Client][🎥] setPeerConnection', newConnections.get(fromUserId));
       return { peerConnections: newConnections };
-    }),
+    });
+  },
 
-  setRemoteStream: (userId, stream) =>
+  setRemoteStream: (fromUserId, stream) =>
     set((state) => {
       const newStreams = new Map(state.remoteStreams);
-      newStreams.set(userId, stream);
+      newStreams.set(fromUserId, stream);
       return { remoteStreams: newStreams };
     }),
 
-  removePeerConnection: (userId) =>
+  removePeerConnection: (fromUserId) =>
     set((state) => {
       const newConnections = new Map(state.peerConnections);
-      newConnections.delete(userId);
+      newConnections.delete(fromUserId);
       return { peerConnections: newConnections };
     }),
 
-  removeRemoteStream: (userId) =>
+  removeRemoteStream: (fromUserId) =>
     set((state) => {
       const newStreams = new Map(state.remoteStreams);
-      newStreams.delete(userId);
+      newStreams.delete(fromUserId);
       return { remoteStreams: newStreams };
     }),
 
