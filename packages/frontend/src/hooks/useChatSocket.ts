@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useChatStore } from '@/states/store/chatStore';
 import { useSocketStore } from '@/states/store/socketStore';
 import { useRoomStore } from '@/states/store/roomStore';
+import { ChatType } from '@/constants/chatState';
+import { useAuthStore } from '@/states/store/authStore';
 
 interface IChatEntry {
   userId: string;
@@ -18,6 +20,7 @@ interface IUserJoined {
 }
 
 export const useChatSocket = (gsid: string, userId: string) => {
+  const { userId: myUserId } = useAuthStore();
   const addChatEntry = useChatStore((state) => state.addChatEntry);
   const { addUser, removeUser, setIsHost } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
@@ -26,7 +29,11 @@ export const useChatSocket = (gsid: string, userId: string) => {
     if (!socket) return;
 
     socket.on('receive_message', (data: IChatEntry) => {
-      addChatEntry(data);
+      addChatEntry({
+        userId: data.userId,
+        message: data.message,
+        chatType: data.userId === myUserId ? ChatType.MY_CHAT : ChatType.OTHER_CHAT,
+      });
     });
 
     socket.on('user_left', (data: IUserLeft) => {
@@ -39,6 +46,7 @@ export const useChatSocket = (gsid: string, userId: string) => {
       addChatEntry({
         userId: `[알림]`,
         message: `${data.userId}님이 퇴장하셨습니다.`,
+        chatType: ChatType.NOTICE,
       });
     });
 
@@ -47,6 +55,7 @@ export const useChatSocket = (gsid: string, userId: string) => {
       addChatEntry({
         userId: `[알림]`,
         message: `${data.userId}님이 입장하셨습니다.`,
+        chatType: ChatType.NOTICE,
       });
     });
 
@@ -55,7 +64,7 @@ export const useChatSocket = (gsid: string, userId: string) => {
       socket.off('user_left');
       socket.off('user_joined');
     };
-  }, [gsid, socket, addChatEntry, addUser, removeUser, setIsHost, userId]);
+  }, [gsid, socket, addChatEntry, addUser, removeUser, setIsHost, userId, myUserId]);
 
   const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;

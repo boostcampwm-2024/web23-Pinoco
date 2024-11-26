@@ -1,8 +1,10 @@
+import { ChatType } from '@/constants/chatState';
 import { create } from 'zustand';
 
 interface IChatEntry {
   userId: string;
   message: string;
+  chatType: ChatType;
 }
 
 interface IChatState {
