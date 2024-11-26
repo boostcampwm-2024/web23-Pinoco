@@ -2,7 +2,6 @@ import { Server } from 'socket.io';
 import { ISignalingSocket } from '@/types/signaling.types';
 import handleSignaling from '@/handlers/handleSignaling';
 import handleSocket from '@/handlers/handleSocket';
-import handleRoom from '@/handlers/handleRoom';
 import corsConfig from '@/middleware/cors';
 import { Server as HttpServer } from 'http';
 import { SOCKET_MESSAGES } from '@/constants/socketConstants';
@@ -17,9 +16,8 @@ export default function initSocket(httpServer: HttpServer) {
     const userId = socket.handshake.query.userId;
     socket.data.userId = userId;
     console.log(SOCKET_MESSAGES.connection, socket.data.userId);
-    handleSignaling(socket);
+    handleSignaling(socket, io);
     handleSocket(socket);
-    handleRoom(socket, io);
   });
 
   return io;

@@ -1,68 +1,46 @@
+import { Server } from 'socket.io';
 import {
   ISignalingSocket,
   IOfferPayload,
   IAnswerPayload,
   ICandidatePayload,
   IRoomPayload,
-  ISignalingLogType,
 } from '@/types/signaling.types';
-import handleLog from '@/util/logUtils';
+import { getTargetSocket } from '@/util/handlerUtils';
 
-const handleSignaling = (socket: ISignalingSocket) => {
-  // video-offer
-  socket.on('video_offer', (data: IOfferPayload) => {
-    socket.to(data.targetUserId).emit('video_offer', {
-      targetUserId: data.targetUserId,
-      offer: data.offer,
-    });
-
-    handleLog(socket, {
-      type: ISignalingLogType.offer,
-      from: socket.data.userId,
-      to: data.targetUserId,
-    });
+const handleSignaling = (socket: ISignalingSocket, io: Server) => {
+  socket.on('create_room', async (payload: IRoomPayload) => {
+    await socket.join(payload.gsid);
+    socket.data.gsid = payload.gsid;
   });
-
-  // video-answer
-  socket.on('video_answer', (data: IAnswerPayload) => {
-    socket.to(data.targetUserId).emit('video_answer', {
-      targetUserId: data.targetUserId,
-      answer: data.answer,
-    });
-
-    handleLog(socket, {
-      type: ISignalingLogType.answer,
-      from: socket.data.userId,
-      to: data.targetUserId,
-    });
+  socket.on('join_room', async (payload: IRoomPayload) => {
+    await socket.join(payload.gsid);
+    socket.data.gsid = payload.gsid;
+    socket
+      .to(payload.gsid)
+      .emit('user_joined', { fromUserId: socket.data.userId, gsid: payload.gsid });
   });
-
-  // new-ice-candidate
-  socket.on('new_ice_candidate', (data: ICandidatePayload) => {
-    socket.to(data.targetUserId).emit('new_ice_candidate', {
-      targetUserId: data.targetUserId,
-      candidate: data.candidate,
-    });
-
-    handleLog(socket, {
-      type: ISignalingLogType.candidate,
-      from: socket.data.userId,
-      to: data.targetUserId,
-    });
+  socket.on('video_offer', async (payload: IOfferPayload) => {
+    const targetSocket = await getTargetSocket(io, payload.targetUserId);
+    if (!targetSocket) return;
+    targetSocket.emit('video_offer', payload);
+    console.log('[Server][🎥] video_offer', payload.fromUserId);
   });
-
-  socket.on('user_left', (data: IRoomPayload) => {
-    socket.to(data.gsid).emit('user_left', {
-      gsid: data.gsid,
-      targetUserId: data.targetUserId,
-      fromUserId: socket.data.userId,
-    });
-
-    handleLog(socket, {
-      type: ISignalingLogType.left,
-      from: socket.data.userId,
-      to: data.gsid,
-    });
+  socket.on('video_answer', async (payload: IAnswerPayload) => {
+    const targetSocket = await getTargetSocket(io, payload.targetUserId);
+    if (!targetSocket) return;
+    targetSocket.emit('video_answer', payload);
+    console.log('[Server][🎥] video_answer', payload.fromUserId);
+  });
+  socket.on('new_ice_candidate', async (payload: ICandidatePayload) => {
+    const targetSocket = await getTargetSocket(io, payload.targetUserId);
+    if (!targetSocket) return;
+    targetSocket.emit('new_ice_candidate', payload);
+    console.log('[Server][🎥] new_ice_candidate', payload.fromUserId);
+  });
+  socket.on('user_left', async (payload: IRoomPayload) => {
+    socket.to(payload.gsid).emit('user_left', payload);
+    console.log('[Server][🎥] user_left', payload.fromUserId);
   });
 };
 

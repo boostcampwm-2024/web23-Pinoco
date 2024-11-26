@@ -9,8 +9,10 @@ export interface IRoomPayload {
 
 // Offer 페이로드
 export interface IOfferPayload {
-  targetUserId: string;
+  fromUserId: string;
   offer: RTCSessionDescriptionInit;
+  gsid: string;
+  targetUserId: string;
 }
 
 // 응답 페이로드
@@ -21,13 +23,17 @@ export interface IOfferResponse {
 
 export interface IAnswerPayload {
   targetUserId: string;
+  fromUserId: string;
   answer: RTCSessionDescriptionInit;
+  gsid: string;
 }
 
 // ICE Candidate 페이로드
 export interface ICandidatePayload {
   targetUserId: string;
+  fromUserId: string;
   candidate: RTCIceCandidate;
+  gsid: string;
 }
 
 export enum ISignalingLogType {
@@ -39,6 +45,7 @@ export enum ISignalingLogType {
   joined = 'user_joined',
   left = 'user_left',
   error = 'error',
+  hello = 'hello',
 }
 
 export interface ILogData {
@@ -57,6 +64,8 @@ export interface IServerEventsType {
   user_left: (payload: IRoomPayload) => void;
   client_log: (payload: ILogData) => void;
   error: (error: string) => void;
+  create_room: (payload: IRoomPayload) => void;
+  join_room: (payload: IRoomPayload) => void;
 }
 
 export interface IClientEventsType {
@@ -67,9 +76,10 @@ export interface IClientEventsType {
   user_left: (payload: IRoomPayload) => void;
   client_log: (payload: ILogData) => void;
   error: (error: string) => void;
+  create_room: (payload: IRoomPayload) => void;
+  join_room: (payload: IRoomPayload) => void;
 }
 
 export interface ISignalingSocket extends Socket<IServerEventsType, IClientEventsType> {}
 
-// 기존 코드와의 호환성을 위한 타입
 export type IWebRTCPayload = IOfferPayload | IAnswerPayload | ICandidatePayload | IRoomPayload;
