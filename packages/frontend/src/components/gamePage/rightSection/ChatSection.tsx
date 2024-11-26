@@ -96,12 +96,9 @@ export default function ChatSection() {
         ))}
       </div>
       {isScrolledUp && (
-        <div className="relative">
-          <button
-            onClick={scrollToBottom}
-            className="absolute z-50 cursor-pointer bottom-8 right-6"
-          >
-            <ArrowDownIcon className="p-2 transition-all bg-gray-500 rounded-full size-8 text-white-default hover:opacity-100 hover:bg-gray-600" />
+        <div className="relative flex justify-center">
+          <button onClick={scrollToBottom} className="absolute z-50 cursor-pointer bottom-2">
+            <ArrowDownIcon className="p-2 transition-all bg-gray-500 rounded-full size-10 text-white-default hover:opacity-100 hover:bg-gray-600 animate-bounce" />
           </button>
         </div>
       )}
