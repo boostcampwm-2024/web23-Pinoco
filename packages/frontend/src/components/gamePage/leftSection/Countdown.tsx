@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
-interface CountdownProps {
+interface ICountdownProps {
   initialCount?: number;
   onCountdownEnd: () => void;
 }
 
-export default function Countdown({ initialCount = 3, onCountdownEnd }: CountdownProps) {
+export default function Countdown({ initialCount = 3, onCountdownEnd }: ICountdownProps) {
   const [countdown, setCountdown] = useState(initialCount);
 
   useEffect(() => {
