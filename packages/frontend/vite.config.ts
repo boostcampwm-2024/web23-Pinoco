@@ -5,6 +5,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths(), svgrPlugin()],
+  optimizeDeps: {
+    include: ['react-tooltip'],
+  },
   build: {
     rollupOptions: {
       plugins: [

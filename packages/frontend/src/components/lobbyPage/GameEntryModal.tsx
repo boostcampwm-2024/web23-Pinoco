@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Tooltip } from 'react-tooltip';
 
 interface IGameEntryModalProps {
   title: string;
@@ -18,6 +19,14 @@ export default function GameEntryModal({
 }: IGameEntryModalProps) {
   const [gameCode, setGameCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem('modalTooltipShown')) {
+      setShowTooltip(true);
+      localStorage.setItem('modalTooltipShown', 'true');
+    }
+  }, []);
 
   const handleConfirm = () => {
     if (gameCode.trim()) {
@@ -30,7 +39,21 @@ export default function GameEntryModal({
 
   const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="max-w-lg p-8 bg-white shadow-lg rounded-2xl w-96">
+      <div id="modal-tooltip-anchor" className="max-w-lg p-8 bg-white shadow-lg rounded-2xl w-96">
+        {showTooltip && (
+          <Tooltip
+            key="modal-tooltip"
+            anchorId="modal-tooltip-anchor"
+            place="top"
+            content="방에 들어가있는 친구에게 game/ 뒤의 코드를 공유받으세요!"
+            isOpen
+            style={{
+              backgroundColor: '#B4C25D',
+              color: '#000000',
+              borderRadius: '0.5rem',
+            }}
+          />
+        )}
         <h2 className="mb-4 text-xl font-semibold text-center text-gray-900">{title}</h2>
         {subtitle && <p className="mb-4 text-left text-gray-800">{subtitle}</p>}
         {textForm && (
