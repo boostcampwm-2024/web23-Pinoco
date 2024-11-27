@@ -6,7 +6,7 @@ interface IPeerConnection {
   connection: RTCPeerConnection;
 }
 
-interface CreatePeerConnectionParams {
+interface ICreatePeerConnectionParams {
   fromUserId: string;
   signalingSocket: Socket;
   gsid: string;
@@ -16,7 +16,7 @@ interface CreatePeerConnectionParams {
 interface IPeerConnectionState {
   peerConnections: Map<string, IPeerConnection>;
   remoteStreams: Map<string, MediaStream | null>;
-  createPeerConnection: (params: CreatePeerConnectionParams) => RTCPeerConnection;
+  createPeerConnection: (params: ICreatePeerConnectionParams) => RTCPeerConnection;
   setPeerConnection: (fromUserId: string, connection: RTCPeerConnection) => void;
   setRemoteStream: (fromUserId: string, stream: MediaStream | null) => void;
   removePeerConnection: (fromUserId: string) => void;
@@ -28,7 +28,7 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
   peerConnections: new Map(),
   remoteStreams: new Map(),
 
-  createPeerConnection: (params: CreatePeerConnectionParams) => {
+  createPeerConnection: (params: ICreatePeerConnectionParams) => {
     const { fromUserId, signalingSocket, gsid, localUserId } = params;
     const existingConnection = get().peerConnections.get(fromUserId)?.connection;
     if (existingConnection) return existingConnection;
