@@ -83,6 +83,9 @@ export class GameService {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
+    // 투표자가 살아있는 사람인지 확인 (원래는 죽은사람은 vote_pinoco 요청이 안 오는게 맞으나 클라측(타이머) 이슈로 보내지는 상황)
+    if (!game.liveUserIds.includes(voterId)) return;
+
     game.votes[voterId] = targetId;
   }
 
