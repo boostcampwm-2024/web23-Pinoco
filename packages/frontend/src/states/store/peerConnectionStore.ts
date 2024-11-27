@@ -35,7 +35,6 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
 
     const peerConnection = new RTCPeerConnection({
       iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
         {
           urls: import.meta.env.VITE_TURN_URL,
           username: import.meta.env.VITE_TURN_USERNAME,
@@ -43,14 +42,6 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
         },
       ],
     });
-
-    setInterval(() => {
-      peerConnection.getSenders().forEach((sender) => {
-        console.log('Sender Track State:', sender.track?.readyState);
-        console.log('Sender Track Enabled:', sender.track?.enabled);
-        console.log('Sender Track Muted:', sender.track?.muted);
-      });
-    }, 5000);
 
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
@@ -78,7 +69,12 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
     };
 
     peerConnection.onconnectionstatechange = () => {
-      console.log(`[Client][🎥] 연결 상태 (${fromUserId}):`, peerConnection.connectionState);
+      const state = peerConnection.connectionState;
+      console.log(`[Client][🎥] 연결 상태 (${fromUserId}):`, state);
+      if (state === 'closed' || state === 'failed') {
+        get().removePeerConnection(fromUserId);
+        get().removeRemoteStream(fromUserId);
+      }
     };
 
     if (fromUserId) get().setPeerConnection(fromUserId, peerConnection);
