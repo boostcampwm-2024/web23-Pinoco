@@ -43,14 +43,6 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
       ],
     });
 
-    setInterval(() => {
-      peerConnection.getSenders().forEach((sender) => {
-        console.log('Sender Track State:', sender.track?.readyState);
-        console.log('Sender Track Enabled:', sender.track?.enabled);
-        console.log('Sender Track Muted:', sender.track?.muted);
-      });
-    }, 5000);
-
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         signalingSocket?.emit('new_ice_candidate', {

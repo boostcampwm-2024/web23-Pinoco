@@ -36,36 +36,16 @@ export interface ICandidatePayload {
   gsid: string;
 }
 
-export enum ISignalingLogType {
-  offer = 'video_offer',
-  answer = 'video_answer',
-  candidate = 'new_ice_candidate',
-  createRoom = 'create_room',
-  joinRoom = 'join_room',
-  joined = 'user_joined',
-  left = 'user_left',
-  error = 'error',
-  hello = 'hello',
-}
-
-export interface ILogData {
-  type: ISignalingLogType;
-  from: string | null;
-  to: string | null;
-  gsid?: string;
-  isClient?: boolean;
-}
-
 export interface IServerEventsType {
   video_offer: (payload: IOfferPayload) => void;
   video_answer: (payload: IAnswerPayload) => void;
   new_ice_candidate: (payload: ICandidatePayload) => void;
   user_joined: (payload: IRoomPayload) => void;
   user_left: (payload: IRoomPayload) => void;
-  client_log: (payload: ILogData) => void;
   error: (error: string) => void;
   create_room: (payload: IRoomPayload) => void;
   join_room: (payload: IRoomPayload) => void;
+  leave_room: () => void;
 }
 
 export interface IClientEventsType {
@@ -74,10 +54,10 @@ export interface IClientEventsType {
   new_ice_candidate: (payload: ICandidatePayload) => void;
   user_joined: (payload: IRoomPayload) => void;
   user_left: (payload: IRoomPayload) => void;
-  client_log: (payload: ILogData) => void;
   error: (error: string) => void;
   create_room: (payload: IRoomPayload) => void;
   join_room: (payload: IRoomPayload) => void;
+  leave_room: () => void;
 }
 
 export interface ISignalingSocket extends Socket<IServerEventsType, IClientEventsType> {}
