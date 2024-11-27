@@ -12,6 +12,7 @@ import useEnding from '@/hooks/useEnding';
 import useVoteResult from '@/hooks/useVoteResult';
 import { useAuthStore } from '@/states/store/authStore';
 import Countdown from './Countdown';
+import WordDisplay from './WordDisplay';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
@@ -144,6 +145,13 @@ export default function MainDisplay() {
 
   return (
     <div className="relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg bg-green-default/40">
+      <WordDisplay
+        gamePhase={gamePhase}
+        currentWord={currentWord}
+        theme={theme}
+        isPinoco={isPinoco}
+      />
+
       <div className="flex-grow">
         {gamePhase === GAME_PHASE.WAITING && (
           <div className="flex flex-col items-center justify-center h-full">
@@ -153,16 +161,9 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.COUNTDOWN && <Countdown onCountdownEnd={handleCountdownEnd} />}
 
-        {gamePhase === GAME_PHASE.WORD_REVEAL && (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-3xl font-bold text-white-default">제시어: {currentWord}</p>
-          </div>
-        )}
-
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="flex flex-col items-center justify-center h-full">
             <p className="text-xl text-white-default">현재 발언자: {currentSpeaker}</p>
-            <p className="mt-2 text-lg text-white-default">제시어: {currentWord}</p>
           </div>
         )}
 
