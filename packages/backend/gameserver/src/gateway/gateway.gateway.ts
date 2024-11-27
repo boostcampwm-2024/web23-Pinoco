@@ -224,7 +224,8 @@ export class GatewayGateway
         const isPinoco = gameState.pinocoId === uid;
         const personalGameState = {
           isPinoco,
-          word: isPinoco ? gameState.theme : gameState.word,
+          theme: gameState.theme,
+          word: isPinoco ? '' : gameState.word,
           speakerId: gameState.speakerQueue[0],
           allUserIds: gameState.userIds,
         };
@@ -286,7 +287,9 @@ export class GatewayGateway
       let gameState = this.gameService.getGameState(gsid);
       const room = await this.roomService.getRoom(gsid);
 
-      if (Object.keys(gameState.votes).length === room.userIds.size) {
+      if (
+        Object.keys(gameState.votes).length === gameState.liveUserIds.length
+      ) {
         const result = await this.gatewayService.processVoteResult(gsid);
 
         this.logger.logSocketEvent('send', 'receive_vote_result', {
