@@ -13,6 +13,7 @@ interface IGameErrorMessage {
 
 interface IGameStart {
   isPinoco: boolean;
+  theme: string;
   word: string;
   speakerId: string;
   allUserIds: string[];
@@ -41,7 +42,6 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
     };
 
     const handleStartGame = (data: IGameStart) => {
-      console.log('start_game_success시 서버로 부터 받는 데이터', data);
       setAllUsers(data.allUserIds);
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
