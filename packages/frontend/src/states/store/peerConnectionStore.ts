@@ -6,7 +6,7 @@ interface IPeerConnection {
   connection: RTCPeerConnection;
 }
 
-interface CreatePeerConnectionParams {
+interface ICreatePeerConnectionParams {
   fromUserId: string;
   signalingSocket: Socket;
   gsid: string;
@@ -15,10 +15,10 @@ interface CreatePeerConnectionParams {
 
 interface IPeerConnectionState {
   peerConnections: Map<string, IPeerConnection>;
-  remoteStreams: Map<string, MediaStream>;
-  createPeerConnection: (params: CreatePeerConnectionParams) => RTCPeerConnection;
+  remoteStreams: Map<string, MediaStream | null>;
+  createPeerConnection: (params: ICreatePeerConnectionParams) => RTCPeerConnection;
   setPeerConnection: (fromUserId: string, connection: RTCPeerConnection) => void;
-  setRemoteStream: (fromUserId: string, stream: MediaStream) => void;
+  setRemoteStream: (fromUserId: string, stream: MediaStream | null) => void;
   removePeerConnection: (fromUserId: string) => void;
   removeRemoteStream: (fromUserId: string) => void;
   clearConnections: () => void;
@@ -27,7 +27,8 @@ interface IPeerConnectionState {
 export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) => ({
   peerConnections: new Map(),
   remoteStreams: new Map(),
-  createPeerConnection: (params: CreatePeerConnectionParams) => {
+
+  createPeerConnection: (params: ICreatePeerConnectionParams) => {
     const { fromUserId, signalingSocket, gsid, localUserId } = params;
     const existingConnection = get().peerConnections.get(fromUserId)?.connection;
     if (existingConnection) return existingConnection;
@@ -42,6 +43,14 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
         },
       ],
     });
+
+    setInterval(() => {
+      peerConnection.getSenders().forEach((sender) => {
+        console.log('Sender Track State:', sender.track?.readyState);
+        console.log('Sender Track Enabled:', sender.track?.enabled);
+        console.log('Sender Track Muted:', sender.track?.muted);
+      });
+    }, 5000);
 
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
@@ -58,7 +67,13 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
     peerConnection.ontrack = (event) => {
       if (fromUserId) {
         get().setRemoteStream(fromUserId, event.streams[0]);
-        console.log('[Client][🎥] Received remote stream for: ', event.streams);
+        console.log('[Client][🎥] Received remote stream for: ', {
+          stream: event.streams[0],
+          tracks: event.streams[0]?.getTracks(),
+          active: event.streams[0]?.active,
+          audioTracks: event.streams[0]?.getAudioTracks().length,
+          videoTracks: event.streams[0]?.getVideoTracks().length,
+        });
       }
     };
 
