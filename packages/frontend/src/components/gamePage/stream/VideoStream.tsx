@@ -1,12 +1,12 @@
 import { useRef, useEffect } from 'react';
 
-interface VideoStreamProps {
+interface IVideoStreamProps {
   userName: string | null;
   stream: MediaStream | null;
   isLocal?: boolean;
 }
 
-export default function VideoStream({ userName, stream, isLocal }: VideoStreamProps) {
+export default function VideoStream({ userName, stream, isLocal }: IVideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
