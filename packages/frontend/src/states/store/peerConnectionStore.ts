@@ -35,7 +35,6 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
 
     const peerConnection = new RTCPeerConnection({
       iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
         {
           urls: import.meta.env.VITE_TURN_URL,
           username: import.meta.env.VITE_TURN_USERNAME,
