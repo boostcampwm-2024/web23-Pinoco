@@ -11,12 +11,13 @@ import useGuessing from '@/hooks/useGuessing';
 import useEnding from '@/hooks/useEnding';
 import useVoteResult from '@/hooks/useVoteResult';
 import { useAuthStore } from '@/states/store/authStore';
+import Countdown from './Countdown';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
   const { isHost, isPinoco, allUsers } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
-  const [countdown, setCountdown] = useState(3);
+  const [theme, setTheme] = useState('');
   const [currentWord, setCurrentWord] = useState('');
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
@@ -33,26 +34,16 @@ export default function MainDisplay() {
     if (gameStartData) {
       setGamePhase(GAME_PHASE.COUNTDOWN);
       setCurrentWord(gameStartData.word);
-      setCountdown(3);
-
-      const countdownInterval = setInterval(() => {
-        setCountdown((prevCount) => {
-          if (prevCount <= 1) {
-            clearInterval(countdownInterval);
-            setGamePhase(GAME_PHASE.WORD_REVEAL);
-
-            setTimeout(() => {
-              setGamePhase(GAME_PHASE.SPEAKING);
-            }, 3000);
-
-            return 0;
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-      return () => clearInterval(countdownInterval);
+      setTheme(gameStartData.theme);
     }
   }, [gameStartData]);
+
+  const handleCountdownEnd = () => {
+    setGamePhase(GAME_PHASE.WORD_REVEAL);
+    setTimeout(() => {
+      setGamePhase(GAME_PHASE.SPEAKING);
+    }, 3000);
+  };
 
   const handleVote = () => {
     if (!isVoteSubmitted) {
@@ -160,13 +151,7 @@ export default function MainDisplay() {
           </div>
         )}
 
-        {gamePhase === GAME_PHASE.COUNTDOWN && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="flex items-center justify-center bg-black rounded-full size-32 bg-opacity-70">
-              <p className="text-6xl font-bold text-white-default-default">{countdown}</p>
-            </div>
-          </div>
-        )}
+        {gamePhase === GAME_PHASE.COUNTDOWN && <Countdown onCountdownEnd={handleCountdownEnd} />}
 
         {gamePhase === GAME_PHASE.WORD_REVEAL && (
           <div className="flex items-center justify-center h-full">
