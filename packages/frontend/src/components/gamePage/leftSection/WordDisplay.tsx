@@ -24,6 +24,7 @@ export default function WordDisplay({ gamePhase, currentWord, theme, isPinoco }:
 
   return (
     <motion.div
+      layoutId="word-container"
       transition={springTransition}
       className={`${
         gamePhase === GAME_PHASE.WORD_REVEAL
@@ -32,6 +33,7 @@ export default function WordDisplay({ gamePhase, currentWord, theme, isPinoco }:
       }`}
     >
       <motion.div
+        layoutId="word-content"
         transition={springTransition}
         className={`${
           gamePhase === GAME_PHASE.WORD_REVEAL ? 'bg-green-default/90 p-8 rounded-xl shadow-lg' : ''
