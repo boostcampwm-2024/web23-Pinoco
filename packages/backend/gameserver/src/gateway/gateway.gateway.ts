@@ -224,7 +224,8 @@ export class GatewayGateway
         const isPinoco = gameState.pinocoId === uid;
         const personalGameState = {
           isPinoco,
-          word: isPinoco ? gameState.theme : gameState.word,
+          theme: gameState.theme,
+          word: isPinoco ? '' : gameState.word,
           speakerId: gameState.speakerQueue[0],
           allUserIds: gameState.userIds,
         };
