@@ -38,9 +38,14 @@ const handleSignaling = (socket: ISignalingSocket, io: Server) => {
     targetSocket.emit('new_ice_candidate', payload);
     console.log('[Server][🎥] new_ice_candidate', payload.fromUserId);
   });
-  socket.on('user_left', async (payload: IRoomPayload) => {
-    socket.to(payload.gsid).emit('user_left', payload);
-    console.log('[Server][🎥] user_left', payload.fromUserId);
+  socket.on('leave_room', async () => {
+    const gsid = socket.data.gsid;
+    const fromUserId = socket.data.userId;
+    const targetSocket = await getTargetSocket(io, fromUserId);
+    if (!targetSocket) return;
+    targetSocket.leave(gsid);
+    socket.to(gsid).emit('user_left', { fromUserId, gsid });
+    console.log('[Server][🎥] user_left', fromUserId);
   });
 };
 

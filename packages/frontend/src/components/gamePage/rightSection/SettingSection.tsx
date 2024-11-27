@@ -5,17 +5,20 @@ import MikeOn from '@/assets/images/MikeOn.svg?react';
 import Leave from '@/assets/images/Leave.svg?react';
 import { useChatStore } from '@/states/store/chatStore';
 import { useRoomStore } from '@/states/store/roomStore';
+import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
 
 export default function SettingSection() {
   const navigate = useNavigate();
   const socket = useSocketStore((state) => state.socket);
   const setChatHistory = useChatStore((state) => state.setChatHistory);
   const setRoomData = useRoomStore((state) => state.setRoomData);
+  const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
   const handleLeave = () => {
-    if (!socket) return;
+    if (!socket || !signalingSocket) return;
 
     socket.emit('leave_room');
+    signalingSocket.emit('leave_room');
     setChatHistory([]);
     setRoomData(null, false, false);
     navigate('/lobby');
