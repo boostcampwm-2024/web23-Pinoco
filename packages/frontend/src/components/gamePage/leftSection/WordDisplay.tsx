@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { GamePhase, GAME_PHASE } from '@/constants';
 
-interface WordDisplayProps {
+interface IWordDisplayProps {
   gamePhase: GamePhase;
   currentWord: string;
   theme: string;
@@ -15,7 +15,12 @@ const springTransition = {
   damping: 30,
 } as const;
 
-export default function WordDisplay({ gamePhase, currentWord, theme, isPinoco }: WordDisplayProps) {
+export default function WordDisplay({
+  gamePhase,
+  currentWord,
+  theme,
+  isPinoco,
+}: IWordDisplayProps) {
   const isVisible = gamePhase === GAME_PHASE.SPEAKING || gamePhase === GAME_PHASE.WORD_REVEAL;
 
   if (!isVisible) return null;
