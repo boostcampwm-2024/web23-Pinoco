@@ -139,7 +139,7 @@ export class GameService {
     return game.isGuessed;
   }
 
-  async endGame(gsid: string): Promise<void> {
+  endGame(gsid: string) {
     this.games.delete(gsid);
   }
 }

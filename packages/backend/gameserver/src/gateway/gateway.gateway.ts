@@ -330,6 +330,12 @@ export class GatewayGateway
               isGuessed: false,
               guessingWord: '',
             });
+
+            this.gameService.endGame(gsid);
+            const room = this.roomService.getRoom(gsid);
+            if (room) {
+              room.readyUserIds.clear();
+            }
           }, 3000);
         }
       }
