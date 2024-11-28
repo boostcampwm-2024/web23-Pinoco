@@ -31,7 +31,7 @@ export class RoomService {
       throw new Error('존재하지 않는 방입니다.');
     }
 
-    if (room.userIds.size > this.MAX_ROOM_SIZE) {
+    if (room.userIds.size >= this.MAX_ROOM_SIZE) {
       throw new Error('방이 가득 찼습니다.');
     }
 
