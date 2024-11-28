@@ -8,7 +8,11 @@ export class RoomService {
   private MAX_ROOM_SIZE = 6;
 
   async createRoom(userId: string): Promise<string> {
-    const gsid = uuidv4();
+    let gsid: string;
+    do {
+      gsid = uuidv4().substring(0, 4);
+    } while (this.rooms.has(gsid));
+
     const roomInfo: IRoomInfo = {
       gsid,
       userIds: new Set([userId]),
