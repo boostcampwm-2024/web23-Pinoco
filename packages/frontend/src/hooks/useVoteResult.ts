@@ -6,6 +6,7 @@ import { useRoomStore } from '@/states/store/roomStore';
 interface IVoteResult {
   voteResult: Record<string, number>;
   deadPerson: string;
+  isDeadPersonPinoco: boolean;
 }
 
 export default function useVoteResult(
@@ -17,6 +18,7 @@ export default function useVoteResult(
   const { removeUser } = useRoomStore();
   const [voteResult, setVoteResult] = useState<Record<string, number>>({});
   const [deadPerson, setDeadPerson] = useState<string | null>(null);
+  const [isDeadPersonPinoco, setIsDeadPersonPinoco] = useState<boolean | null>(null); // 추가
 
   useEffect(() => {
     if (!socket) return;
@@ -31,6 +33,7 @@ export default function useVoteResult(
 
       setVoteResult(data.voteResult);
       setDeadPerson(data.deadPerson);
+      setIsDeadPersonPinoco(data.isDeadPersonPinoco); // 추가
 
       if (setSelectedVote) {
         setSelectedVote(null);
@@ -45,5 +48,5 @@ export default function useVoteResult(
     };
   }, [socket, onIsVotedChange, onPhaseChange, removeUser, setSelectedVote]);
 
-  return { voteResult, deadPerson };
+  return { voteResult, deadPerson, isDeadPersonPinoco }; // 수정
 }

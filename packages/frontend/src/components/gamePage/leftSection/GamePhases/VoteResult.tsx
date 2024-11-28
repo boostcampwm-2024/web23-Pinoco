@@ -1,21 +1,24 @@
 interface IVoteResultPhaseProps {
   deadPerson: string | null;
   voteResult: Record<string, number>;
-  isPinoco: boolean;
+  isDeadPersonPinoco: boolean | null;
 }
 
-export default function VoteResult({ deadPerson, voteResult, isPinoco }: IVoteResultPhaseProps) {
+export default function VoteResult({
+  deadPerson,
+  voteResult,
+  isDeadPersonPinoco,
+}: IVoteResultPhaseProps) {
   const maxVotes = Math.max(...Object.values(voteResult));
   const maxVotedUsers = Object.entries(voteResult)
     .filter(([_, votes]) => votes === maxVotes)
     .map(([userId]) => userId);
-  const totalVotes = Object.values(voteResult).reduce((sum, votes) => sum + votes, 0);
-
   const isTie = maxVotedUsers.length > 1;
   const isNoElimination = isTie || maxVotedUsers.includes('');
 
-  const getRoleText = (userId: string) => {
-    return userId === '' ? '' : isPinoco && userId === deadPerson ? '피노코' : '제페토';
+  const getRoleText = () => {
+    if (isDeadPersonPinoco === null) return '';
+    return isDeadPersonPinoco ? '피노코' : '제페토';
   };
 
   const renderVoteResults = () => (
@@ -33,7 +36,7 @@ export default function VoteResult({ deadPerson, voteResult, isPinoco }: IVoteRe
       <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
         <h2 className="text-2xl font-bold text-white-default">투표 결과</h2>
         <p className="text-xl text-white-default">
-          {deadPerson}님이 제거되었습니다. {deadPerson}님은 {getRoleText(deadPerson)}였습니다!
+          {deadPerson}님이 제거되었습니다. {deadPerson}님은 {getRoleText()}였습니다!
         </p>
         {renderVoteResults()}
       </div>
