@@ -30,7 +30,7 @@ export default function MainDisplay() {
   const { gameStartData, currentSpeaker, endSpeaking, votePinoco } = useGameSocket(setGamePhase);
   const { endingResult } = useEnding(setGamePhase);
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
-  const { voteResult, deadPerson } = useVoteResult(
+  const { voteResult, deadPerson, isDeadPersonPinoco } = useVoteResult(
     setIsVoteSubmitted,
     setGamePhase,
     setSelectedVote,
@@ -118,7 +118,11 @@ export default function MainDisplay() {
         )}
 
         {gamePhase === GAME_PHASE.VOTING_RESULT && (
-          <VoteResult deadPerson={deadPerson ?? ''} voteResult={voteResult} isPinoco={isPinoco} />
+          <VoteResult
+            deadPerson={deadPerson ?? ''}
+            voteResult={voteResult}
+            isDeadPersonPinoco={isDeadPersonPinoco ?? null}
+          />
         )}
         {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">
