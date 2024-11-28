@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-const testImg1 = '/images/gameManual/1.png';
-const testImg2 = '/images/gameManual/2.png';
-const testImg3 = '/images/gameManual/3.png';
+const manualImg1 = '/images/gameManual/manu1.png';
+const manualImg2 = '/images/gameManual/manu2.png';
+const manualImg3 = '/images/gameManual/manu3.png';
+const manualImg4 = '/images/gameManual/manu4.png';
+const manualImg5 = '/images/gameManual/manu5.png';
+const manualImg6 = '/images/gameManual/manu6.png';
+const manualImg7 = '/images/gameManual/manu7.png';
+const manualImg8 = '/images/gameManual/manu8.png';
+
 const howToPlay = '/images/gameManual/HowToPlayLogo.png';
 
 interface IGameManualProps {
@@ -12,7 +18,7 @@ interface IGameManualProps {
 
 const images = [
   {
-    src: testImg1,
+    src: manualImg1,
     description: (
       <p className="text-center text-gray-700 text-lg">
         게임 시작 전, <span className="font-bold">모든 플레이어가 준비 상태를 완료</span>해야 게임이
@@ -23,7 +29,7 @@ const images = [
     ),
   },
   {
-    src: testImg2,
+    src: manualImg2,
     description: (
       <p className="text-center text-gray-700 text-lg">
         게임이 시작되면 각 플레이어는 <span className="font-bold">제시어</span>를 확인하거나 자신의
@@ -34,7 +40,7 @@ const images = [
     ),
   },
   {
-    src: testImg3,
+    src: manualImg3,
     description: (
       <p className="text-center text-gray-700 text-lg">
         게임이 종료되면 <span className="font-bold">승패 결과</span>가 화면에 표시돼요. <br />
@@ -44,7 +50,7 @@ const images = [
     ),
   },
   {
-    src: testImg1,
+    src: manualImg4,
     description: (
       <p className="text-center text-gray-700 text-lg">
         피노코는 <span className="font-bold">정체를 숨기며</span> 제페토처럼 행동해야 해요. <br />
@@ -54,7 +60,7 @@ const images = [
     ),
   },
   {
-    src: testImg2,
+    src: manualImg5,
     description: (
       <p className="text-center text-gray-700 text-lg">
         모든 플레이어가 발언을 완료하면 <span className="font-bold">투표</span>가 시작돼요. <br />
@@ -63,7 +69,7 @@ const images = [
     ),
   },
   {
-    src: testImg3,
+    src: manualImg6,
     description: (
       <p className="text-center text-gray-700 text-lg">
         투표 결과에 따라 피노코가 지목돼요. <br />
@@ -74,7 +80,7 @@ const images = [
     ),
   },
   {
-    src: testImg1,
+    src: manualImg7,
     description: (
       <p className="text-center text-gray-700 text-lg">
         피노코는 <span className="font-bold">최종적으로 제시어</span>를 추측해요. <br />
@@ -84,7 +90,7 @@ const images = [
     ),
   },
   {
-    src: testImg2,
+    src: manualImg8,
     description: (
       <p className="text-center text-gray-700 text-lg">
         결과 화면에서는 <span className="font-bold">게임의 최종 승패</span>와 함께 피노코와 제페토의
