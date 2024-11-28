@@ -16,7 +16,7 @@ import Voting from './GamePhases/Voting';
 import VoteResult from './GamePhases/VoteResult';
 import EndingResult from './GamePhases/EndingResult';
 import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
-import VideoStream from '../stream/VideoStream';
+import VideoStream from '@/components/gamePage/stream/VideoStream';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
