@@ -118,10 +118,7 @@ export class GatewayService {
     await this.gameService.submitVote(gsid, voterId, targetId);
   }
 
-  async processVoteResult(gsid: string): Promise<{
-    voteResult: Record<string, number>;
-    deadPerson: string;
-  }> {
+  async processVoteResult(gsid: string) {
     return await this.gameService.processVoteResult(gsid);
   }
 

@@ -89,10 +89,7 @@ export class GameService {
     game.votes[voterId] = targetId;
   }
 
-  async processVoteResult(gsid: string): Promise<{
-    voteResult: Record<string, number>;
-    deadPerson: string;
-  }> {
+  async processVoteResult(gsid: string) {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
@@ -125,7 +122,9 @@ export class GameService {
       this.startSpeakingPhase(gsid);
     }
 
-    return { voteResult: voteCount, deadPerson };
+    const isDeadPersonPinoco = deadPerson === game.pinocoId;
+
+    return { voteResult: voteCount, deadPerson, isDeadPersonPinoco };
   }
 
   async submitGuess(gsid: string, word: string): Promise<boolean> {
