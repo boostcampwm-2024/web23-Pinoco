@@ -18,6 +18,7 @@ export class RoomService {
       userIds: new Set([userId]),
       readyUserIds: new Set(),
       hostUserId: userId,
+      isPlaying: false,
     };
 
     this.rooms.set(gsid, roomInfo);
@@ -32,6 +33,10 @@ export class RoomService {
 
     if (room.userIds.size > this.MAX_ROOM_SIZE) {
       throw new Error('방이 가득 찼습니다.');
+    }
+
+    if (room.isPlaying) {
+      throw new Error('게임이 진행중입니다.');
     }
 
     room.userIds.add(userId);
