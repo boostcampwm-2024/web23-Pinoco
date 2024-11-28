@@ -12,7 +12,7 @@ export default function CameraSettingButton({ iconColor }: { iconColor: string }
     if (camera) camera.enabled = !isCameraOn;
   }
   useEffect(() => {
-    const initSetting = !!localStream?.getVideoTracks()[0];
+    const initSetting = !!localStream?.getVideoTracks()[0].enabled;
     setIsCameraOn(initSetting);
   }, [localStream]);
   return (

@@ -12,7 +12,7 @@ export default function MikeSettingButton({ iconColor }: { iconColor: string }) 
     if (mike) mike.enabled = !isMikeOn;
   }
   useEffect(() => {
-    const initSetting = !!localStream?.getAudioTracks()[0];
+    const initSetting = !!localStream?.getAudioTracks()[0].enabled;
     setIsMikeOn(initSetting);
   }, [localStream]);
   return (
