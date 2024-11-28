@@ -43,7 +43,7 @@ export default function GuestLoginButton() {
       <Button
         className="text-xl font-semibold text-black bg-white hover:bg-gray-300"
         onClick={() => setShowModal(true)}
-        buttonText="비회원으로 시작하기"
+        buttonText="게임 시작하기"
       />
       {showModal && (
         <NicknameModal
