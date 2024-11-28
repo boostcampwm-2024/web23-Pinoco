@@ -1,13 +1,11 @@
 import { useEffect } from 'react';
 import { useSocketStore } from '@/states/store/socketStore';
-import { useAuthStore } from '@/states/store/authStore';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
 import RoomCreationButton from '@/components/lobbyPage/RoomCreationButton';
 import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import Header from '@/components/layout/Header';
-import SettingSection from '@/components/lobbyPage/SettingSection';
 import { useRoomStore } from '@/states/store/roomStore';
 import { useChatStore } from '@/states/store/chatStore';
 import { useLocalStreamStore } from '@/states/store/localStreamStore';
@@ -49,9 +47,6 @@ export default function LobbyPage() {
           <VideoAudioTestButton />
           <RoomCreationButton />
           <RoomJoinButton />
-        </div>
-        <div className="absolute flex justify-end w-full bottom-10">
-          <SettingSection />
         </div>
       </div>
     </>
