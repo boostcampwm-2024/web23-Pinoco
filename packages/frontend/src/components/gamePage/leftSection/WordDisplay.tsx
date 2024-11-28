@@ -25,7 +25,7 @@ export default function WordDisplay({
 
   if (!isVisible) return null;
 
-  const displayText = isPinoco ? `테마: ${theme}` : `제시어: ${currentWord}`;
+  const displayText = isPinoco ? `🎨 테마: ${theme}` : `💭 제시어: ${currentWord}`;
 
   return (
     <motion.div
@@ -34,7 +34,7 @@ export default function WordDisplay({
       className={`${
         gamePhase === GAME_PHASE.WORD_REVEAL
           ? 'fixed inset-0 flex items-center justify-center bg-black/50 z-50'
-          : 'absolute left-4 top-4 p-2 bg-green-default/60 rounded-lg'
+          : 'absolute left-4 top-4 p-2 bg-black rounded-lg'
       }`}
     >
       <motion.div

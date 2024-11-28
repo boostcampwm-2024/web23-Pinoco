@@ -1,5 +1,4 @@
 import GuestLoginButton from '@/components/landingPage/GuestLoginButton';
-import OAuthLoginButton from '@/components/landingPage/OAuthLoginButton';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
 import { useSocketStore } from '@/states/store/socketStore';
@@ -15,7 +14,6 @@ export default function LandingPage() {
           <span className="font-semibold text-7xl">실시간 화상 통화로</span>
           <span className="mb-24 font-semibold text-7xl">진행하는 라이어 게임</span>
           <GuestLoginButton />
-          <OAuthLoginButton />
         </div>
         <div>
           <MainLogo />

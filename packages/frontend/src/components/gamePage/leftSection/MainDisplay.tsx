@@ -100,7 +100,7 @@ export default function MainDisplay() {
                 height="h-full"
               />
             </div>
-            <div className="absolute top-16 left-4 text-lg p-2 text-white-default bg-slate-950 rounded-lg">
+            <div className="absolute p-2 text-lg rounded-lg top-16 left-4 text-white-default bg-slate-950">
               📢 {currentSpeaker}
             </div>
           </div>
@@ -137,13 +137,13 @@ export default function MainDisplay() {
 
       {gamePhase === GAME_PHASE.SPEAKING && (
         <div className="w-full mt-auto">
-          <Timer key={currentSpeaker} initialTime={5} onTimeEnd={() => endSpeaking(userId!)} />
+          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
         </div>
       )}
 
       {gamePhase === GAME_PHASE.VOTING && (
         <div className="w-full mt-auto">
-          <Timer key="voting" initialTime={10} onTimeEnd={handleVote} />
+          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
         </div>
       )}
     </div>
