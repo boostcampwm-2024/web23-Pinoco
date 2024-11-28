@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import testImg1 from '@/assets/images/manual/1.png';
-import testImg2 from '@/assets/images/manual/2.png';
-import testImg3 from '@/assets/images/manual/3.png';
-import howToPlay from '@/assets/images/manual/HowToPlayLogo.png';
+const testImg1 = '/images/gameManual/1.png';
+const testImg2 = '/images/gameManual/2.png';
+const testImg3 = '/images/gameManual/3.png';
+const howToPlay = '/images/gameManual/HowToPlayLogo.png';
 
 interface IGameManualProps {
   onClose: () => void;
