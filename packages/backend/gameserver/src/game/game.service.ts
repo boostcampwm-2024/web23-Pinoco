@@ -132,10 +132,10 @@ export class GameService {
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
     game.guessingWord = word;
-    game.isGuessed = game.word === word;
     game.phase = 'ENDING';
+    const isCorrect = game.word === word;
 
-    return game.isGuessed;
+    return isCorrect;
   }
 
   endGame(gsid: string) {

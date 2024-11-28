@@ -15,7 +15,6 @@ export interface IGameState {
   speakerQueue: string[];
   votes: Record<string, string>;
   guessingWord?: string;
-  isGuessed?: boolean;
 }
 
 export interface IGameInfo extends IGameState {
