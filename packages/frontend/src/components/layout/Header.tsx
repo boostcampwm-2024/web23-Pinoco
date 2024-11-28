@@ -9,14 +9,7 @@ export default function Header() {
         <HeaderLogo />
       </div>
       <nav>
-        <ul className="flex gap-4 last:mr-8">
-          <li>
-            <Bell />
-          </li>
-          <li>
-            <Friends />
-          </li>
-        </ul>
+        <ul className="flex gap-4 last:mr-8"></ul>
       </nav>
     </header>
   );
