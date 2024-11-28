@@ -52,7 +52,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
 
     signalingSocket.on('user_joined', async ({ fromUserId, gsid }) => {
       console.log('[Client][📢] user_joined', fromUserId, gsid);
-      const localStream = await getVideoStream();
+      const localStream = useLocalStreamStore.getState().localStream;
       const { setRemoteStream } = usePeerConnectionStore.getState();
       const peerConnection = createPeerConnection({
         fromUserId,
@@ -85,7 +85,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
     });
 
     signalingSocket.on('video_offer', async ({ offer, fromUserId, gsid }) => {
-      const localStream = await getVideoStream();
+      const localStream = useLocalStreamStore.getState().localStream;
       const { setRemoteStream } = usePeerConnectionStore.getState();
       const peerConnection = createPeerConnection({
         fromUserId,
