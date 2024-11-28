@@ -22,7 +22,6 @@ export default function GamePage() {
   return (
     <>
       <BackgroundImage gradientClass="bg-white/30" />
-      <Header />
       <div className="relative flex w-full h-screen">
         <LeftGameSection />
         <RightGameSection />

@@ -4,9 +4,10 @@ interface IVideoStreamProps {
   userName: string | null;
   stream: MediaStream | null;
   isLocal?: boolean;
+  height?: string;
 }
 
-export default function VideoStream({ userName, stream, isLocal }: IVideoStreamProps) {
+export default function VideoStream({ userName, stream, isLocal, height }: IVideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -23,7 +24,9 @@ export default function VideoStream({ userName, stream, isLocal }: IVideoStreamP
   }, [stream]);
 
   return (
-    <div className="aspect-video relative w-full overflow-hidden bg-gray-700 rounded-lg min-h-32">
+    <div
+      className={`${height} aspect-video relative w-full overflow-hidden bg-gray-700 rounded-lg min-h-32`}
+    >
       <video
         ref={videoRef}
         muted={isLocal}

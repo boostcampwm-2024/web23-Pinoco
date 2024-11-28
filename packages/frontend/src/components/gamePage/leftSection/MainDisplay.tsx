@@ -17,6 +17,7 @@ import VoteResult from './GamePhases/VoteResult';
 import EndingResult from './GamePhases/EndingResult';
 import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
 import VideoStream from '@/components/gamePage/stream/VideoStream';
+import { useLocalStreamStore } from '@/states/store/localStreamStore';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
@@ -34,8 +35,13 @@ export default function MainDisplay() {
     setGamePhase,
     setSelectedVote,
   );
-  const remoteStreams = usePeerConnectionStore((state) => state.remoteStreams);
-  const currentStream = remoteStreams.get(currentSpeaker || '');
+  function getCurrentStream() {
+    const localStream = useLocalStreamStore.getState().localStream;
+    const remoteStreams = usePeerConnectionStore.getState().remoteStreams;
+    if (currentSpeaker === userId) return localStream;
+    const currentStream = remoteStreams.get(currentSpeaker || '');
+    return currentStream;
+  }
 
   useEffect(() => {
     if (gameStartData) {
@@ -85,9 +91,10 @@ export default function MainDisplay() {
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-4/6 p-4">
               <VideoStream
-                stream={currentStream || null}
+                stream={getCurrentStream() || null}
                 userName={currentSpeaker}
                 isLocal={true}
+                height="h-full"
               />
             </div>
             <div className="absolute top-16 left-4 text-lg p-2 text-white-default bg-slate-950 rounded-lg">
