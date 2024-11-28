@@ -229,10 +229,12 @@ export class GatewayGateway
           speakerId: gameState.speakerQueue[0],
           allUserIds: gameState.userIds,
         };
+        room.isPlaying = true;
 
         this.logger.logSocketEvent('send', 'start_game_success', {
           personalGameState,
         });
+
         this.server
           .to(this.getSocketIdByUserId(uid))
           .emit('start_game_success', personalGameState);
@@ -330,6 +332,11 @@ export class GatewayGateway
               isGuessed: false,
               guessingWord: '',
             });
+
+            this.gameService.endGame(gsid);
+            const room = this.roomService.getRoom(gsid);
+            room.readyUserIds.clear();
+            room.isPlaying = false;
           }, 3000);
         }
       }
@@ -380,9 +387,8 @@ export class GatewayGateway
       // 게임 종료 및 초기화
       await this.gameService.endGame(gsid);
       const room = this.roomService.getRoom(gsid);
-      if (room) {
-        room.readyUserIds.clear();
-      }
+      room.readyUserIds.clear();
+      room.isPlaying = false;
     } catch (error) {
       this.logger.logError('guessing_error', error);
       this.emitError(client, error.message);

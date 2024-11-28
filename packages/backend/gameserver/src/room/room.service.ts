@@ -8,12 +8,17 @@ export class RoomService {
   private MAX_ROOM_SIZE = 6;
 
   async createRoom(userId: string): Promise<string> {
-    const gsid = uuidv4();
+    let gsid: string;
+    do {
+      gsid = uuidv4().substring(0, 4);
+    } while (this.rooms.has(gsid));
+
     const roomInfo: IRoomInfo = {
       gsid,
       userIds: new Set([userId]),
       readyUserIds: new Set(),
       hostUserId: userId,
+      isPlaying: false,
     };
 
     this.rooms.set(gsid, roomInfo);
@@ -26,8 +31,12 @@ export class RoomService {
       throw new Error('존재하지 않는 방입니다.');
     }
 
-    if (room.userIds.size > this.MAX_ROOM_SIZE) {
+    if (room.userIds.size >= this.MAX_ROOM_SIZE) {
       throw new Error('방이 가득 찼습니다.');
+    }
+
+    if (room.isPlaying) {
+      throw new Error('게임이 진행중입니다.');
     }
 
     room.userIds.add(userId);

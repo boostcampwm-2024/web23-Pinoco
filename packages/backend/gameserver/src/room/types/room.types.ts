@@ -3,6 +3,7 @@ export interface IRoomInfo {
   userIds: Set<string>;
   readyUserIds: Set<string>;
   hostUserId: string;
+  isPlaying: boolean;
 }
 
 export interface IRoomEventPayload {
