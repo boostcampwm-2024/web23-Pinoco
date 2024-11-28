@@ -60,7 +60,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         gsid,
         localUserId: userId,
       });
-
+      setRemoteStream(fromUserId, null);
       localStream?.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
       });
@@ -71,7 +71,6 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       };
       dataChannel.onopen = () => {
         console.log('[Client][📢] dataChannel opened');
-        setRemoteStream(fromUserId, null);
       };
 
       const offer = await peerConnection.createOffer();
@@ -94,7 +93,7 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         gsid,
         localUserId: userId,
       });
-
+      setRemoteStream(fromUserId, null);
       localStream?.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
       });
@@ -106,7 +105,6 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
         };
         dataChannel.onopen = () => {
           console.log('[Client][📢] dataChannel opened');
-          setRemoteStream(fromUserId, null);
         };
       };
 

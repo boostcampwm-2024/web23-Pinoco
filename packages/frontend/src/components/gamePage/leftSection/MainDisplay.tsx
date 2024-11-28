@@ -15,6 +15,8 @@ import WordDisplay from './WordDisplay';
 import Voting from './GamePhases/Voting';
 import VoteResult from './GamePhases/VoteResult';
 import EndingResult from './GamePhases/EndingResult';
+import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
+import VideoStream from '@/components/gamePage/stream/VideoStream';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
@@ -32,6 +34,8 @@ export default function MainDisplay() {
     setGamePhase,
     setSelectedVote,
   );
+  const remoteStreams = usePeerConnectionStore((state) => state.remoteStreams);
+  const currentStream = remoteStreams.get(currentSpeaker || '');
 
   useEffect(() => {
     if (gameStartData) {
@@ -79,7 +83,16 @@ export default function MainDisplay() {
 
         {gamePhase === GAME_PHASE.SPEAKING && (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-xl text-white-default">현재 발언자: {currentSpeaker}</p>
+            <div className="w-4/6 p-4">
+              <VideoStream
+                stream={currentStream || null}
+                userName={currentSpeaker}
+                isLocal={true}
+              />
+            </div>
+            <div className="absolute top-16 left-4 text-lg p-2 text-white-default bg-slate-950 rounded-lg">
+              📢 {currentSpeaker}
+            </div>
           </div>
         )}
 
