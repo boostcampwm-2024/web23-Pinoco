@@ -32,7 +32,7 @@ export default function VideoStream({ userName, stream, isLocal, height }: IVide
         muted={isLocal}
         autoPlay
         playsInline
-        poster="/images/videoPoster.png"
+        poster="/images/videoStream/videoPoster.png"
         onLoadedMetadata={() => {
           console.log('[Client][🎥] Video metadata loaded for:', userName);
         }}
