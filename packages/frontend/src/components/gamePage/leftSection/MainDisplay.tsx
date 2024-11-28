@@ -68,9 +68,12 @@ export default function MainDisplay() {
       setIsVoteSubmitted(true);
     }
   };
-
   return (
-    <div className="relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg bg-green-default/40">
+    <div
+      className={`relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg ${
+        gamePhase === GAME_PHASE.ENDING ? 'bg-green-default' : 'bg-green-default/40'
+      }`}
+    >
       <WordDisplay
         gamePhase={gamePhase}
         currentWord={currentWord}
