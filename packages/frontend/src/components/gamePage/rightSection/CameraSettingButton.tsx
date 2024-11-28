@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CameraOn from '@/assets/images/CameraOn.svg?react';
 import CameraOff from '@/assets/images/CameraOff.svg?react';
+import { useLocalStreamStore } from '@/states/store/localStreamStore';
 
 export default function CameraSettingButton() {
+  const { localStream } = useLocalStreamStore();
   const [isCameraOn, setIsCameraOn] = useState(false);
   function handleCamera() {
     setIsCameraOn(!isCameraOn);
+    const camera = localStream?.getVideoTracks()[0];
+    if (camera) camera.enabled = !isCameraOn;
   }
+  useEffect(() => {
+    const initSetting = !!localStream?.getVideoTracks()[0];
+    setIsCameraOn(initSetting);
+  }, [localStream]);
   return (
     <button
       className="p-4 w-[120px] bg-transparent rounded-lg flex flex-col items-center justify-center gap-2"
