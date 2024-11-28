@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface ITimerProps {
   initialTime: number;
@@ -7,21 +7,38 @@ interface ITimerProps {
 
 export default function Timer({ initialTime, onTimeEnd }: ITimerProps) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
+  const startTimeRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      onTimeEnd();
-      return;
-    }
+    const animate = (currentTime: number) => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = currentTime;
+      }
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
+      const elapsedTime = (currentTime - startTimeRef.current) / 1000;
+      const newTimeLeft = initialTime - elapsedTime;
 
-    return () => clearInterval(timer);
-  }, [timeLeft, onTimeEnd]);
+      if (newTimeLeft <= 0) {
+        setTimeLeft(0);
+        setTimeout(onTimeEnd, 50);
+        return;
+      }
 
-  const progressPercentage = (timeLeft / initialTime) * 100;
+      setTimeLeft(newTimeLeft);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [initialTime, onTimeEnd]);
+
+  const progressPercentage = Math.max((timeLeft / initialTime) * 100, 0);
 
   return (
     <div className="flex items-center gap-4">
@@ -29,7 +46,7 @@ export default function Timer({ initialTime, onTimeEnd }: ITimerProps) {
       <div className="w-full h-8">
         <div className="w-full h-full overflow-hidden bg-gray-700 rounded-full">
           <div
-            className={`h-full transform-gpu transition-transform duration-1000 ease-linear ${
+            className={`h-full transform-gpu transition-transform duration-[50ms] ease-linear ${
               timeLeft < 10 ? 'bg-red-500' : 'bg-green-default'
             }`}
             style={{ transform: `translateX(${progressPercentage - 100}%)` }}
