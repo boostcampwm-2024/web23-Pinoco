@@ -137,13 +137,13 @@ export default function MainDisplay() {
 
       {gamePhase === GAME_PHASE.SPEAKING && (
         <div className="w-full mt-auto">
-          <Timer key={currentSpeaker} initialTime={30} onTimeEnd={() => endSpeaking(userId!)} />
+          <Timer key={currentSpeaker} initialTime={15} onTimeEnd={() => endSpeaking(userId!)} />
         </div>
       )}
 
       {gamePhase === GAME_PHASE.VOTING && (
         <div className="w-full mt-auto">
-          <Timer key="voting" initialTime={60} onTimeEnd={handleVote} />
+          <Timer key="voting" initialTime={30} onTimeEnd={handleVote} />
         </div>
       )}
     </div>
