@@ -95,9 +95,8 @@ export default function MainDisplay() {
         )}
 
         {gamePhase === GAME_PHASE.VOTING_RESULT && (
-          <VoteResult deadPerson={deadPerson ?? ''} voteResult={voteResult} />
+          <VoteResult deadPerson={deadPerson ?? ''} voteResult={voteResult} isPinoco={isPinoco} />
         )}
-
         {gamePhase === GAME_PHASE.GUESSING && (
           <div className="flex flex-col items-center justify-center h-full">
             {isPinoco ? (
