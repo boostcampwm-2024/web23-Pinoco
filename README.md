@@ -75,13 +75,14 @@
 |------|---|
 |공통|[![My Skills](https://skillicons.dev/icons?i=ts)](https://skillicons.dev)
 |FE|[![My Skills](https://skillicons.dev/icons?i=react,vite,tailwind,)](https://skillicons.dev)
-|BE|[![My Skills](https://skillicons.dev/icons?i=express,mysql,nest)](https://skillicons.dev)
+|BE|[![My Skills](https://skillicons.dev/icons?i=express,nest)](https://skillicons.dev)
 |배포|[![My Skills](https://skillicons.dev/icons?i=githubactions,docker,nginx)](https://skillicons.dev)
 |협업| [![My Skills](https://skillicons.dev/icons?i=figma,git,github,notion)](https://skillicons.dev)
 
 
 ## 시스템 아키텍처
-![image](https://github.com/user-attachments/assets/2ddfb0db-d10d-407c-93a5-6a63349bb833)
+![image](https://github.com/user-attachments/assets/37fb42bf-99cf-4ac1-9abe-647ab8cc0e73)
+
 
 <br />
 
