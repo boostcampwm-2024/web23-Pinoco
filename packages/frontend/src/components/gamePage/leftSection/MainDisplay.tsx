@@ -18,6 +18,7 @@ import EndingResult from './GamePhases/EndingResult';
 import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
 import VideoStream from '@/components/gamePage/stream/VideoStream';
 import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useSpeakingControl } from '@/hooks/useSpeakingControl';
 
 export default function MainDisplay() {
   const { userId } = useAuthStore();
@@ -28,6 +29,8 @@ export default function MainDisplay() {
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [isVoteSubmitted, setIsVoteSubmitted] = useState(false);
   const { gameStartData, currentSpeaker, endSpeaking, votePinoco } = useGameSocket(setGamePhase);
+  const { endSpeakingEarly } = useSpeakingControl(currentSpeaker, userId);
+
   const { endingResult } = useEnding(setGamePhase);
   const { submitGuess } = useGuessing(isPinoco, setGamePhase);
   const { voteResult, deadPerson, isDeadPersonPinoco } = useVoteResult(
@@ -103,6 +106,14 @@ export default function MainDisplay() {
             <div className="absolute p-2 text-lg rounded-lg top-16 left-4 text-white-default bg-slate-950">
               📢 {currentSpeaker}
             </div>
+            {currentSpeaker === userId && (
+              <button
+                className="mt-4 px-6 py-2 bg-green-default text-white-default rounded-lg hover:bg-green-200 hover:text-black self-end ml-auto"
+                onClick={endSpeakingEarly}
+              >
+                발언 종료
+              </button>
+            )}
           </div>
         )}
 
