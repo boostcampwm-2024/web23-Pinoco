@@ -3,7 +3,6 @@ import VideoStream from '@/components/gamePage/stream/VideoStream';
 import { useAuthStore } from '@/store/authStore';
 import { useLocalStreamStore } from '@/store/localStreamStore';
 import { usePeerConnectionStore } from '@/store/peerConnectionStore';
-import { useReadyStatus } from '@/hooks/useReadyStatus';
 import { useRoomStore } from '@/store/roomStore';
 
 export default function VideoFeed() {
