@@ -73,94 +73,101 @@ export default function MainDisplay() {
   };
   return (
     <div
-      className={`relative flex flex-col flex-grow w-full p-4 mt-4 rounded-lg ${
+      className={`relative flex-1 flex flex-col w-full p-4 mt-4 rounded-lg overflow-hidden ${
         gamePhase === GAME_PHASE.ENDING ? 'bg-green-default' : 'bg-green-default/40'
       }`}
     >
-      <WordDisplay
-        gamePhase={gamePhase}
-        currentWord={currentWord}
-        theme={theme}
-        isPinoco={isPinoco}
-      />
+      {gamePhase === GAME_PHASE.SPEAKING && (
+        <div className="absolute inset-0">
+          <VideoStream
+            stream={getCurrentStream() || null}
+            userName={currentSpeaker}
+            isLocal={true}
+            height="h-full"
+          />
+        </div>
+      )}
 
-      <div className="flex-grow">
-        {gamePhase === GAME_PHASE.WAITING && (
-          <div className="flex flex-col items-center justify-center h-full">
-            {isHost ? <StartButton /> : <ReadyButton />}
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="mb-4">
+          <div className="mb-2">
+            <WordDisplay
+              gamePhase={gamePhase}
+              currentWord={currentWord}
+              theme={theme}
+              isPinoco={isPinoco}
+            />
           </div>
-        )}
-
-        {gamePhase === GAME_PHASE.COUNTDOWN && <Countdown onCountdownEnd={handleCountdownEnd} />}
-
-        {gamePhase === GAME_PHASE.SPEAKING && (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-4/6 p-4">
-              <VideoStream
-                stream={getCurrentStream() || null}
-                userName={currentSpeaker}
-                isLocal={true}
-                height="h-full"
-              />
-            </div>
-            <div className="absolute p-2 text-lg rounded-lg top-16 left-4 text-white-default bg-slate-950">
+          {gamePhase === GAME_PHASE.SPEAKING && (
+            <div className="p-2 text-lg rounded-lg w-fit text-white-default bg-slate-950">
               📢 {currentSpeaker}
             </div>
-            {currentSpeaker === userId && (
+          )}
+        </div>
+
+        <div className="flex-1">
+          {gamePhase === GAME_PHASE.WAITING && (
+            <div className="flex flex-col items-center justify-center h-full">
+              {isHost ? <StartButton /> : <ReadyButton />}
+            </div>
+          )}
+          {gamePhase === GAME_PHASE.COUNTDOWN && <Countdown onCountdownEnd={handleCountdownEnd} />}
+          {gamePhase === GAME_PHASE.VOTING && (
+            <Voting
+              userId={userId!}
+              allUsers={allUsers}
+              selectedVote={selectedVote}
+              isVoteSubmitted={isVoteSubmitted}
+              setSelectedVote={setSelectedVote}
+              handleVote={handleVote}
+            />
+          )}
+          {gamePhase === GAME_PHASE.VOTING_RESULT && (
+            <VoteResult
+              deadPerson={deadPerson ?? ''}
+              voteResult={voteResult}
+              isDeadPersonPinoco={isDeadPersonPinoco ?? null}
+            />
+          )}
+          {gamePhase === GAME_PHASE.GUESSING && (
+            <div className="flex flex-col items-center justify-center h-full">
+              {isPinoco ? (
+                <GuessInput onSubmitGuess={submitGuess} />
+              ) : (
+                <p className="text-xl text-center text-white-default">
+                  피노코가 제시어를 추측 중입니다 🤔
+                </p>
+              )}
+            </div>
+          )}
+          {gamePhase === GAME_PHASE.ENDING && <EndingResult endingResult={endingResult} />}
+        </div>
+
+        <div className="relative mt-auto">
+          {gamePhase === GAME_PHASE.SPEAKING && currentSpeaker === userId && (
+            <div className="absolute bottom-12 right-4">
               <button
-                className="mt-4 px-6 py-2 bg-green-default text-white-default rounded-lg hover:bg-green-200 hover:text-black self-end ml-auto"
+                className="px-6 py-2 rounded-lg bg-green-default text-white-default hover:bg-green-200 hover:text-black"
                 onClick={endSpeakingEarly}
               >
                 발언 종료
               </button>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        {gamePhase === GAME_PHASE.VOTING && (
-          <Voting
-            userId={userId!}
-            allUsers={allUsers}
-            selectedVote={selectedVote}
-            isVoteSubmitted={isVoteSubmitted}
-            setSelectedVote={setSelectedVote}
-            handleVote={handleVote}
-          />
-        )}
-
-        {gamePhase === GAME_PHASE.VOTING_RESULT && (
-          <VoteResult
-            deadPerson={deadPerson ?? ''}
-            voteResult={voteResult}
-            isDeadPersonPinoco={isDeadPersonPinoco ?? null}
-          />
-        )}
-        {gamePhase === GAME_PHASE.GUESSING && (
-          <div className="flex flex-col items-center justify-center h-full">
-            {isPinoco ? (
-              <GuessInput onSubmitGuess={submitGuess} />
-            ) : (
-              <p className="text-xl text-center text-white-default">
-                피노코가 제시어를 추측 중입니다 🤔
-              </p>
-            )}
-          </div>
-        )}
-
-        {gamePhase === GAME_PHASE.ENDING && <EndingResult endingResult={endingResult} />}
+          {(gamePhase === GAME_PHASE.SPEAKING || gamePhase === GAME_PHASE.VOTING) && (
+            <div className="w-full">
+              <Timer
+                key={gamePhase === GAME_PHASE.SPEAKING ? currentSpeaker : 'voting'}
+                initialTime={gamePhase === GAME_PHASE.SPEAKING ? 15 : 30}
+                onTimeEnd={
+                  gamePhase === GAME_PHASE.SPEAKING ? () => endSpeaking(userId!) : handleVote
+                }
+              />
+            </div>
+          )}
+        </div>
       </div>
-
-      {gamePhase === GAME_PHASE.SPEAKING && (
-        <div className="w-full mt-auto">
-          <Timer key={currentSpeaker} initialTime={15} onTimeEnd={() => endSpeaking(userId!)} />
-        </div>
-      )}
-
-      {gamePhase === GAME_PHASE.VOTING && (
-        <div className="w-full mt-auto">
-          <Timer key="voting" initialTime={30} onTimeEnd={handleVote} />
-        </div>
-      )}
     </div>
   );
 }
