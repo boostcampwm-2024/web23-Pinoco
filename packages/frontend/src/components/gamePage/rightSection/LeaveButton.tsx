@@ -4,13 +4,17 @@ import { useSocketStore } from '@/states/store/socketStore';
 import { useChatStore } from '@/states/store/chatStore';
 import { useRoomStore } from '@/states/store/roomStore';
 import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
+import { useState } from 'react';
+import LeaveConfirmModal from './LeaveConfirmModal';
 
 export default function LeaveButton() {
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const socket = useSocketStore((state) => state.socket);
   const setChatHistory = useChatStore((state) => state.setChatHistory);
   const setRoomData = useRoomStore((state) => state.setRoomData);
   const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
+
   function handleLeave() {
     if (!socket || !signalingSocket) return;
     socket.emit('leave_room');
@@ -19,13 +23,20 @@ export default function LeaveButton() {
     setRoomData(null, false, false);
     navigate('/lobby');
   }
+
   return (
-    <button
-      className="w-[120px] px-4 py-4 bg-transparent rounded-lg flex flex-col items-center justify-center gap-2"
-      onClick={handleLeave}
-    >
-      <Leave className="text-white-default pr-2" />
-      <p className="text-white-default text-lg">방 나가기</p>
-    </button>
+    <>
+      <button
+        className="w-[120px] px-4 py-4 bg-transparent rounded-lg flex flex-col items-center justify-center gap-2"
+        onClick={() => setShowModal(true)}
+      >
+        <Leave className="pr-2 text-white-default" />
+        <p className="text-lg text-white-default">방 나가기</p>
+      </button>
+
+      {showModal && (
+        <LeaveConfirmModal onConfirm={handleLeave} onClose={() => setShowModal(false)} />
+      )}
+    </>
   );
 }
