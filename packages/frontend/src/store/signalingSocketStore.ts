@@ -148,7 +148,15 @@ export const useSignalingSocketStore = create<ISignalingSocketStore>((set, get) 
       console.log('[Client][📢] user_left', fromUserId);
     });
 
-    console.log('[Client][🔔] setupEventHandlers');
+    signalingSocket.on('disconnect_event', async ({ fromUserId, gsid }) => {
+      const peerConnections = usePeerConnectionStore.getState().peerConnections;
+      const peerConnection = peerConnections.get(fromUserId)?.connection;
+      if (!peerConnection) return;
+      await peerConnection.close();
+      removePeerConnection(fromUserId);
+      removeRemoteStream(fromUserId);
+      console.log('[Client][📢] disconnect_event', fromUserId, gsid);
+    });
   },
 
   removeEventHandlers: () => {
