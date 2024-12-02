@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/states/store/socketStore';
+import { useSocketStore } from '@/store/socketStore';
 
 export const useSpeakingControl = (currentSpeaker: string | null, userId: string | null) => {
   const socket = useSocketStore((state) => state.socket);

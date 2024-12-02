@@ -1,9 +1,9 @@
 import Leave from '@/assets/images/Leave.svg?react';
 import { useNavigate } from 'react-router-dom';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useChatStore } from '@/states/store/chatStore';
-import { useRoomStore } from '@/states/store/roomStore';
-import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useChatStore } from '@/store/chatStore';
+import { useRoomStore } from '@/store/roomStore';
+import { useSignalingSocketStore } from '@/store/signalingSocketStore';
 import { useState } from 'react';
 import LeaveConfirmModal from './LeaveConfirmModal';
 

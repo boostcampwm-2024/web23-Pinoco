@@ -4,8 +4,8 @@ import LeftGameSection from '@/components/gamePage/leftSection/LeftGameSection';
 import RightGameSection from '@/components/gamePage/rightSection/RightGameSection';
 import Header from '@/components/layout/Header';
 import GameManual from '@/components/gamePage/GameManual';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useRoomStore } from '@/states/store/roomStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useRoomStore } from '@/store/roomStore';
 
 export default function GamePage() {
   const { socket } = useSocketStore();

@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react';
 import VideoStream from '@/components/gamePage/stream/VideoStream';
-import { useAuthStore } from '@/states/store/authStore';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
-import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
+import { useAuthStore } from '@/store/authStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
+import { usePeerConnectionStore } from '@/store/peerConnectionStore';
 import { useReadyStatus } from '@/hooks/useReadyStatus';
 
 export default function VideoFeed() {

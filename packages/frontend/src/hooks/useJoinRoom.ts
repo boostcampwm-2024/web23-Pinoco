@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/states/store/authStore';
-import { useRoomStore } from '@/states/store/roomStore';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
+import { useAuthStore } from '@/store/authStore';
+import { useRoomStore } from '@/store/roomStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useSignalingSocketStore } from '@/store/signalingSocketStore';
 
 export default function useJoinRoom() {
   const navigate = useNavigate();

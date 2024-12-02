@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/states/store/socketStore';
+import { useSocketStore } from '@/store/socketStore';
 import { GAME_PHASE, GamePhase } from '@/constants';
 
 export default function useGuessing(isPinoco: boolean, setGamePhase: (phase: GamePhase) => void) {

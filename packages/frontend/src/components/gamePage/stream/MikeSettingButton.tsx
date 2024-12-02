@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import MikeOn from '@/assets/images/MikeOn.svg?react';
 import MikeOff from '@/assets/images/MikeOff.svg?react';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 
 export default function MikeSettingButton({ iconColor }: { iconColor: string }) {
   const { localStream } = useLocalStreamStore();

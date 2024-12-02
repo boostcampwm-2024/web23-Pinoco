@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useSocketStore } from '@/states/store/socketStore';
+import { useSocketStore } from '@/store/socketStore';
 import { GAME_PHASE, GamePhase } from '@/constants';
-import { useRoomStore } from '@/states/store/roomStore';
+import { useRoomStore } from '@/store/roomStore';
 
 interface IVoteResult {
   voteResult: Record<string, number>;

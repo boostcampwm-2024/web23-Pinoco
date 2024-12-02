@@ -3,9 +3,9 @@ import Button from '@/components/common/Button';
 import NicknameModal from './NicknameModal';
 import { useNavigate } from 'react-router-dom';
 import { getGuestLogin } from '@/apis/login';
-import { useAuthStore } from '@/states/store/authStore';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useSignalingSocketStore } from '@/states/store/signalingSocketStore';
+import { useAuthStore } from '@/store/authStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useSignalingSocketStore } from '@/store/signalingSocketStore';
 
 export default function GuestLoginButton() {
   const navigate = useNavigate();

@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useChatStore } from '@/states/store/chatStore';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useRoomStore } from '@/states/store/roomStore';
+import { useChatStore } from '@/store/chatStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useRoomStore } from '@/store/roomStore';
 import { ChatType } from '@/constants/chatState';
-import { useAuthStore } from '@/states/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 interface IChatEntry {
   userId: string;

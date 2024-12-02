@@ -1,5 +1,5 @@
 import VideoStream from '@/components/gamePage/stream/VideoStream';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 import CameraSettingButton from '@/components/gamePage/stream/CameraSettingButton';
 import MikeSettingButton from '@/components/gamePage/stream/MikeSettingButton';
 
