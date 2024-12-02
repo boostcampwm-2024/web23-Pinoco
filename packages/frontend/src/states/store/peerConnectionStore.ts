@@ -71,7 +71,7 @@ export const usePeerConnectionStore = create<IPeerConnectionState>((set, get) =>
     peerConnection.onconnectionstatechange = () => {
       const state = peerConnection.connectionState;
       console.log(`[Client][🎥] 연결 상태 (${fromUserId}):`, state);
-      if (state === 'closed' || state === 'failed') {
+      if (state === 'closed' || state === 'failed' || state === 'disconnected') {
         get().removePeerConnection(fromUserId);
         get().removeRemoteStream(fromUserId);
       }
