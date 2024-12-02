@@ -16,10 +16,10 @@ export default function useJoinRoom() {
     if (!userId || !socket || !signalingSocket) return;
 
     socket.emit('join_room', { gsid });
-    signalingSocket.emit('join_room', { gsid });
     socket.on('join_room_success', (data) => {
       setRoomData(gsid, data.isHost, false);
       setAllUsers(data.userIds);
+      signalingSocket.emit('join_room', { gsid });
       navigate(`/game/${gsid}`);
     });
 

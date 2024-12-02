@@ -7,15 +7,21 @@ import {
   IRoomPayload,
 } from '@/types/signaling.types';
 import { getTargetSocket } from '@/util/handlerUtils';
+import { getRoom } from '@/util/handlerUtils';
+import { ROOM_CONSTANTS } from '@/constants/roomConstants';
 
 const handleSignaling = (socket: ISignalingSocket, io: Server) => {
   socket.on('create_room', async (payload: IRoomPayload) => {
     await socket.join(payload.gsid);
     socket.data.gsid = payload.gsid;
+    console.log('[Server][🎥] create_room', payload.gsid);
   });
   socket.on('join_room', async (payload: IRoomPayload) => {
-    await socket.join(payload.gsid);
+    const roomSize = await getRoom(io, payload.gsid)?.size;
+    if (!roomSize || roomSize >= ROOM_CONSTANTS.maxParticipants) return;
     socket.data.gsid = payload.gsid;
+    await socket.join(payload.gsid);
+    console.log('[Server][🎥] join_room', payload.gsid);
     socket
       .to(payload.gsid)
       .emit('user_joined', { fromUserId: socket.data.userId, gsid: payload.gsid });
