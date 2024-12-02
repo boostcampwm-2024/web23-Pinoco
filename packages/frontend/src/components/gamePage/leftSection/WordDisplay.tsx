@@ -34,7 +34,7 @@ export default function WordDisplay({
       className={`${
         gamePhase === GAME_PHASE.WORD_REVEAL
           ? 'fixed inset-0 flex items-center justify-center bg-black/50 z-50'
-          : 'absolute left-4 top-4 p-2 bg-black rounded-lg'
+          : 'absolute top-14 p-2 bg-black rounded-lg'
       }`}
     >
       <motion.div
