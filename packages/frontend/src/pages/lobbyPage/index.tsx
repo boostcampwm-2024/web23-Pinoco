@@ -26,8 +26,6 @@ export default function LobbyPage() {
     }
   }, []);
 
-  console.log('lobbyPage', socket?.connected);
-
   return (
     <>
       <BackgroundImage gradientClass="bg-gradient-to-t from-black/90" />
