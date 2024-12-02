@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Socket, io } from 'socket.io-client';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
-import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
+import { usePeerConnectionStore } from '@/store/peerConnectionStore';
 import { getVideoStream } from '@/utils/videoStreamUtils';
 
 interface ISignalingSocketStore {

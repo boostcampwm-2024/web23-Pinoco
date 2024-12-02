@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useSocketStore } from '@/states/store/socketStore';
-import { useRoomStore } from '@/states/store/roomStore';
+import { useSocketStore } from '@/store/socketStore';
+import { useRoomStore } from '@/store/roomStore';
 import { GAME_PHASE, GamePhase } from '@/constants';
 
 interface IReadyUsers {

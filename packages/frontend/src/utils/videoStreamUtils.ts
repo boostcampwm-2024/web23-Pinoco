@@ -1,4 +1,4 @@
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 
 export async function getVideoStream() {
   const videoConfig = {

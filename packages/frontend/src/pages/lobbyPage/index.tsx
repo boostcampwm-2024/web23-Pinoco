@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { useSocketStore } from '@/states/store/socketStore';
+import { useSocketStore } from '@/store/socketStore';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
 import RoomCreationButton from '@/components/lobbyPage/RoomCreationButton';
 import RoomJoinButton from '@/components/lobbyPage/RoomJoinButton';
 import VideoAudioTestButton from '@/components/lobbyPage/VideoAudioTestButton';
 import Header from '@/components/layout/Header';
-import { useRoomStore } from '@/states/store/roomStore';
-import { useChatStore } from '@/states/store/chatStore';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useRoomStore } from '@/store/roomStore';
+import { useChatStore } from '@/store/chatStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 import { getVideoStream } from '@/utils/videoStreamUtils';
 
 export default function LobbyPage() {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useChatSocket } from '@/hooks/useChatSocket';
-import { useAuthStore } from '@/states/store/authStore';
-import { useChatStore } from '@/states/store/chatStore';
+import { useAuthStore } from '@/store/authStore';
+import { useChatStore } from '@/store/chatStore';
 import { ChatType } from '@/constants/chatState';
 import ArrowDownIcon from '@/assets/images/ArrowDownIcon.svg?react';
 

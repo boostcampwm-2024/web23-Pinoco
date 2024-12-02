@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import CameraOn from '@/assets/images/CameraOn.svg?react';
 import CameraOff from '@/assets/images/CameraOff.svg?react';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 
 export default function CameraSettingButton({ iconColor }: { iconColor: string }) {
   const { localStream } = useLocalStreamStore();

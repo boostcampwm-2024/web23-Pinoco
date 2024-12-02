@@ -1,7 +1,7 @@
 import GuestLoginButton from '@/components/landingPage/GuestLoginButton';
 import BackgroundImage from '@/components/layout/BackgroundImage';
 import MainLogo from '@/assets/images/MainLogo.svg?react';
-import { useSocketStore } from '@/states/store/socketStore';
+import { useSocketStore } from '@/store/socketStore';
 
 export default function LandingPage() {
   const { socket } = useSocketStore();

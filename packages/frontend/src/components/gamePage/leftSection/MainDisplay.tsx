@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRoomStore } from '@/states/store/roomStore';
+import { useRoomStore } from '@/store/roomStore';
 import StartButton from './GameButtons/StartButton';
 import ReadyButton from './GameButtons/ReadyButton';
 import { GAME_PHASE, GamePhase } from '@/constants';
@@ -9,15 +9,15 @@ import { useGameSocket } from '@/hooks/useGameSocket';
 import useGuessing from '@/hooks/useGuessing';
 import useEnding from '@/hooks/useEnding';
 import useVoteResult from '@/hooks/useVoteResult';
-import { useAuthStore } from '@/states/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import Countdown from './Countdown';
 import WordDisplay from './WordDisplay';
 import Voting from './GamePhases/Voting';
 import VoteResult from './GamePhases/VoteResult';
 import EndingResult from './GamePhases/EndingResult';
-import { usePeerConnectionStore } from '@/states/store/peerConnectionStore';
+import { usePeerConnectionStore } from '@/store/peerConnectionStore';
 import VideoStream from '@/components/gamePage/stream/VideoStream';
-import { useLocalStreamStore } from '@/states/store/localStreamStore';
+import { useLocalStreamStore } from '@/store/localStreamStore';
 import { useSpeakingControl } from '@/hooks/useSpeakingControl';
 
 export default function MainDisplay() {
