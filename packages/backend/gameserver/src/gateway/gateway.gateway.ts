@@ -28,7 +28,6 @@ export class GatewayGateway
 
   constructor(
     private readonly gatewayService: GatewayService,
-    private readonly logger: LoggerService,
     private readonly gameService: GameService,
     private readonly roomService: RoomService,
   ) {}
@@ -37,34 +36,24 @@ export class GatewayGateway
     const userId = client.handshake.query.userId as string;
     const password = client.handshake.query.password as string;
 
-    this.logger.logSocketEvent('receive', 'connection', { userId });
-
     const isValid = await this.gatewayService.validateConnection(
       userId,
       password,
     );
     if (!isValid) {
-      this.logger.logSocketEvent('send', 'connection_failed', { userId });
       this.emitError(client, '인증에 실패했습니다.');
       client.disconnect();
       return;
     }
 
     client.data.userId = userId;
-    this.logger.logSocketEvent('send', 'connection_success', { userId });
   }
 
   async handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
-    this.logger.logSocketEvent('receive', 'disconnect', { userId, gsid });
 
     const result = await this.gatewayService.handleDisconnection(gsid, userId);
     if (result) {
-      this.logger.logSocketEvent('send', 'user_left', {
-        gsid,
-        userId,
-        newHostId: result.hostUserId,
-      });
       this.emitUserLeft(gsid, result);
     }
   }
@@ -72,25 +61,14 @@ export class GatewayGateway
   @SubscribeMessage('leave_room')
   async handleLeaveRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
-    this.logger.logSocketEvent('receive', 'leave_room', { userId, gsid });
 
     try {
       const result = await this.gatewayService.handleLeaveRoom(gsid, userId);
       if (result) {
-        this.logger.logSocketEvent('send', 'user_left', {
-          gsid,
-          userId,
-          newHostId: result.hostUserId,
-        });
         this.emitUserLeft(gsid, result);
       }
       this.handleRoomLeave(client);
-      this.logger.logSocketEvent('send', 'leave_room_success', {
-        userId,
-        gsid,
-      });
     } catch (error) {
-      this.logger.logError('leave_room_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -98,18 +76,12 @@ export class GatewayGateway
   @SubscribeMessage('create_room')
   async handleCreateRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const userId = client.data.userId;
-    this.logger.logSocketEvent('receive', 'create_room', { userId });
 
     try {
       const result = await this.gatewayService.createRoom(userId);
       this.handleRoomJoin(client, result.gsid);
-      this.logger.logSocketEvent('send', 'create_room_success', {
-        userId,
-        gsid: result.gsid,
-      });
       client.emit('create_room_success', result);
     } catch (error) {
-      this.logger.logError('create_room_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -120,10 +92,6 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const userId = client.data.userId;
-    this.logger.logSocketEvent('receive', 'join_room', {
-      userId,
-      gsid: data.gsid,
-    });
 
     try {
       const roomInfo = await this.gatewayService.joinRoom(
@@ -132,20 +100,9 @@ export class GatewayGateway
       );
       this.handleRoomJoin(client, data.gsid);
 
-      this.logger.logSocketEvent('send', 'join_room_success', {
-        userId,
-        gsid: data.gsid,
-        roomInfo,
-      });
       client.emit('join_room_success', roomInfo);
-
-      this.logger.logSocketEvent('send', 'user_joined', {
-        gsid: data.gsid,
-        userId: client.data.userId,
-      });
       this.emitUserJoined(data.gsid, client.data.userId);
     } catch (error) {
-      this.logger.logError('join_room_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -156,32 +113,16 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { userId, gsid } = client.data;
-    this.logger.logSocketEvent('receive', 'send_message', {
-      userId,
-      gsid,
-      message: data.message,
-    });
 
     if (!gsid) {
-      this.logger.logSocketEvent('send', 'error', {
-        userId,
-        reason: 'not_in_room',
-      });
       this.emitError(client, '방에 참여되어 있지 않습니다.');
       return;
     }
 
     try {
       await this.gatewayService.saveMessage(gsid, userId, data.message);
-
-      this.logger.logSocketEvent('send', 'receive_message', {
-        gsid,
-        userId,
-        message: data.message,
-      });
       this.emitMessage(gsid, { userId, message: data.message });
     } catch (error) {
-      this.logger.logError('send_message_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -192,11 +133,6 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { userId, gsid } = client.data;
-    this.logger.logSocketEvent('receive', 'send_ready', {
-      userId,
-      gsid,
-      isReady: data.isReady,
-    });
 
     try {
       const readyUsers = await this.gatewayService.handleReady(
@@ -204,7 +140,6 @@ export class GatewayGateway
         userId,
         data.isReady,
       );
-      this.logger.logSocketEvent('send', 'update_ready', { gsid, readyUsers });
       this.server.to(gsid).emit('update_ready', { readyUsers });
     } catch (error) {
       this.emitError(client, error.message);
@@ -214,7 +149,6 @@ export class GatewayGateway
   @SubscribeMessage('start_game')
   async handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
-    this.logger.logSocketEvent('receive', 'start_game', { userId, gsid });
 
     try {
       const gameState = await this.gatewayService.startGame(gsid, userId);
@@ -231,10 +165,6 @@ export class GatewayGateway
         };
         room.isPlaying = true;
 
-        this.logger.logSocketEvent('send', 'start_game_success', {
-          personalGameState,
-        });
-
         this.server
           .to(this.getSocketIdByUserId(uid))
           .emit('start_game_success', personalGameState);
@@ -247,27 +177,19 @@ export class GatewayGateway
   @SubscribeMessage('end_speaking')
   async handleEndSpeaking(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
-    this.logger.logSocketEvent('receive', 'end_speaking', { userId, gsid });
 
     try {
       await this.gatewayService.handleSpeakingEnd(gsid, userId);
       const gameState = this.gameService.getGameState(gsid);
 
       if (gameState.phase === 'VOTING') {
-        this.logger.logSocketEvent('send', 'start_vote', { gsid });
         this.server.to(gsid).emit('start_vote');
       } else {
-        this.logger.logSocketEvent('send', 'start_speaking', {
-          gsid,
-          speakerId: gameState.speakerQueue[0],
-        });
-
         this.server.to(gsid).emit('start_speaking', {
           speakerId: gameState.speakerQueue[0],
         });
       }
     } catch (error) {
-      this.logger.logError('end_speaking_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -278,11 +200,6 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
-    this.logger.logSocketEvent('receive', 'vote_pinoco', {
-      userId,
-      gsid,
-      targetId: data.voteUserId,
-    });
 
     try {
       await this.gatewayService.submitVote(gsid, userId, data.voteUserId);
@@ -293,38 +210,23 @@ export class GatewayGateway
         Object.keys(gameState.votes).length === gameState.liveUserIds.length
       ) {
         const result = await this.gatewayService.processVoteResult(gsid);
-
-        this.logger.logSocketEvent('send', 'receive_vote_result', {
-          gsid,
-          result,
-        });
         this.server.to(gsid).emit('receive_vote_result', result);
 
         gameState = this.gameService.getGameState(gsid);
         if (gameState.phase === 'GUESSING') {
-          this.logger.logSocketEvent('send', 'start_guessing', {
-            gsid,
-            guessingUserId: gameState.pinocoId,
-          });
           setTimeout(() => {
             this.server.to(gsid).emit('start_guessing', {
               guessingUserId: gameState.pinocoId,
             });
           }, 3000);
         } else if (gameState.phase === 'SPEAKING') {
-          // 다음 라운드 시작
           const nextSpeaker = gameState.speakerQueue[0];
-          this.logger.logSocketEvent('send', 'start_speaking', {
-            gsid,
-            speakerId: nextSpeaker,
-          });
           setTimeout(() => {
             this.server.to(gsid).emit('start_speaking', {
               speakerId: nextSpeaker,
             });
           }, 3000);
         } else if (gameState.phase === 'ENDING') {
-          this.logger.logSocketEvent('send', 'start_ending', { gsid });
           setTimeout(() => {
             this.server.to(gsid).emit('start_ending', {
               isPinocoWin: true,
@@ -341,7 +243,6 @@ export class GatewayGateway
         }
       }
     } catch (error) {
-      this.logger.logError('vote_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -352,11 +253,6 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
-    this.logger.logSocketEvent('receive', 'send_guessing', {
-      userId,
-      gsid,
-      word: data.guessingWord,
-    });
 
     try {
       const isCorrect = await this.gatewayService.submitGuess(
@@ -367,16 +263,6 @@ export class GatewayGateway
 
       const gameState = this.gameService.getGameState(gsid);
 
-      this.logger.logSocketEvent('send', 'start_ending', {
-        gsid,
-        result: {
-          isPinocoWin: isCorrect,
-          pinoco: gameState.pinocoId,
-          isGuessed: true,
-          guessingWord: data.guessingWord,
-        },
-      });
-
       this.server.to(gsid).emit('start_ending', {
         isPinocoWin: isCorrect,
         pinoco: gameState.pinocoId,
@@ -384,13 +270,11 @@ export class GatewayGateway
         guessingWord: data.guessingWord,
       });
 
-      // 게임 종료 및 초기화
       await this.gameService.endGame(gsid);
       const room = this.roomService.getRoom(gsid);
       room.readyUserIds.clear();
       room.isPlaying = false;
     } catch (error) {
-      this.logger.logError('guessing_error', error);
       this.emitError(client, error.message);
     }
   }
@@ -421,10 +305,6 @@ export class GatewayGateway
   }
 
   private emitError(client: AuthenticatedSocket, message: string): void {
-    this.logger.logSocketEvent('send', 'error', {
-      userId: client.data.userId,
-      message,
-    });
     client.emit('error', { errorMessage: message } as ErrorResponse);
   }
 
