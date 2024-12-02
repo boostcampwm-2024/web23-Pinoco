@@ -46,6 +46,7 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
+      setReadyUsers([]);
     };
 
     const handleStartVote = () => {
