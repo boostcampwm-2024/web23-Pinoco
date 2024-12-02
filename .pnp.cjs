@@ -7620,6 +7620,7 @@ const RAW_RUNTIME_STATE =
           ["typescript", "patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"],\
           ["typescript-eslint", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:8.12.2"],\
           ["vite", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.4.10"],\
+          ["vite-plugin-remove-console", "npm:2.2.0"],\
           ["vite-plugin-svgr", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:4.3.0"],\
           ["vite-tsconfig-paths", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.1.0"],\
           ["zustand", "virtual:a315446cd0626d69c81bb371962241fad2e843699b8251d1a49a3231d7821af7bdb2285677102303361c3219ca15ceeabaa438b7b5ead02c2587180fe2eace6b#npm:5.0.1"]\
@@ -13757,6 +13758,15 @@ const RAW_RUNTIME_STATE =
           "stylus",\
           "sugarss",\
           "terser"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["vite-plugin-remove-console", [\
+      ["npm:2.2.0", {\
+        "packageLocation": "./.yarn/cache/vite-plugin-remove-console-npm-2.2.0-28ddb95349-b97e77f68e.zip/node_modules/vite-plugin-remove-console/",\
+        "packageDependencies": [\
+          ["vite-plugin-remove-console", "npm:2.2.0"]\
         ],\
         "linkType": "HARD"\
       }]\
