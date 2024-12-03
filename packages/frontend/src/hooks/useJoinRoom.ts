@@ -7,8 +7,7 @@ import { useSignalingSocketStore } from '@/store/signalingSocketStore';
 export default function useJoinRoom() {
   const navigate = useNavigate();
   const userId = useAuthStore((state) => state.userId);
-  const setRoomData = useRoomStore((state) => state.setRoomData);
-  const { setAllUsers } = useRoomStore();
+  const { setRoomData, setAllUsers, setReadyUsers, setHostUserId } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
   const signalingSocket = useSignalingSocketStore((state) => state.signalingSocket);
 
@@ -17,8 +16,10 @@ export default function useJoinRoom() {
 
     socket.emit('join_room', { gsid });
     socket.on('join_room_success', (data) => {
-      setRoomData(gsid, data.isHost, false);
+      setRoomData(gsid, data.isHost, false, data.hostUserId);
       setAllUsers(data.userIds);
+      setReadyUsers(data.readyUserIds);
+      setHostUserId(data.hostUserId);
       signalingSocket.emit('join_room', { gsid });
       navigate(`/game/${gsid}`);
     });
