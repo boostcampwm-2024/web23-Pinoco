@@ -1,16 +1,17 @@
-import { useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import VideoStream from '@/components/gamePage/stream/VideoStream';
 import { useAuthStore } from '@/store/authStore';
 import { useLocalStreamStore } from '@/store/localStreamStore';
 import { usePeerConnectionStore } from '@/store/peerConnectionStore';
-import { useReadyStatus } from '@/hooks/useReadyStatus';
+import { useRoomStore } from '@/store/roomStore';
 
 export default function VideoFeed() {
   const localStream = useLocalStreamStore((state) => state.localStream);
   const remoteStreams = usePeerConnectionStore((state) => state.remoteStreams);
   const { userId } = useAuthStore();
   const feedHeight = 'h-[180px]';
-  const { isUserReady } = useReadyStatus();
+  const readyUsers = useRoomStore((state) => state.readyUsers);
+  const isUserReady = (userId: string) => readyUsers.includes(userId);
 
   return (
     <>
@@ -40,7 +41,7 @@ export default function VideoFeed() {
             height={feedHeight}
           />
           {isUserReady(remoteUserId) && (
-            <div className="absolute bottom-2 right-2 animate-spin-slow">
+            <div className="absolute bottom-2 right-2">
               <span className="px-2 py-1 text-orange-500 font-bold bg-white rounded-full">
                 READY
               </span>

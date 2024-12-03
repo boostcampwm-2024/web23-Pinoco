@@ -25,14 +25,17 @@ interface ISpeakingStart {
 
 export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   const socket = useSocketStore((state) => state.socket);
-  const { setIsPinoco, setAllUsers } = useRoomStore();
-  const [readyUsers, setReadyUsers] = useState<string[]>([]);
+  const { setIsPinoco, setAllUsers, setReadyUsers } = useRoomStore();
   const [error, setError] = useState<string | null>(null);
   const [gameStartData, setGameStartData] = useState<IGameStart | null>(null);
   const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
+
+    const handleUpdateReady = (data: IReadyUsers) => {
+      setReadyUsers(data.readyUsers);
+    };
 
     const handleStartSpeaking = (data: ISpeakingStart) => {
       setCurrentSpeaker(data.speakerId);
@@ -46,6 +49,7 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
+      setReadyUsers([]);
     };
 
     const handleStartVote = () => {
@@ -54,27 +58,23 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
       }
     };
 
-    socket.on('update_ready', (data: IReadyUsers) => {
-      setReadyUsers(data.readyUsers);
-    });
-
+    socket.on('update_ready', handleUpdateReady);
     socket.on('error', (data: IGameErrorMessage) => {
       setError(data.errorMessage);
       setTimeout(() => setError(null), 3000);
     });
-
     socket.on('start_game_success', handleStartGame);
     socket.on('start_speaking', handleStartSpeaking);
     socket.on('start_vote', handleStartVote);
 
     return () => {
-      socket.off('update_ready');
+      socket.off('update_ready', handleUpdateReady);
       socket.off('error');
       socket.off('start_game_success', handleStartGame);
       socket.off('start_speaking', handleStartSpeaking);
       socket.off('start_vote', handleStartVote);
     };
-  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker, setAllUsers]);
+  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker, setAllUsers, setReadyUsers]);
 
   const sendReady = (isReady: boolean) => {
     if (!socket) return;
@@ -100,7 +100,6 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   };
 
   return {
-    readyUsers,
     sendReady,
     startGame,
     error,

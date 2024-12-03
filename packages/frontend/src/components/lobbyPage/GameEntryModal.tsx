@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 
 interface IGameEntryModalProps {
@@ -20,12 +20,17 @@ export default function GameEntryModal({
   const [gameCode, setGameCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!localStorage.getItem('modalTooltipShown')) {
       setShowTooltip(true);
       localStorage.setItem('modalTooltipShown', 'true');
     }
+  }, []);
+
+  useEffect(() => {
+    inputRef.current?.focus();
   }, []);
 
   const handleConfirm = () => {
@@ -59,6 +64,7 @@ export default function GameEntryModal({
         {textForm && (
           <input
             type="text"
+            ref={inputRef}
             placeholder={textForm}
             value={gameCode}
             onChange={(e) => setGameCode(e.target.value)}
