@@ -4,8 +4,13 @@ import { RoomService } from '../room/room.service';
 import { ChatService } from '../chat/chat.service';
 import { GameService } from '../game/game.service';
 import { IGameInfo } from '../game/types/game.types';
-import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
-import { CreateRoomResponse } from '../types/socket.types';
+import {
+  Iuser_left,
+  Ijoin_room_success,
+  Iupdate_ready,
+  Iuser_joined,
+  Icreate_room_success,
+} from '../room/room.types';
 import { WsException } from '@nestjs/websockets';
 
 @Injectable()
@@ -23,23 +28,27 @@ export class GatewayService {
     return this.authService.isValidGuest(userId, password);
   }
 
-  handleDisconnection(gsid: string, userId: string): IRoomEventPayload | null {
+  handleDisconnection(gsid: string, userId: string): Iuser_left | null {
     if (!gsid) return null;
-    const newHostId = this.roomService.leaveRoom(gsid, userId);
-    return newHostId ? { userId, hostUserId: newHostId } : null;
+    return this.roomService.leaveRoom(gsid, userId);
   }
 
-  handleLeaveRoom(gsid: string, userId: string): IRoomEventPayload | null {
-    const newHostId = this.roomService.leaveRoom(gsid, userId);
-    return newHostId ? { userId, hostUserId: newHostId } : null;
+  handleLeaveRoom(gsid: string, userId: string): Iuser_left | null {
+    return this.roomService.leaveRoom(gsid, userId);
   }
 
-  createRoom(userId: string): CreateRoomResponse {
+  createRoom(userId: string): Icreate_room_success {
     const gsid = this.roomService.createRoom(userId);
     return { gsid, isHost: true };
   }
 
-  joinRoom(gsid: string, userId: string): IJoinRoomResponse {
+  joinRoom(
+    gsid: string,
+    userId: string,
+  ): {
+    joinRoomData: Ijoin_room_success;
+    userJoinedData: Iuser_joined;
+  } {
     const room = this.roomService.getRoom(gsid);
     if (!room) {
       throw new WsException('존재하지 않는 방입니다.');
@@ -56,17 +65,8 @@ export class GatewayService {
     this.chatService.saveMessage(gsid, userId, message);
   }
 
-  handleReady(gsid: string, userId: string, isReady: boolean): string[] {
-    const room = this.roomService.getRoom(gsid);
-    if (!room) throw new Error('방을 찾을 수 없습니다.');
-
-    if (isReady) {
-      room.readyUserIds.add(userId);
-    } else {
-      room.readyUserIds.delete(userId);
-    }
-
-    return Array.from(room.readyUserIds);
+  handleReady(gsid: string, userId: string, isReady: boolean): Iupdate_ready {
+    return this.roomService.handleReady(gsid, userId, isReady);
   }
 
   startGame(gsid: string, userId: string): IGameInfo {

@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IRoomInfo, IJoinRoomResponse } from './types/room.types';
+import {
+  IRoomInfo,
+  Ijoin_room_success,
+  Iuser_left,
+  Iupdate_ready,
+  Iuser_joined,
+} from './room.types';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -25,7 +31,10 @@ export class RoomService {
     return gsid;
   }
 
-  joinRoom(gsid: string, userId: string): IJoinRoomResponse {
+  joinRoom(
+    gsid: string,
+    userId: string,
+  ): { joinRoomData: Ijoin_room_success; userJoinedData: Iuser_joined } {
     const room = this.rooms.get(gsid);
     if (!room) {
       throw new Error('존재하지 않는 방입니다.');
@@ -42,14 +51,19 @@ export class RoomService {
     room.userIds.add(userId);
 
     return {
-      userIds: Array.from(room.userIds),
-      readyUserIds: Array.from(room.readyUserIds),
-      isHost: room.hostUserId === userId,
-      hostUserId: room.hostUserId,
+      joinRoomData: {
+        userIds: Array.from(room.userIds),
+        readyUserIds: Array.from(room.readyUserIds),
+        isHost: room.hostUserId === userId,
+        hostUserId: room.hostUserId,
+      },
+      userJoinedData: {
+        userId,
+      },
     };
   }
 
-  leaveRoom(gsid: string, userId: string): string | null {
+  leaveRoom(gsid: string, userId: string): Iuser_left | null {
     const room = this.rooms.get(gsid);
     if (!room) return null;
 
@@ -64,10 +78,31 @@ export class RoomService {
     if (room.hostUserId === userId) {
       const newHost = Array.from(room.userIds)[0];
       room.hostUserId = newHost;
-      return newHost;
+      return {
+        userId,
+        hostUserId: newHost,
+      };
     }
 
-    return room.hostUserId;
+    return {
+      userId,
+      hostUserId: room.hostUserId,
+    };
+  }
+
+  handleReady(gsid: string, userId: string, isReady: boolean): Iupdate_ready {
+    const room = this.getRoom(gsid);
+    if (!room) throw new Error('방을 찾을 수 없습니다.');
+
+    if (isReady) {
+      room.readyUserIds.add(userId);
+    } else {
+      room.readyUserIds.delete(userId);
+    }
+
+    return {
+      readyUserIds: Array.from(room.readyUserIds),
+    };
   }
 
   getRoom(gsid: string): IRoomInfo | undefined {

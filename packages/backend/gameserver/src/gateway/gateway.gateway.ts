@@ -9,12 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GatewayService } from './gateway.service';
-import {
-  AuthenticatedSocket,
-  SendMessagePayload,
-  ErrorResponse,
-} from '../types/socket.types';
-import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
+import { AuthenticatedSocket } from '../types/socket.types';
+import { Iuser_left, Ijoin_room_success } from '../room/room.types';
 import { LoggerService } from '../logger/logger.service';
 import { GameService } from '../game/game.service';
 import { RoomService } from '../room/room.service';
@@ -271,7 +267,7 @@ export class GatewayGateway
     }
   }
 
-  private emitUserLeft(gsid: string, payload: IRoomEventPayload): void {
+  private emitUserLeft(gsid: string, payload: Iuser_left): void {
     this.server.to(gsid).emit('user_left', payload);
   }
 
@@ -279,7 +275,7 @@ export class GatewayGateway
     this.server.to(gsid).emit('user_joined', { userId });
   }
 
-  private emitMessage(gsid: string, payload: SendMessagePayload): void {
+  private emitMessage(gsid: string, payload): void {
     this.server.to(gsid).emit('receive_message', payload);
   }
 

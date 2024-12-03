@@ -1,7 +1,6 @@
 import { Catch, ArgumentsHost } from '@nestjs/common';
 import { BaseWsExceptionFilter, WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { ErrorResponse } from '../types/socket.types';
 
 @Catch()
 export class WebSocketExceptionFilter extends BaseWsExceptionFilter {
@@ -16,6 +15,6 @@ export class WebSocketExceptionFilter extends BaseWsExceptionFilter {
       errorMessage = exception.message || '알 수 없는 오류가 발생했습니다.';
     }
 
-    client.emit('error', { errorMessage } as ErrorResponse);
+    client.emit('error', errorMessage);
   }
 }
