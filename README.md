@@ -82,7 +82,7 @@
 
 ## 시스템 아키텍처
 
-![아키텍쳐](https://github.com/user-attachments/assets/399c8697-1edc-43c4-b595-7a0607771309)
+![최종 구조도](https://github.com/user-attachments/assets/022f87a9-009d-4ab7-a0c7-06718095c2a8)
 
 <br />
 
