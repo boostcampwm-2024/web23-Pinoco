@@ -173,6 +173,7 @@ export class GameService {
     }
 
     if (!game.liveUserIds.includes(voterId)) {
+      // 살아있는 유저가 아니면 투표 취소(원래는 예외처리 해야하나 클라이언트에서 죽음사람도 타이머 종료시에 이벤트를 잘 못 보내고 있기에 단순히 무시만 하도록 함)
       return game;
     }
 
