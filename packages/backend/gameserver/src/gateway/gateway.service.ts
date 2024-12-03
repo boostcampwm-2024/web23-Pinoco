@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { RoomService } from '../room/room.service';
 import { GameService } from '../game/game.service';
-import { IGameInfo, IGameState } from '../game/types/game.types';
+import {
+  IGameState,
+  GamePhase,
+  IStartGameResponse,
+  Istart_speaking,
+  Ireceive_vote_result,
+  Istart_guessing,
+  Istart_ending,
+} from '../game/types/game.types';
 import {
   Iuser_left,
   Ijoin_room_success,
@@ -116,144 +124,109 @@ export class GatewayService {
     return this.gameService.getGameState(gsid);
   }
 
-  startGame(gsid: string, userId: string, server: Server): IGameInfo {
-    const room = this.roomService.getRoom(gsid);
-    if (!room) throw new Error('방을 찾을 수 없습니다.');
-
-    if (room.hostUserId !== userId) {
-      throw new Error('방장만 게임을 시작할 수 있습니다.');
-    }
-
-    if (room.userIds.size < 3) {
-      throw new Error('게임을 시작하려면 최소 3명의 플레이어가 필요합니다.');
-    }
-
-    if (room.readyUserIds.size !== room.userIds.size - 1) {
-      throw new Error('모든 참가자가 준비되어야 합니다.');
-    }
-
+  startGame(gsid: string, userId: string): IStartGameResponse {
     const gameState = this.gameService.startGame(gsid);
-    room.isPlaying = true;
+    const userSpecificData: IStartGameResponse['userSpecificData'] = {};
 
-    room.userIds.forEach((uid) => {
+    gameState.userIds.forEach((uid) => {
       const isPinoco = gameState.pinocoId === uid;
-      const personalGameState = {
+      userSpecificData[uid] = {
         isPinoco,
         theme: gameState.theme,
         word: isPinoco ? '' : gameState.word,
         speakerId: gameState.speakerQueue[0],
         allUserIds: gameState.userIds,
       };
-
-      const sockets = server.sockets.sockets;
-      for (const [, socket] of sockets.entries()) {
-        if ((socket as AuthenticatedSocket).data.userId === uid) {
-          socket.emit('start_game_success', personalGameState);
-          break;
-        }
-      }
     });
 
-    return {
-      ...gameState,
-      gsid,
-    };
+    return { userSpecificData };
   }
 
-  handleSpeakingEnd(gsid: string, userId: string, server: Server): void {
-    const game = this.gameService.getGameState(gsid);
-    if (!game) throw new Error('게임을 찾을 수 없습니다.');
+  handleSpeakingEnd(
+    gsid: string,
+    userId: string,
+  ): {
+    nextPhase: GamePhase;
+    response: Istart_speaking | null;
+  } {
+    const gameState = this.gameService.endSpeaking(gsid, userId);
 
-    if (game.speakerQueue[0] !== userId) {
-      throw new Error('현재 발언 차례가 아닙니다.');
+    if (gameState.phase === 'SPEAKING') {
+      return {
+        nextPhase: 'SPEAKING',
+        response: { speakerId: gameState.speakerQueue[0] },
+      };
     }
 
-    this.gameService.endSpeaking(gsid);
-    const newGameState = this.gameService.getGameState(gsid);
-
-    if (newGameState.phase === 'VOTING') {
-      server.to(gsid).emit('start_vote');
-    } else {
-      server.to(gsid).emit('start_speaking', {
-        speakerId: newGameState.speakerQueue[0],
-      });
-    }
+    return {
+      nextPhase: 'VOTING',
+      response: null,
+    };
   }
 
   submitVote(
     gsid: string,
     voterId: string,
     targetId: string,
-    server: Server,
-  ): void {
-    const room = this.roomService.getRoom(gsid);
-    if (!room) throw new Error('방을 찾을 수 없습니다.');
+  ): {
+    shouldProcessVote: boolean;
+    voteResult?: {
+      nextPhase: GamePhase;
+      voteResponse: Ireceive_vote_result;
+      nextResponse?: Istart_speaking | Istart_guessing | Istart_ending;
+      delay?: number;
+    };
+  } {
+    const gameState = this.gameService.submitVote(gsid, voterId, targetId);
 
-    this.gameService.submitVote(gsid, voterId, targetId);
-    let gameState = this.gameService.getGameState(gsid);
-
-    if (Object.keys(gameState.votes).length === gameState.liveUserIds.length) {
-      const result = this.gameService.processVoteResult(gsid);
-      server.to(gsid).emit('receive_vote_result', result);
-
-      gameState = this.gameService.getGameState(gsid);
-      if (gameState.phase === 'GUESSING') {
-        setTimeout(() => {
-          server.to(gsid).emit('start_guessing', {
-            guessingUserId: gameState.pinocoId,
-          });
-        }, 3000);
-      } else if (gameState.phase === 'SPEAKING') {
-        setTimeout(() => {
-          server.to(gsid).emit('start_speaking', {
-            speakerId: gameState.speakerQueue[0],
-          });
-        }, 3000);
-      } else if (gameState.phase === 'ENDING') {
-        setTimeout(() => {
-          server.to(gsid).emit('start_ending', {
-            isPinocoWin: true,
-            pinoco: gameState.pinocoId,
-            isGuessed: false,
-            guessingWord: '',
-          });
-          this.endGame(gsid);
-        }, 3000);
-      }
+    if (Object.keys(gameState.votes).length !== gameState.liveUserIds.length) {
+      return { shouldProcessVote: false };
     }
+
+    const newGameState = this.gameService.processVoteResult(gsid);
+    const voteResponse: Ireceive_vote_result = {
+      voteResult: newGameState.voteResult.voteCount,
+      deadPerson: newGameState.voteResult.deadPerson,
+      isDeadPersonPinoco: newGameState.voteResult.isDeadPersonPinoco,
+    };
+
+    let nextResponse: Istart_speaking | Istart_guessing | Istart_ending;
+    if (newGameState.phase === 'GUESSING') {
+      nextResponse = { guessingUserId: newGameState.pinocoId };
+    } else if (newGameState.phase === 'SPEAKING') {
+      nextResponse = { speakerId: newGameState.speakerQueue[0] };
+    } else if (newGameState.phase === 'ENDING') {
+      this.gameService.endGame(gsid);
+      nextResponse = {
+        isPinocoWin: false,
+        pinoco: newGameState.pinocoId,
+        isGuessed: false,
+        guessingWord: '',
+      };
+    }
+
+    return {
+      shouldProcessVote: true,
+      voteResult: {
+        nextPhase: newGameState.phase,
+        voteResponse,
+        nextResponse,
+        delay: 3000,
+      },
+    };
   }
 
-  submitGuess(
-    gsid: string,
-    userId: string,
-    word: string,
-    server: Server,
-  ): boolean {
-    const game = this.gameService.getGameState(gsid);
-    if (!game) throw new Error('게임을 찾을 수 없습니다.');
+  submitGuess(gsid: string, userId: string, word: string): Istart_ending {
+    const gameState = this.gameService.submitGuess(gsid, userId, word);
 
-    if (game.pinocoId !== userId) {
-      throw new Error('피노코만 단어를 추측할 수 있습니다.');
-    }
-
-    const isCorrect = this.gameService.submitGuess(gsid, word);
-    server.to(gsid).emit('start_ending', {
-      isPinocoWin: isCorrect,
-      pinoco: game.pinocoId,
+    const response: Istart_ending = {
+      isPinocoWin: gameState.isPinocoWin,
+      pinoco: gameState.pinocoId,
       isGuessed: true,
-      guessingWord: word,
-    });
+      guessingWord: gameState.guessingWord,
+    };
 
-    this.endGame(gsid);
-    return isCorrect;
-  }
-
-  endGame(gsid: string): void {
     this.gameService.endGame(gsid);
-    const room = this.roomService.getRoom(gsid);
-    if (room) {
-      room.readyUserIds.clear();
-      room.isPlaying = false;
-    }
+    return response;
   }
 }

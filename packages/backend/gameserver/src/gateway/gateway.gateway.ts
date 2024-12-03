@@ -108,13 +108,32 @@ export class GatewayGateway
   @SubscribeMessage('start_game')
   handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
-    this.gatewayService.startGame(gsid, userId, this.server);
+    const { userSpecificData } = this.gatewayService.startGame(gsid, userId);
+
+    Object.entries(userSpecificData).forEach(([uid, data]) => {
+      const sockets = this.server.sockets.sockets;
+      for (const [, socket] of sockets.entries()) {
+        if ((socket as AuthenticatedSocket).data.userId === uid) {
+          socket.emit('start_game_success', data);
+          break;
+        }
+      }
+    });
   }
 
   @SubscribeMessage('end_speaking')
   handleEndSpeaking(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
-    this.gatewayService.handleSpeakingEnd(gsid, userId, this.server);
+    const { nextPhase, response } = this.gatewayService.handleSpeakingEnd(
+      gsid,
+      userId,
+    );
+
+    if (nextPhase === 'VOTING') {
+      this.server.to(gsid).emit('start_vote');
+    } else {
+      this.server.to(gsid).emit('start_speaking', response);
+    }
   }
 
   @SubscribeMessage('vote_pinoco')
@@ -123,7 +142,33 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
-    this.gatewayService.submitVote(gsid, userId, data.voteUserId, this.server);
+    console.log(gsid, userId, data.voteUserId);
+
+    const result = this.gatewayService.submitVote(
+      gsid,
+      userId,
+      data.voteUserId,
+    );
+
+    if (result.shouldProcessVote && result.voteResult) {
+      const { nextPhase, voteResponse, nextResponse } = result.voteResult;
+
+      this.server.to(gsid).emit('receive_vote_result', voteResponse);
+
+      setTimeout(() => {
+        switch (nextPhase) {
+          case 'GUESSING':
+            this.server.to(gsid).emit('start_guessing', nextResponse);
+            break;
+          case 'SPEAKING':
+            this.server.to(gsid).emit('start_speaking', nextResponse);
+            break;
+          case 'ENDING':
+            this.server.to(gsid).emit('start_ending', nextResponse);
+            break;
+        }
+      }, 3000);
+    }
   }
 
   @SubscribeMessage('send_guessing')
@@ -132,11 +177,11 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
-    this.gatewayService.submitGuess(
+    const response = this.gatewayService.submitGuess(
       gsid,
       userId,
       data.guessingWord,
-      this.server,
     );
+    this.server.to(gsid).emit('start_ending', response);
   }
 }
