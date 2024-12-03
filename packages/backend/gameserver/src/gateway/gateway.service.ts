@@ -6,9 +6,12 @@ import { GameService } from '../game/game.service';
 import { IGameInfo } from '../game/types/game.types';
 import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
 import { CreateRoomResponse } from '../types/socket.types';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class GatewayService {
+  private readonly MAX_ROOM_SIZE = 6;
+
   constructor(
     private readonly authService: AuthService,
     private readonly roomService: RoomService,
@@ -44,6 +47,15 @@ export class GatewayService {
   }
 
   async joinRoom(gsid: string, userId: string): Promise<IJoinRoomResponse> {
+    const room = this.roomService.getRoom(gsid);
+    if (!room) {
+      throw new WsException('존재하지 않는 방입니다.');
+    }
+
+    if (room.userIds.size >= this.MAX_ROOM_SIZE) {
+      throw new WsException('방이 가득 찼습니다.');
+    }
+
     return await this.roomService.joinRoom(gsid, userId);
   }
 

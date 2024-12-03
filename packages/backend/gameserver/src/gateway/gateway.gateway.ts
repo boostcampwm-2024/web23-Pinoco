@@ -18,8 +18,12 @@ import { IRoomEventPayload, IJoinRoomResponse } from '../room/types/room.types';
 import { LoggerService } from '../logger/logger.service';
 import { GameService } from '../game/game.service';
 import { RoomService } from '../room/room.service';
+import { UseFilters } from '@nestjs/common';
+import { WebSocketExceptionFilter } from '../filters/ws-exception.filter';
+import { WsException } from '@nestjs/websockets';
 
 @WebSocketGateway()
+@UseFilters(WebSocketExceptionFilter)
 export class GatewayGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -41,9 +45,7 @@ export class GatewayGateway
       password,
     );
     if (!isValid) {
-      this.emitError(client, '인증에 실패했습니다.');
-      client.disconnect();
-      return;
+      throw new WsException('인증에 실패했습니다.');
     }
 
     client.data.userId = userId;
@@ -61,29 +63,19 @@ export class GatewayGateway
   @SubscribeMessage('leave_room')
   async handleLeaveRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
-
-    try {
-      const result = await this.gatewayService.handleLeaveRoom(gsid, userId);
-      if (result) {
-        this.emitUserLeft(gsid, result);
-      }
-      this.handleRoomLeave(client);
-    } catch (error) {
-      this.emitError(client, error.message);
+    const result = await this.gatewayService.handleLeaveRoom(gsid, userId);
+    if (result) {
+      this.emitUserLeft(gsid, result);
     }
+    this.handleRoomLeave(client);
   }
 
   @SubscribeMessage('create_room')
   async handleCreateRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const userId = client.data.userId;
-
-    try {
-      const result = await this.gatewayService.createRoom(userId);
-      this.handleRoomJoin(client, result.gsid);
-      client.emit('create_room_success', result);
-    } catch (error) {
-      this.emitError(client, error.message);
-    }
+    const result = await this.gatewayService.createRoom(userId);
+    this.handleRoomJoin(client, result.gsid);
+    client.emit('create_room_success', result);
   }
 
   @SubscribeMessage('join_room')
@@ -91,20 +83,14 @@ export class GatewayGateway
     @MessageBody() data: { gsid: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    const userId = client.data.userId;
+    const roomInfo = await this.gatewayService.joinRoom(
+      data.gsid,
+      client.data.userId,
+    );
+    this.handleRoomJoin(client, data.gsid);
 
-    try {
-      const roomInfo = await this.gatewayService.joinRoom(
-        data.gsid,
-        client.data.userId,
-      );
-      this.handleRoomJoin(client, data.gsid);
-
-      client.emit('join_room_success', roomInfo);
-      this.emitUserJoined(data.gsid, client.data.userId);
-    } catch (error) {
-      this.emitError(client, error.message);
-    }
+    client.emit('join_room_success', roomInfo);
+    this.emitUserJoined(data.gsid, client.data.userId);
   }
 
   @SubscribeMessage('send_message')
@@ -115,16 +101,11 @@ export class GatewayGateway
     const { userId, gsid } = client.data;
 
     if (!gsid) {
-      this.emitError(client, '방에 참여되어 있지 않습니다.');
-      return;
+      throw new WsException('방에 참여되어 있지 않습니다.');
     }
 
-    try {
-      await this.gatewayService.saveMessage(gsid, userId, data.message);
-      this.emitMessage(gsid, { userId, message: data.message });
-    } catch (error) {
-      this.emitError(client, error.message);
-    }
+    await this.gatewayService.saveMessage(gsid, userId, data.message);
+    this.emitMessage(gsid, { userId, message: data.message });
   }
 
   @SubscribeMessage('send_ready')
@@ -142,7 +123,7 @@ export class GatewayGateway
       );
       this.server.to(gsid).emit('update_ready', { readyUsers });
     } catch (error) {
-      this.emitError(client, error.message);
+      throw new WsException(error.message);
     }
   }
 
@@ -170,7 +151,7 @@ export class GatewayGateway
           .emit('start_game_success', personalGameState);
       });
     } catch (error) {
-      this.emitError(client, error.message);
+      throw new WsException(error.message);
     }
   }
 
@@ -190,7 +171,7 @@ export class GatewayGateway
         });
       }
     } catch (error) {
-      this.emitError(client, error.message);
+      throw new WsException(error.message);
     }
   }
 
@@ -243,7 +224,7 @@ export class GatewayGateway
         }
       }
     } catch (error) {
-      this.emitError(client, error.message);
+      throw new WsException(error.message);
     }
   }
 
@@ -275,7 +256,7 @@ export class GatewayGateway
       room.readyUserIds.clear();
       room.isPlaying = false;
     } catch (error) {
-      this.emitError(client, error.message);
+      throw new WsException(error.message);
     }
   }
 
@@ -302,10 +283,6 @@ export class GatewayGateway
 
   private emitMessage(gsid: string, payload: SendMessagePayload): void {
     this.server.to(gsid).emit('receive_message', payload);
-  }
-
-  private emitError(client: AuthenticatedSocket, message: string): void {
-    client.emit('error', { errorMessage: message } as ErrorResponse);
   }
 
   // Socket ID를 찾기 위한 헬퍼 메소드 추가
