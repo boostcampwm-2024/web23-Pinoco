@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { RoomService } from '../room/room.service';
 import { GameService } from '../game/game.service';
-import { IGameInfo } from '../game/types/game.types';
+import { IGameInfo, IGameState } from '../game/types/game.types';
 import {
   Iuser_left,
   Ijoin_room_success,
@@ -10,13 +10,13 @@ import {
   Iuser_joined,
   Icreate_room_success,
   Ireceive_message,
+  IRoomInfo,
 } from '../room/types/room.types';
-import { WsException } from '@nestjs/websockets';
+import { Server } from 'socket.io';
+import { AuthenticatedSocket } from '../types/socket.types';
 
 @Injectable()
 export class GatewayService {
-  private readonly MAX_ROOM_SIZE = 6;
-
   constructor(
     private readonly authService: AuthService,
     private readonly roomService: RoomService,
@@ -27,48 +27,96 @@ export class GatewayService {
     return this.authService.isValidGuest(userId, password);
   }
 
-  handleDisconnection(gsid: string, userId: string): Iuser_left | null {
-    if (!gsid) return null;
-    return this.roomService.leaveRoom(gsid, userId);
+  handleDisconnection(
+    gsid: string,
+    userId: string,
+    client: AuthenticatedSocket,
+  ): Iuser_left {
+    const room = this.roomService.leaveRoom(userId, gsid, client);
+    return {
+      userId,
+      hostUserId: room.hostUserId,
+    };
   }
 
-  handleLeaveRoom(gsid: string, userId: string): Iuser_left | null {
-    return this.roomService.leaveRoom(gsid, userId);
+  handleLeaveRoom(
+    gsid: string,
+    userId: string,
+    client: AuthenticatedSocket,
+  ): Iuser_left {
+    const room = this.roomService.leaveRoom(userId, gsid, client);
+    return {
+      userId,
+      hostUserId: room.hostUserId,
+    };
   }
 
   createRoom(userId: string): Icreate_room_success {
-    const gsid = this.roomService.createRoom(userId);
-    return { gsid, isHost: true };
+    const room = this.roomService.createRoom(userId);
+    return {
+      gsid: room.gsid,
+      isHost: true,
+    };
   }
 
   joinRoom(
     gsid: string,
     userId: string,
+    client: AuthenticatedSocket,
   ): {
     joinRoomData: Ijoin_room_success;
     userJoinedData: Iuser_joined;
   } {
-    const room = this.roomService.getRoom(gsid);
-    if (!room) {
-      throw new WsException('존재하지 않는 방입니다.');
-    }
+    const room = this.roomService.joinRoom(userId, gsid, client);
 
-    if (room.userIds.size >= this.MAX_ROOM_SIZE) {
-      throw new WsException('방이 가득 찼습니다.');
-    }
-
-    return this.roomService.joinRoom(gsid, userId);
+    return {
+      joinRoomData: {
+        userIds: Array.from(room.userIds),
+        readyUserIds: Array.from(room.readyUserIds),
+        isHost: room.hostUserId === userId,
+        hostUserId: room.hostUserId,
+      },
+      userJoinedData: {
+        userId,
+      },
+    };
   }
 
-  createMessage(userId: string, message: string): Ireceive_message {
-    return this.roomService.createMessage(userId, message);
+  createMessage(
+    gsid: string,
+    userId: string,
+    message: string,
+    server: Server,
+  ): Ireceive_message {
+    this.roomService.createMessage(userId, message, gsid, server);
+    return {
+      userId,
+      message,
+      timestamp: Date.now(),
+    };
   }
 
-  handleReady(gsid: string, userId: string, isReady: boolean): Iupdate_ready {
-    return this.roomService.handleReady(gsid, userId, isReady);
+  handleReady(
+    gsid: string,
+    userId: string,
+    isReady: boolean,
+    server: Server,
+  ): Iupdate_ready {
+    const room = this.roomService.handleReady(gsid, userId, isReady, server);
+    return {
+      readyUsers: Array.from(room.readyUserIds),
+    };
   }
 
-  startGame(gsid: string, userId: string): IGameInfo {
+  getRoomInfo(gsid: string): IRoomInfo {
+    return this.roomService.getRoom(gsid);
+  }
+
+  getGameState(gsid: string): IGameState {
+    return this.gameService.getGameState(gsid);
+  }
+
+  startGame(gsid: string, userId: string, server: Server): IGameInfo {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 
@@ -85,13 +133,34 @@ export class GatewayService {
     }
 
     const gameState = this.gameService.startGame(gsid);
+    room.isPlaying = true;
+
+    room.userIds.forEach((uid) => {
+      const isPinoco = gameState.pinocoId === uid;
+      const personalGameState = {
+        isPinoco,
+        theme: gameState.theme,
+        word: isPinoco ? '' : gameState.word,
+        speakerId: gameState.speakerQueue[0],
+        allUserIds: gameState.userIds,
+      };
+
+      const sockets = server.sockets.sockets;
+      for (const [, socket] of sockets.entries()) {
+        if ((socket as AuthenticatedSocket).data.userId === uid) {
+          socket.emit('start_game_success', personalGameState);
+          break;
+        }
+      }
+    });
+
     return {
       ...gameState,
       gsid,
     };
   }
 
-  handleSpeakingEnd(gsid: string, userId: string): void {
+  handleSpeakingEnd(gsid: string, userId: string, server: Server): void {
     const game = this.gameService.getGameState(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
@@ -100,20 +169,66 @@ export class GatewayService {
     }
 
     this.gameService.endSpeaking(gsid);
+    const newGameState = this.gameService.getGameState(gsid);
+
+    if (newGameState.phase === 'VOTING') {
+      server.to(gsid).emit('start_vote');
+    } else {
+      server.to(gsid).emit('start_speaking', {
+        speakerId: newGameState.speakerQueue[0],
+      });
+    }
   }
 
-  submitVote(gsid: string, voterId: string, targetId: string): void {
+  submitVote(
+    gsid: string,
+    voterId: string,
+    targetId: string,
+    server: Server,
+  ): void {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 
     this.gameService.submitVote(gsid, voterId, targetId);
+    let gameState = this.gameService.getGameState(gsid);
+
+    if (Object.keys(gameState.votes).length === gameState.liveUserIds.length) {
+      const result = this.gameService.processVoteResult(gsid);
+      server.to(gsid).emit('receive_vote_result', result);
+
+      gameState = this.gameService.getGameState(gsid);
+      if (gameState.phase === 'GUESSING') {
+        setTimeout(() => {
+          server.to(gsid).emit('start_guessing', {
+            guessingUserId: gameState.pinocoId,
+          });
+        }, 3000);
+      } else if (gameState.phase === 'SPEAKING') {
+        setTimeout(() => {
+          server.to(gsid).emit('start_speaking', {
+            speakerId: gameState.speakerQueue[0],
+          });
+        }, 3000);
+      } else if (gameState.phase === 'ENDING') {
+        setTimeout(() => {
+          server.to(gsid).emit('start_ending', {
+            isPinocoWin: true,
+            pinoco: gameState.pinocoId,
+            isGuessed: false,
+            guessingWord: '',
+          });
+          this.endGame(gsid);
+        }, 3000);
+      }
+    }
   }
 
-  processVoteResult(gsid: string) {
-    return this.gameService.processVoteResult(gsid);
-  }
-
-  submitGuess(gsid: string, userId: string, word: string): boolean {
+  submitGuess(
+    gsid: string,
+    userId: string,
+    word: string,
+    server: Server,
+  ): boolean {
     const game = this.gameService.getGameState(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
@@ -121,6 +236,24 @@ export class GatewayService {
       throw new Error('피노코만 단어를 추측할 수 있습니다.');
     }
 
-    return this.gameService.submitGuess(gsid, word);
+    const isCorrect = this.gameService.submitGuess(gsid, word);
+    server.to(gsid).emit('start_ending', {
+      isPinocoWin: isCorrect,
+      pinoco: game.pinocoId,
+      isGuessed: true,
+      guessingWord: word,
+    });
+
+    this.endGame(gsid);
+    return isCorrect;
+  }
+
+  endGame(gsid: string): void {
+    this.gameService.endGame(gsid);
+    const room = this.roomService.getRoom(gsid);
+    if (room) {
+      room.readyUserIds.clear();
+      room.isPlaying = false;
+    }
   }
 }
