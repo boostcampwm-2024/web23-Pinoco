@@ -1,8 +1,6 @@
 <div align="center">
-  <img width="712" alt="image" src="https://github.com/user-attachments/assets/69e7d1c4-e179-467e-b6e2-a6d168df7542">
+  <img width="712" alt="image" src="https://github.com/user-attachments/assets/603afc77-0a6f-439f-b13c-025d95ff4829">
  </div>
-
-
 
 ## 👉🏻 [Pinoco 보러가기](https://pinoco.site/)
 
