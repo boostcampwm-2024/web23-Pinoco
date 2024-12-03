@@ -22,7 +22,7 @@ export default function LobbyPage() {
     if (gsid) {
       socket?.emit('leave_room');
       setChatHistory([]);
-      setRoomData(null, false, false);
+      setRoomData(null, false, false, '');
     }
   }, []);
 
