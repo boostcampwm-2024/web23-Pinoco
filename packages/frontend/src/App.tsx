@@ -1,4 +1,4 @@
-import { Routes, Route, createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -18,7 +18,9 @@ const router = createBrowserRouter([
         index: true,
         element: (
           <PublicRoute>
-            <LandingPage />
+            <Suspense fallback={<LoadingSpinner />}>
+              <LandingPage />
+            </Suspense>
           </PublicRoute>
         ),
       },
@@ -26,7 +28,9 @@ const router = createBrowserRouter([
         path: 'lobby',
         element: (
           <PrivateRoute>
-            <LobbyPage />
+            <Suspense fallback={<LoadingSpinner />}>
+              <LobbyPage />
+            </Suspense>
           </PrivateRoute>
         ),
       },
@@ -34,7 +38,9 @@ const router = createBrowserRouter([
         path: 'game/:gsid',
         element: (
           <PrivateRoute>
-            <GamePage />
+            <Suspense fallback={<LoadingSpinner />}>
+              <GamePage />
+            </Suspense>
           </PrivateRoute>
         ),
       },
@@ -55,11 +61,7 @@ function App() {
     };
   }, []);
 
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <RouterProvider router={router} />
-    </Suspense>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
