@@ -7,7 +7,6 @@
   font-weight: 400;
   src:
     local('Pretendard Regular'),
-    url('./assets/fonts/Pretendard-Regular.woff') format('woff'),
     url('./assets/fonts/Pretendard-Regular.woff2') format('woff2');
 }
 
@@ -16,7 +15,6 @@
   font-weight: 500;
   src:
     local('Pretendard Medium'),
-    url('./assets/fonts/Pretendard-Medium.woff') format('woff'),
     url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
 }
 
@@ -25,6 +23,5 @@
   font-weight: 700;
   src:
     local('Pretendard Bold'),
-    url('./assets/fonts/Pretendard-Bold.woff') format('woff'),
     url('./assets/fonts/Pretendard-Bold.woff2') format('woff2');
 }
