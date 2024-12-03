@@ -28,5 +28,11 @@ export interface Iuser_joined {
 }
 
 export interface Iupdate_ready {
-  readyUserIds: string[];
+  readyUsers: string[];
+}
+
+export interface Ireceive_message {
+  userId: string;
+  message: string;
+  timestamp: number;
 }

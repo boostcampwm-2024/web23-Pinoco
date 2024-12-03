@@ -10,7 +10,11 @@ import {
 import { Server } from 'socket.io';
 import { GatewayService } from './gateway.service';
 import { AuthenticatedSocket } from '../types/socket.types';
-import { Iuser_left, Ijoin_room_success } from '../room/room.types';
+import {
+  Iuser_left,
+  Ijoin_room_success,
+  Ireceive_message,
+} from '../room/types/room.types';
 import { LoggerService } from '../logger/logger.service';
 import { GameService } from '../game/game.service';
 import { RoomService } from '../room/room.service';
@@ -98,8 +102,8 @@ export class GatewayGateway
       throw new WsException('방에 참여되어 있지 않습니다.');
     }
 
-    this.gatewayService.saveMessage(gsid, userId, data.message);
-    this.emitMessage(gsid, { userId, message: data.message });
+    const payload = this.gatewayService.createMessage(userId, data.message);
+    this.server.to(gsid).emit('receive_message', payload);
   }
 
   @SubscribeMessage('send_ready')
@@ -115,7 +119,8 @@ export class GatewayGateway
         userId,
         data.isReady,
       );
-      this.server.to(gsid).emit('update_ready', { readyUsers });
+      console.log(readyUsers);
+      this.server.to(gsid).emit('update_ready', readyUsers);
     } catch (error) {
       throw new WsException(error.message);
     }
@@ -273,10 +278,6 @@ export class GatewayGateway
 
   private emitUserJoined(gsid: string, userId: string): void {
     this.server.to(gsid).emit('user_joined', { userId });
-  }
-
-  private emitMessage(gsid: string, payload): void {
-    this.server.to(gsid).emit('receive_message', payload);
   }
 
   private getSocketIdByUserId(userId: string): string {

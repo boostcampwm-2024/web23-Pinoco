@@ -5,7 +5,8 @@ import {
   Iuser_left,
   Iupdate_ready,
   Iuser_joined,
-} from './room.types';
+  Ireceive_message,
+} from './types/room.types';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -101,11 +102,19 @@ export class RoomService {
     }
 
     return {
-      readyUserIds: Array.from(room.readyUserIds),
+      readyUsers: Array.from(room.readyUserIds),
     };
   }
 
   getRoom(gsid: string): IRoomInfo | undefined {
     return this.rooms.get(gsid);
+  }
+
+  createMessage(userId: string, message: string): Ireceive_message {
+    return {
+      userId,
+      message,
+      timestamp: Date.now(),
+    };
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { RoomService } from '../room/room.service';
-import { ChatService } from '../chat/chat.service';
 import { GameService } from '../game/game.service';
 import { IGameInfo } from '../game/types/game.types';
 import {
@@ -10,7 +9,8 @@ import {
   Iupdate_ready,
   Iuser_joined,
   Icreate_room_success,
-} from '../room/room.types';
+  Ireceive_message,
+} from '../room/types/room.types';
 import { WsException } from '@nestjs/websockets';
 
 @Injectable()
@@ -20,7 +20,6 @@ export class GatewayService {
   constructor(
     private readonly authService: AuthService,
     private readonly roomService: RoomService,
-    private readonly chatService: ChatService,
     private readonly gameService: GameService,
   ) {}
 
@@ -61,8 +60,8 @@ export class GatewayService {
     return this.roomService.joinRoom(gsid, userId);
   }
 
-  saveMessage(gsid: string, userId: string, message: string): void {
-    this.chatService.saveMessage(gsid, userId, message);
+  createMessage(userId: string, message: string): Ireceive_message {
+    return this.roomService.createMessage(userId, message);
   }
 
   handleReady(gsid: string, userId: string, isReady: boolean): Iupdate_ready {
