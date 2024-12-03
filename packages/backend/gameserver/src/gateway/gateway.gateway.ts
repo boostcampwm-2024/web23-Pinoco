@@ -45,6 +45,7 @@ export class GatewayGateway
 
   handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
+    if (!userId || !gsid) return;
 
     const result = this.gatewayService.handleDisconnection(
       gsid,

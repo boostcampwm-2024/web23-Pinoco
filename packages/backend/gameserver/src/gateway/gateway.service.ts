@@ -33,8 +33,11 @@ export class GatewayService {
     gsid: string,
     userId: string,
     client: AuthenticatedSocket,
-  ): Iuser_left {
+  ): Iuser_left | null {
     const game = this.gameService.leaveRoom(userId, gsid, client);
+    if (!game) {
+      return null;
+    }
     return {
       userId,
       hostUserId: game.hostUserId,
