@@ -7,8 +7,6 @@ const manualImg3 = '/images/gameManual/manu3.png';
 const manualImg4 = '/images/gameManual/manu4.png';
 const manualImg5 = '/images/gameManual/manu5.png';
 const manualImg6 = '/images/gameManual/manu6.png';
-const manualImg7 = '/images/gameManual/manu7.png';
-const manualImg8 = '/images/gameManual/manu8.png';
 
 const howToPlay = '/images/gameManual/HowToPlayLogo.png';
 
@@ -21,10 +19,10 @@ const images = [
     src: manualImg1,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        게임 시작 전, <span className="font-bold">모든 플레이어가 준비 상태를 완료</span>해야 게임이
-        시작돼요. <br />
-        방장은 준비가 완료된 플레이어를 확인하고 <span className="font-bold">"게임 시작"</span>{' '}
-        버튼을 눌러주세요.
+        <span className="font-bold">모든 플레이어가 준비 상태</span>를 완료하면 게임이 시작됩니다.{' '}
+        <br />
+        방장은 준비된 플레이어를 확인하고 <span className="font-bold">"게임 시작"</span> 버튼을
+        눌러주세요.
       </p>
     ),
   },
@@ -32,10 +30,9 @@ const images = [
     src: manualImg2,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        게임이 시작되면 각 플레이어는 <span className="font-bold">제시어</span>를 확인하거나 자신의
-        역할(피노코인지 제페토인지)을 알게 돼요. <br />
-        피노코는 <span className="font-bold">제시어를 알지 못하니</span> 주의 깊게 대화를 듣고
-        유추하세요.
+        게임이 시작되면 <span className="font-bold">각 플레이어의 역할</span>과{' '}
+        <span className="font-bold">제시어</span>가 공개됩니다. <br />
+        <span className="font-bold">피노코</span>에게는 제시어 대신 제시어의 테마가 공개됩니다.
       </p>
     ),
   },
@@ -43,9 +40,11 @@ const images = [
     src: manualImg3,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        게임이 종료되면 <span className="font-bold">승패 결과</span>가 화면에 표시돼요. <br />
-        피노코가 제시어를 맞추거나 자신의 정체를 숨긴다면{' '}
-        <span className="font-bold">피노코가 승리</span>하고, 그렇지 않으면 제페토가 승리해요.
+        <span className="font-bold">발언 시간</span> 동안 플레이어들은 돌아가며 제시어에 대해
+        설명해야합니다.
+        <br />
+        피노코는 <span className="font-bold">정체를 숨기며</span> 제페토처럼 행동해야 해요. <br />
+        다른 플레이어들의 <span className="font-bold">반응</span>을 관찰하며 제시어를 유추하세요.
       </p>
     ),
   },
@@ -53,9 +52,9 @@ const images = [
     src: manualImg4,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        피노코는 <span className="font-bold">정체를 숨기며</span> 제페토처럼 행동해야 해요. <br />
-        대화 중 다른 플레이어들의 <span className="font-bold">반응을 유심히 관찰</span>하며 제시어를
-        유추하는 것이 중요해요.
+        모든 플레이어가 발언을 마치면 <span className="font-bold">투표</span>가 시작됩니다. <br />
+        대화 내용을 바탕으로 <span className="font-bold">누가 피노코인지 추리</span>하여 투표를
+        진행하세요.
       </p>
     ),
   },
@@ -63,8 +62,9 @@ const images = [
     src: manualImg5,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        모든 플레이어가 발언을 완료하면 <span className="font-bold">투표</span>가 시작돼요. <br />
-        대화를 통해 <span className="font-bold">누가 피노코인지 추리</span>한 뒤 투표를 진행하세요.
+        투표 결과로 <span className="font-bold">피노코가 지목</span>되었다면, 피노코는{' '}
+        <span className="font-bold">제시어를 추측</span>할 마지막 기회를 얻습니다. <br />
+        제시어를 정확히 맞추면 <span className="font-bold">피노코가 승리</span>합니다.
       </p>
     ),
   },
@@ -72,30 +72,11 @@ const images = [
     src: manualImg6,
     description: (
       <p className="text-center text-gray-700 text-lg">
-        투표 결과에 따라 피노코가 지목돼요. <br />
-        만약 피노코가 지목된다면, 피노코는 마지막으로{' '}
-        <span className="font-bold">제시어를 추측</span>할 기회를 얻어요. <br />
-        성공 여부에 따라 <span className="font-bold">승패가 결정</span>돼요.
-      </p>
-    ),
-  },
-  {
-    src: manualImg7,
-    description: (
-      <p className="text-center text-gray-700 text-lg">
-        피노코는 <span className="font-bold">최종적으로 제시어</span>를 추측해요. <br />
-        제시어를 정확히 맞추면 <span className="font-bold">피노코가 승리</span>하고, 그렇지 않으면
-        제페토가 승리해요.
-      </p>
-    ),
-  },
-  {
-    src: manualImg8,
-    description: (
-      <p className="text-center text-gray-700 text-lg">
-        결과 화면에서는 <span className="font-bold">게임의 최종 승패</span>와 함께 피노코와 제페토의
-        역할이 공개돼요. <br />
-        승패를 확인하고 <span className="font-bold">다음 게임을 준비</span>하세요!
+        <span className="font-bold">게임 결과</span>가 공개됩니다. <br />
+        피노코가 제시어를 맞추거나, 투표로 2명이 남을 때까지 정체를 숨기면{' '}
+        <span className="font-bold">피노코가 승리</span>, <br />
+        그렇지 않으면 <span className="font-bold">제페토가 승리</span>합니다. <br />
+        결과 화면에서 각 플레이어의 역할과 최종 승패를 확인하세요.
       </p>
     ),
   },
