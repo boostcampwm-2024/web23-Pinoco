@@ -81,8 +81,8 @@
 
 
 ## 시스템 아키텍처
-![image](https://github.com/user-attachments/assets/37fb42bf-99cf-4ac1-9abe-647ab8cc0e73)
 
+![아키텍쳐](https://github.com/user-attachments/assets/399c8697-1edc-43c4-b595-7a0607771309)
 
 <br />
 
