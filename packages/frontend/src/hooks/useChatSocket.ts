@@ -22,7 +22,7 @@ interface IUserJoined {
 export const useChatSocket = (gsid: string, userId: string) => {
   const { userId: myUserId } = useAuthStore();
   const addChatEntry = useChatStore((state) => state.addChatEntry);
-  const { addUser, removeUser, setIsHost } = useRoomStore();
+  const { addUser, removeUser, setHostUserId, setIsHost, removeReadyUser } = useRoomStore();
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {
@@ -38,16 +38,27 @@ export const useChatSocket = (gsid: string, userId: string) => {
 
     socket.on('user_left', (data: IUserLeft) => {
       removeUser(data.userId);
-      if (data.hostUserId === userId) {
-        setIsHost(true);
-      } else {
-        setIsHost(false);
-      }
+      setHostUserId(data.hostUserId);
+
+      removeReadyUser(data.hostUserId);
+      console.log('준비유저 업데이트 완료');
+
       addChatEntry({
         userId: `[알림]`,
         message: `${data.userId}님이 퇴장하셨습니다.`,
         chatType: ChatType.NOTICE,
       });
+
+      if (data.hostUserId === myUserId) {
+        setIsHost(true);
+        addChatEntry({
+          userId: `[알림]`,
+          message: `방장이 변경되었습니다. 당신이 새로운 방장입니다.`,
+          chatType: ChatType.NOTICE,
+        });
+      } else {
+        setIsHost(false);
+      }
     });
 
     socket.on('user_joined', (data: IUserJoined) => {
@@ -64,12 +75,21 @@ export const useChatSocket = (gsid: string, userId: string) => {
       socket.off('user_left');
       socket.off('user_joined');
     };
-  }, [gsid, socket, addChatEntry, addUser, removeUser, setIsHost, userId, myUserId]);
+  }, [
+    gsid,
+    socket,
+    addChatEntry,
+    addUser,
+    removeUser,
+    setHostUserId,
+    setIsHost,
+    myUserId,
+    removeReadyUser,
+  ]);
 
   const sendChatEntry = (message: string) => {
     if (!socket || !message.trim()) return;
 
-    // 서버로 메시지 전송
     socket.emit('send_message', { gsid, message });
   };
 
