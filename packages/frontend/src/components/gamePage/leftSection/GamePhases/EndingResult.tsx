@@ -17,22 +17,21 @@ export default function EndingResult({ endingResult }: IEndingPhaseProps) {
     : '/images/ending/geppettoWin.png';
 
   const getEndingMessage = () => {
-    if (isGuessed) {
-      if (isPinocoWin) {
-        return (
-          <>
-            피노코가 제시어를 맞추며 위기에서 벗어났습니다! 제출된 제시어 :{' '}
-            <span className="font-extrabold">{guessingWord}</span>
-          </>
-        );
-      } else {
-        return (
-          <>
-            투표로 지목된 피노코가 제시어를 맞추지 못했습니다! 제출된 제시어 :{' '}
-            <span className="font-extrabold">{guessingWord}</span>
-          </>
-        );
-      }
+    if (!isGuessed) return;
+    if (isPinocoWin) {
+      return (
+        <>
+          피노코가 제시어를 맞추며 위기에서 벗어났습니다! 제출된 제시어 :{' '}
+          <span className="font-extrabold">{guessingWord}</span>
+        </>
+      );
+    } else {
+      return (
+        <>
+          투표로 지목된 피노코가 제시어를 맞추지 못했습니다! 제출된 제시어 :{' '}
+          <span className="font-extrabold">{guessingWord}</span>
+        </>
+      );
     }
   };
 
