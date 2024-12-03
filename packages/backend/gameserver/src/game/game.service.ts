@@ -9,18 +9,16 @@ export class GameService {
 
   constructor(private readonly roomService: RoomService) {}
 
-  async startGame(gsid: string): Promise<IGameState> {
+  startGame(gsid: string): IGameState {
     const room = this.roomService.getRoom(gsid);
     if (!room) throw new Error('방을 찾을 수 없습니다.');
 
     const userIds = Array.from(room.userIds);
     const pinocoIndex = Math.floor(Math.random() * userIds.length);
 
-    // 랜덤하게 테마 선택
     const themeIndex = Math.floor(Math.random() * GAME_WORDS.length);
     const selectedTheme = GAME_WORDS[themeIndex];
 
-    // 선택된 테마에서 랜덤하게 단어 선택
     const word =
       selectedTheme.words[
         Math.floor(Math.random() * selectedTheme.words.length)
@@ -30,7 +28,7 @@ export class GameService {
       phase: 'GAMESTART',
       userIds,
       word,
-      theme: selectedTheme.theme, // 테마 정보 추가
+      theme: selectedTheme.theme,
       pinocoId: userIds[pinocoIndex],
       liveUserIds: [...userIds],
       speakerQueue: [],
@@ -55,7 +53,6 @@ export class GameService {
       ];
     }
     game.speakerQueue = shuffledUserIds;
-
     game.phase = 'SPEAKING';
   }
 
@@ -63,33 +60,26 @@ export class GameService {
     return this.games.get(gsid);
   }
 
-  async endSpeaking(gsid: string): Promise<string | null> {
+  endSpeaking(gsid: string): void {
     const game = this.games.get(gsid);
     if (!game) return;
 
     game.speakerQueue.shift();
     if (game.speakerQueue.length === 0) {
       game.phase = 'VOTING';
-      return;
     }
-    return;
   }
 
-  async submitVote(
-    gsid: string,
-    voterId: string,
-    targetId: string,
-  ): Promise<void> {
+  submitVote(gsid: string, voterId: string, targetId: string): void {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
-    // 투표자가 살아있는 사람인지 확인 (원래는 죽은사람은 vote_pinoco 요청이 안 오는게 맞으나 클라측(타이머) 이슈로 보내지는 상황)
     if (!game.liveUserIds.includes(voterId)) return;
 
     game.votes[voterId] = targetId;
   }
 
-  async processVoteResult(gsid: string) {
+  processVoteResult(gsid: string) {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
@@ -107,12 +97,10 @@ export class GameService {
     const deadPerson =
       maxVotedUsers.length !== 1 ? '' : maxVotedUsers[0]?.[0] || '';
 
-    //동점인경우
     if (deadPerson !== '') {
       game.liveUserIds = game.liveUserIds.filter((id) => id !== deadPerson);
     }
 
-    // 피노코가 죽은 경우 => GUESSING 시작
     game.votes = {};
     if (deadPerson === game.pinocoId) {
       game.phase = 'GUESSING';
@@ -127,18 +115,16 @@ export class GameService {
     return { voteResult: voteCount, deadPerson, isDeadPersonPinoco };
   }
 
-  async submitGuess(gsid: string, word: string): Promise<boolean> {
+  submitGuess(gsid: string, word: string): boolean {
     const game = this.games.get(gsid);
     if (!game) throw new Error('게임을 찾을 수 없습니다.');
 
     game.guessingWord = word;
     game.phase = 'ENDING';
-    const isCorrect = game.word === word;
-
-    return isCorrect;
+    return game.word === word;
   }
 
-  endGame(gsid: string) {
+  endGame(gsid: string): void {
     this.games.delete(gsid);
   }
 }

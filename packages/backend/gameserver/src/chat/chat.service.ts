@@ -10,11 +10,7 @@ interface ChatMessage {
 export class ChatService {
   private chatRooms: Map<string, ChatMessage[]> = new Map();
 
-  async saveMessage(
-    gsid: string,
-    userId: string,
-    message: string,
-  ): Promise<void> {
+  saveMessage(gsid: string, userId: string, message: string): void {
     const messages = this.getChatRoom(gsid);
 
     messages.push({
@@ -26,7 +22,7 @@ export class ChatService {
     this.chatRooms.set(gsid, messages);
   }
 
-  async getMessages(gsid: string): Promise<ChatMessage[]> {
+  getMessages(gsid: string): ChatMessage[] {
     return this.getChatRoom(gsid);
   }
 

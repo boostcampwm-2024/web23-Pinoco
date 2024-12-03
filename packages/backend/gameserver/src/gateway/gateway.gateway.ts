@@ -36,34 +36,32 @@ export class GatewayGateway
     private readonly roomService: RoomService,
   ) {}
 
-  async handleConnection(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleConnection(@ConnectedSocket() client: AuthenticatedSocket) {
     const userId = client.handshake.query.userId as string;
     const password = client.handshake.query.password as string;
 
-    const isValid = await this.gatewayService.validateConnection(
-      userId,
-      password,
-    );
+    const isValid = this.gatewayService.validateConnection(userId, password);
     if (!isValid) {
+      client.disconnect();
       throw new WsException('인증에 실패했습니다.');
     }
 
     client.data.userId = userId;
   }
 
-  async handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
 
-    const result = await this.gatewayService.handleDisconnection(gsid, userId);
+    const result = this.gatewayService.handleDisconnection(gsid, userId);
     if (result) {
       this.emitUserLeft(gsid, result);
     }
   }
 
   @SubscribeMessage('leave_room')
-  async handleLeaveRoom(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleLeaveRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const { userId, gsid } = client.data;
-    const result = await this.gatewayService.handleLeaveRoom(gsid, userId);
+    const result = this.gatewayService.handleLeaveRoom(gsid, userId);
     if (result) {
       this.emitUserLeft(gsid, result);
     }
@@ -71,19 +69,19 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('create_room')
-  async handleCreateRoom(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleCreateRoom(@ConnectedSocket() client: AuthenticatedSocket) {
     const userId = client.data.userId;
-    const result = await this.gatewayService.createRoom(userId);
+    const result = this.gatewayService.createRoom(userId);
     this.handleRoomJoin(client, result.gsid);
     client.emit('create_room_success', result);
   }
 
   @SubscribeMessage('join_room')
-  async handleJoinRoom(
+  handleJoinRoom(
     @MessageBody() data: { gsid: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    const roomInfo = await this.gatewayService.joinRoom(
+    const roomInfo = this.gatewayService.joinRoom(
       data.gsid,
       client.data.userId,
     );
@@ -94,7 +92,7 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('send_message')
-  async handleSendMessage(
+  handleSendMessage(
     @MessageBody() data: { message: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
@@ -104,19 +102,19 @@ export class GatewayGateway
       throw new WsException('방에 참여되어 있지 않습니다.');
     }
 
-    await this.gatewayService.saveMessage(gsid, userId, data.message);
+    this.gatewayService.saveMessage(gsid, userId, data.message);
     this.emitMessage(gsid, { userId, message: data.message });
   }
 
   @SubscribeMessage('send_ready')
-  async handleReady(
+  handleReady(
     @MessageBody() data: { isReady: boolean },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { userId, gsid } = client.data;
 
     try {
-      const readyUsers = await this.gatewayService.handleReady(
+      const readyUsers = this.gatewayService.handleReady(
         gsid,
         userId,
         data.isReady,
@@ -128,11 +126,11 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('start_game')
-  async handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleStartGame(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
 
     try {
-      const gameState = await this.gatewayService.startGame(gsid, userId);
+      const gameState = this.gatewayService.startGame(gsid, userId);
 
       const room = this.roomService.getRoom(gsid);
       room.userIds.forEach((uid) => {
@@ -156,11 +154,11 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('end_speaking')
-  async handleEndSpeaking(@ConnectedSocket() client: AuthenticatedSocket) {
+  handleEndSpeaking(@ConnectedSocket() client: AuthenticatedSocket) {
     const { gsid, userId } = client.data;
 
     try {
-      await this.gatewayService.handleSpeakingEnd(gsid, userId);
+      this.gatewayService.handleSpeakingEnd(gsid, userId);
       const gameState = this.gameService.getGameState(gsid);
 
       if (gameState.phase === 'VOTING') {
@@ -176,21 +174,21 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('vote_pinoco')
-  async handleVote(
+  handleVote(
     @MessageBody() data: { voteUserId: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
 
     try {
-      await this.gatewayService.submitVote(gsid, userId, data.voteUserId);
+      this.gatewayService.submitVote(gsid, userId, data.voteUserId);
       let gameState = this.gameService.getGameState(gsid);
-      const room = await this.roomService.getRoom(gsid);
+      const room = this.roomService.getRoom(gsid);
 
       if (
         Object.keys(gameState.votes).length === gameState.liveUserIds.length
       ) {
-        const result = await this.gatewayService.processVoteResult(gsid);
+        const result = this.gatewayService.processVoteResult(gsid);
         this.server.to(gsid).emit('receive_vote_result', result);
 
         gameState = this.gameService.getGameState(gsid);
@@ -229,14 +227,14 @@ export class GatewayGateway
   }
 
   @SubscribeMessage('send_guessing')
-  async handleGuessing(
+  handleGuessing(
     @MessageBody() data: { guessingWord: string },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
 
     try {
-      const isCorrect = await this.gatewayService.submitGuess(
+      const isCorrect = this.gatewayService.submitGuess(
         gsid,
         userId,
         data.guessingWord,
@@ -251,7 +249,7 @@ export class GatewayGateway
         guessingWord: data.guessingWord,
       });
 
-      await this.gameService.endGame(gsid);
+      this.gameService.endGame(gsid);
       const room = this.roomService.getRoom(gsid);
       room.readyUserIds.clear();
       room.isPlaying = false;
@@ -285,7 +283,6 @@ export class GatewayGateway
     this.server.to(gsid).emit('receive_message', payload);
   }
 
-  // Socket ID를 찾기 위한 헬퍼 메소드 추가
   private getSocketIdByUserId(userId: string): string {
     const sockets = this.server.sockets.sockets;
     for (const [socketId, socket] of sockets.entries()) {
