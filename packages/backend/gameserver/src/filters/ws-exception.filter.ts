@@ -15,6 +15,6 @@ export class WebSocketExceptionFilter extends BaseWsExceptionFilter {
       errorMessage = exception.message || '알 수 없는 오류가 발생했습니다.';
     }
 
-    client.emit('error', errorMessage);
+    client.emit('error', { errorMessage });
   }
 }
