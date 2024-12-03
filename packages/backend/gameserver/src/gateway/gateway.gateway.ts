@@ -12,7 +12,6 @@ import { GatewayService } from './gateway.service';
 import { AuthenticatedSocket } from '../types/socket.types';
 import { UseFilters } from '@nestjs/common';
 import { WebSocketExceptionFilter } from '../filters/ws-exception.filter';
-import { WsException } from '@nestjs/websockets';
 
 @WebSocketGateway()
 @UseFilters(WebSocketExceptionFilter)
@@ -96,11 +95,13 @@ export class GatewayGateway
   ) {
     const { userId, gsid } = client.data;
 
-    if (!gsid) {
-      throw new WsException('방에 참여되어 있지 않습니다.');
-    }
-
-    this.gatewayService.createMessage(gsid, userId, data.message, this.server);
+    const result = this.gatewayService.createMessage(
+      gsid,
+      userId,
+      data.message,
+      this.server,
+    );
+    this.server.to(gsid).emit('receive_message', result);
   }
 
   @SubscribeMessage('send_ready')
@@ -109,7 +110,13 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { userId, gsid } = client.data;
-    this.gatewayService.handleReady(gsid, userId, data.isReady, this.server);
+    const result = this.gatewayService.handleReady(
+      gsid,
+      userId,
+      data.isReady,
+      this.server,
+    );
+    this.server.to(gsid).emit('update_ready', result);
   }
 
   @SubscribeMessage('start_game')

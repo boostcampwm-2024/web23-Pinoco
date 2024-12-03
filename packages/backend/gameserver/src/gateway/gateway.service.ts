@@ -14,6 +14,7 @@ import {
   Iupdate_ready,
   Iuser_joined,
   Icreate_room_success,
+  Ireceive_message,
 } from '../game/types/game.types';
 import { Server } from 'socket.io';
 import { AuthenticatedSocket } from '../types/socket.types';
@@ -87,8 +88,18 @@ export class GatewayService {
     };
   }
 
-  createMessage(gsid: string, userId: string, message: string, server: Server) {
-    return this.gameService.createMessage(userId, message, gsid, server);
+  createMessage(
+    gsid: string,
+    userId: string,
+    message: string,
+    server: Server,
+  ): Ireceive_message {
+    const game = this.gameService.createMessage(userId, message, gsid, server);
+    return {
+      userId,
+      message,
+      timestamp: Date.now(),
+    };
   }
 
   handleReady(

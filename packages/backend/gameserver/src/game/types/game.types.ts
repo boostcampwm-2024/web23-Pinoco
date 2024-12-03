@@ -33,6 +33,12 @@ export interface IStartGameResponse {
   };
 }
 
+export interface Ireceive_message {
+  userId: string;
+  message: string;
+  timestamp: number;
+}
+
 export interface Istart_speaking {
   speakerId: string;
 }

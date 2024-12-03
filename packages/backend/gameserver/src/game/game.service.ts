@@ -275,12 +275,6 @@ export class GameService {
       throw new WsException('방에 참여하지 않은 사용자입니다.');
     }
 
-    server.to(gsid).emit('receive_message', {
-      userId,
-      message,
-      timestamp: Date.now(),
-    });
-
     return game;
   }
 }
