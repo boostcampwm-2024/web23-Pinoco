@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
-import { RoomService } from '../room/room.service';
 import { GameService } from '../game/game.service';
 import {
   IGameState,
@@ -10,16 +9,12 @@ import {
   Ireceive_vote_result,
   Istart_guessing,
   Istart_ending,
-} from '../game/types/game.types';
-import {
   Iuser_left,
   Ijoin_room_success,
   Iupdate_ready,
   Iuser_joined,
   Icreate_room_success,
-  Ireceive_message,
-  IRoomInfo,
-} from '../room/types/room.types';
+} from '../game/types/game.types';
 import { Server } from 'socket.io';
 import { AuthenticatedSocket } from '../types/socket.types';
 
@@ -27,7 +22,6 @@ import { AuthenticatedSocket } from '../types/socket.types';
 export class GatewayService {
   constructor(
     private readonly authService: AuthService,
-    private readonly roomService: RoomService,
     private readonly gameService: GameService,
   ) {}
 
@@ -40,10 +34,10 @@ export class GatewayService {
     userId: string,
     client: AuthenticatedSocket,
   ): Iuser_left {
-    const room = this.roomService.leaveRoom(userId, gsid, client);
+    const game = this.gameService.leaveRoom(userId, gsid, client);
     return {
       userId,
-      hostUserId: room.hostUserId,
+      hostUserId: game.hostUserId,
     };
   }
 
@@ -52,17 +46,17 @@ export class GatewayService {
     userId: string,
     client: AuthenticatedSocket,
   ): Iuser_left {
-    const room = this.roomService.leaveRoom(userId, gsid, client);
+    const game = this.gameService.leaveRoom(userId, gsid, client);
     return {
       userId,
-      hostUserId: room.hostUserId,
+      hostUserId: game.hostUserId,
     };
   }
 
   createRoom(userId: string): Icreate_room_success {
-    const room = this.roomService.createRoom(userId);
+    const game = this.gameService.createRoom(userId);
     return {
-      gsid: room.gsid,
+      gsid: game.gsid,
       isHost: true,
     };
   }
@@ -75,14 +69,14 @@ export class GatewayService {
     joinRoomData: Ijoin_room_success;
     userJoinedData: Iuser_joined;
   } {
-    const room = this.roomService.joinRoom(userId, gsid, client);
+    const game = this.gameService.joinRoom(userId, gsid, client);
 
     return {
       joinRoomData: {
-        userIds: Array.from(room.userIds),
-        readyUserIds: Array.from(room.readyUserIds),
-        isHost: room.hostUserId === userId,
-        hostUserId: room.hostUserId,
+        userIds: Array.from(game.userIds),
+        readyUserIds: Array.from(game.readyUserIds),
+        isHost: game.hostUserId === userId,
+        hostUserId: game.hostUserId,
       },
       userJoinedData: {
         userId,
@@ -90,18 +84,8 @@ export class GatewayService {
     };
   }
 
-  createMessage(
-    gsid: string,
-    userId: string,
-    message: string,
-    server: Server,
-  ): Ireceive_message {
-    this.roomService.createMessage(userId, message, gsid, server);
-    return {
-      userId,
-      message,
-      timestamp: Date.now(),
-    };
+  createMessage(gsid: string, userId: string, message: string, server: Server) {
+    return this.gameService.createMessage(userId, message, gsid, server);
   }
 
   handleReady(
@@ -110,32 +94,24 @@ export class GatewayService {
     isReady: boolean,
     server: Server,
   ): Iupdate_ready {
-    const room = this.roomService.handleReady(gsid, userId, isReady, server);
+    const game = this.gameService.handleReady(gsid, userId, isReady);
     return {
-      readyUsers: Array.from(room.readyUserIds),
+      readyUsers: Array.from(game.readyUserIds),
     };
-  }
-
-  getRoomInfo(gsid: string): IRoomInfo {
-    return this.roomService.getRoom(gsid);
-  }
-
-  getGameState(gsid: string): IGameState {
-    return this.gameService.getGameState(gsid);
   }
 
   startGame(gsid: string, userId: string): IStartGameResponse {
     const gameState = this.gameService.startGame(gsid);
     const userSpecificData: IStartGameResponse['userSpecificData'] = {};
 
-    gameState.userIds.forEach((uid) => {
+    Array.from(gameState.userIds).forEach((uid) => {
       const isPinoco = gameState.pinocoId === uid;
       userSpecificData[uid] = {
         isPinoco,
         theme: gameState.theme,
         word: isPinoco ? '' : gameState.word,
         speakerId: gameState.speakerQueue[0],
-        allUserIds: gameState.userIds,
+        allUserIds: Array.from(gameState.userIds),
       };
     });
 
@@ -179,7 +155,10 @@ export class GatewayService {
   } {
     const gameState = this.gameService.submitVote(gsid, voterId, targetId);
 
-    if (Object.keys(gameState.votes).length !== gameState.liveUserIds.length) {
+    if (
+      !gameState.votes ||
+      Object.keys(gameState.votes).length !== gameState.liveUserIds.length
+    ) {
       return { shouldProcessVote: false };
     }
 
@@ -195,10 +174,9 @@ export class GatewayService {
       nextResponse = { guessingUserId: newGameState.pinocoId };
     } else if (newGameState.phase === 'SPEAKING') {
       nextResponse = { speakerId: newGameState.speakerQueue[0] };
-    } else if (newGameState.phase === 'ENDING') {
-      this.gameService.endGame(gsid);
+    } else if (newGameState.phase === 'WAITING') {
       nextResponse = {
-        isPinocoWin: false,
+        isPinocoWin: true,
         pinoco: newGameState.pinocoId,
         isGuessed: false,
         guessingWord: '',
@@ -211,7 +189,6 @@ export class GatewayService {
         nextPhase: newGameState.phase,
         voteResponse,
         nextResponse,
-        delay: 3000,
       },
     };
   }
@@ -219,14 +196,11 @@ export class GatewayService {
   submitGuess(gsid: string, userId: string, word: string): Istart_ending {
     const gameState = this.gameService.submitGuess(gsid, userId, word);
 
-    const response: Istart_ending = {
+    return {
       isPinocoWin: gameState.isPinocoWin,
       pinoco: gameState.pinocoId,
       isGuessed: true,
       guessingWord: gameState.guessingWord,
     };
-
-    this.gameService.endGame(gsid);
-    return response;
   }
 }

@@ -25,16 +25,22 @@ export class GatewayGateway
   constructor(private readonly gatewayService: GatewayService) {}
 
   handleConnection(@ConnectedSocket() client: AuthenticatedSocket) {
-    const userId = client.handshake.query.userId as string;
-    const password = client.handshake.query.password as string;
+    try {
+      const userId = client.handshake.query.userId as string;
+      const password = client.handshake.query.password as string;
 
-    const isValid = this.gatewayService.validateConnection(userId, password);
-    if (!isValid) {
+      const isValid = this.gatewayService.validateConnection(userId, password);
+      if (!isValid) {
+        client.emit('error', { message: '인증에 실패했습니다.' });
+        client.disconnect();
+        return;
+      }
+
+      client.data.userId = userId;
+    } catch (error) {
+      client.emit('error', { message: '연결 중 오류가 발생했습니다.' });
       client.disconnect();
-      throw new WsException('인증에 실패했습니다.');
     }
-
-    client.data.userId = userId;
   }
 
   handleDisconnect(@ConnectedSocket() client: AuthenticatedSocket) {
@@ -142,7 +148,6 @@ export class GatewayGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     const { gsid, userId } = client.data;
-    console.log(gsid, userId, data.voteUserId);
 
     const result = this.gatewayService.submitVote(
       gsid,
@@ -163,7 +168,7 @@ export class GatewayGateway
           case 'SPEAKING':
             this.server.to(gsid).emit('start_speaking', nextResponse);
             break;
-          case 'ENDING':
+          case 'WAITING':
             this.server.to(gsid).emit('start_ending', nextResponse);
             break;
         }

@@ -1,32 +1,113 @@
 import { Injectable } from '@nestjs/common';
 import { IGameState, GamePhase } from './types/game.types';
-import { RoomService } from '../room/room.service';
 import { GAME_WORDS } from './constants/words';
 import { WsException } from '@nestjs/websockets';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class GameService {
   private games: Map<string, IGameState> = new Map();
+  private readonly MAX_ROOM_SIZE = 6;
 
-  constructor(private readonly roomService: RoomService) {}
+  createRoom(userId: string): IGameState {
+    let gsid: string;
+    do {
+      gsid = uuidv4().substring(0, 4);
+    } while (this.games.has(gsid));
 
-  startGame(gsid: string): IGameState {
-    const room = this.roomService.getRoom(gsid);
-    if (!room) {
+    const gameState: IGameState = {
+      gsid,
+      userIds: new Set([userId]),
+      readyUserIds: new Set(),
+      hostUserId: userId,
+      phase: 'WAITING',
+    };
+
+    this.games.set(gsid, gameState);
+    return gameState;
+  }
+
+  joinRoom(userId: string, gsid: string, client: any): IGameState {
+    const game = this.getGameState(gsid);
+    if (!game) {
+      throw new WsException('존재하지 않는 방입니다.');
+    }
+
+    if (game.userIds.size >= this.MAX_ROOM_SIZE) {
+      throw new WsException('방이 가득 찼습니다.');
+    }
+
+    if (game.phase !== 'WAITING') {
+      throw new WsException('게임이 진행중입니다.');
+    }
+
+    game.userIds.add(userId);
+    client.join(gsid);
+    client.data.gsid = gsid;
+
+    return game;
+  }
+
+  leaveRoom(userId: string, gsid: string, client: any): IGameState | null {
+    const game = this.getGameState(gsid);
+    if (!game) return null;
+
+    game.userIds.delete(userId);
+    game.readyUserIds.delete(userId);
+
+    if (client) {
+      client.leave(gsid);
+      client.data.gsid = null;
+    }
+
+    if (game.userIds.size === 0) {
+      this.games.delete(gsid);
+      return null;
+    }
+
+    if (game.hostUserId === userId) {
+      game.hostUserId = Array.from(game.userIds)[0];
+    }
+
+    return game;
+  }
+
+  handleReady(gsid: string, userId: string, isReady: boolean): IGameState {
+    const game = this.getGameState(gsid);
+    if (!game) {
       throw new WsException('방을 찾을 수 없습니다.');
     }
 
-    if (room.userIds.size < 3) {
+    if (game.phase !== 'WAITING') {
+      throw new WsException('게임이 이미 시작되었습니다.');
+    }
+
+    if (isReady) {
+      game.readyUserIds.add(userId);
+    } else {
+      game.readyUserIds.delete(userId);
+    }
+
+    return game;
+  }
+
+  startGame(gsid: string): IGameState {
+    const game = this.getGameState(gsid);
+    if (!game) {
+      throw new WsException('방을 찾을 수 없습니다.');
+    }
+
+    if (game.userIds.size < 3) {
       throw new WsException(
         '게임을 시작하려면 최소 3명의 플레이어가 필요합니다.',
       );
     }
 
-    if (room.readyUserIds.size !== room.userIds.size - 1) {
+    if (game.readyUserIds.size !== game.userIds.size - 1) {
       throw new WsException('모든 참가자가 준비되어야 합니다.');
     }
 
-    const userIds = Array.from(room.userIds);
+    const userIds = Array.from(game.userIds);
     const pinocoIndex = Math.floor(Math.random() * userIds.length);
 
     const themeIndex = Math.floor(Math.random() * GAME_WORDS.length);
@@ -37,25 +118,18 @@ export class GameService {
         Math.floor(Math.random() * selectedTheme.words.length)
       ];
 
-    const gameState: IGameState = {
-      phase: 'GAMESTART',
-      userIds,
-      word,
-      theme: selectedTheme.theme,
-      pinocoId: userIds[pinocoIndex],
-      liveUserIds: [...userIds],
-      speakerQueue: [],
-      votes: {},
-    };
+    game.word = word;
+    game.theme = selectedTheme.theme;
+    game.pinocoId = userIds[pinocoIndex];
+    game.liveUserIds = [...userIds];
+    game.votes = {};
 
-    this.games.set(gsid, gameState);
     this.startSpeakingPhase(gsid);
-    room.isPlaying = true;
-    return gameState;
+    return game;
   }
 
   startSpeakingPhase(gsid: string): IGameState {
-    const game = this.games.get(gsid);
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
@@ -68,21 +142,14 @@ export class GameService {
         shuffledUserIds[i],
       ];
     }
+
     game.speakerQueue = shuffledUserIds;
     game.phase = 'SPEAKING';
     return game;
   }
 
-  getGameState(gsid: string): IGameState {
-    const game = this.games.get(gsid);
-    if (!game) {
-      throw new WsException('게임을 찾을 수 없습니다.');
-    }
-    return game;
-  }
-
   endSpeaking(gsid: string, userId: string): IGameState {
-    const game = this.games.get(gsid);
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
@@ -100,25 +167,21 @@ export class GameService {
   }
 
   submitVote(gsid: string, voterId: string, targetId: string): IGameState {
-    const game = this.games.get(gsid);
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
 
     if (!game.liveUserIds.includes(voterId)) {
-      // 투표자가 살아있는 사람인지 확인 (원래는 죽은사람은 vote_pinoco 요청이 안 오는게 맞으나 클라측(타이머) 이슈로 보내지는 상황)
-      //throw new WsException('투표할 수 없는 사용자입니다.');
       return game;
     }
-
-    console.log(voterId, targetId);
 
     game.votes[voterId] = targetId;
     return game;
   }
 
   processVoteResult(gsid: string): IGameState {
-    const game = this.games.get(gsid);
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
@@ -147,7 +210,8 @@ export class GameService {
     if (deadPerson === game.pinocoId) {
       game.phase = 'GUESSING';
     } else if (game.liveUserIds.length <= 2) {
-      game.phase = 'ENDING';
+      game.phase = 'WAITING';
+      this.resetGame(gsid);
     } else {
       this.startSpeakingPhase(gsid);
     }
@@ -162,7 +226,7 @@ export class GameService {
   }
 
   submitGuess(gsid: string, userId: string, word: string): IGameState {
-    const game = this.games.get(gsid);
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
@@ -172,23 +236,51 @@ export class GameService {
     }
 
     game.guessingWord = word;
-    game.phase = 'ENDING';
+    game.phase = 'WAITING';
     game.isPinocoWin = game.word === word;
+    this.resetGame(gsid);
     return game;
   }
 
-  endGame(gsid: string): void {
-    const game = this.games.get(gsid);
+  resetGame(gsid: string): void {
+    const game = this.getGameState(gsid);
     if (!game) {
       throw new WsException('게임을 찾을 수 없습니다.');
     }
 
-    const room = this.roomService.getRoom(gsid);
-    if (room) {
-      room.isPlaying = false;
-      room.readyUserIds.clear();
+    game.phase = 'WAITING';
+    game.readyUserIds.clear();
+  }
+
+  getGameState(gsid: string): IGameState {
+    const game = this.games.get(gsid);
+    if (!game) {
+      throw new WsException('게임을 찾을 수 없습니다.');
+    }
+    return game;
+  }
+
+  createMessage(
+    userId: string,
+    message: string,
+    gsid: string,
+    server: any,
+  ): IGameState {
+    const game = this.getGameState(gsid);
+    if (!game) {
+      throw new WsException('방을 찾을 수 없습니다.');
     }
 
-    this.games.delete(gsid);
+    if (!game.userIds.has(userId)) {
+      throw new WsException('방에 참여하지 않은 사용자입니다.');
+    }
+
+    server.to(gsid).emit('receive_message', {
+      userId,
+      message,
+      timestamp: Date.now(),
+    });
+
+    return game;
   }
 }
