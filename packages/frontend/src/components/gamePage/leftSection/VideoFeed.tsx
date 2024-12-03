@@ -16,9 +16,10 @@ export default function VideoFeed() {
   return (
     <>
       <div
-        className={`relative ${
-          isUserReady(userId || '') ? 'border-4 border-white' : ''
-        } rounded-lg`}
+        className={`relative rounded-lg`}
+        style={{
+          boxShadow: isUserReady(userId || '') ? '0 0 0 4px white' : '',
+        }}
       >
         <VideoStream stream={localStream} userName={userId} isLocal={true} height={feedHeight} />
         {isUserReady(userId || '') && (

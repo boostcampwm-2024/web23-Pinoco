@@ -33,7 +33,7 @@ export default function useEnding(setGamePhase: (phase: GamePhase) => void) {
       const timeout = setTimeout(() => {
         setGamePhase(GAME_PHASE.WAITING);
         setEndingResult(null);
-      }, 5000);
+      }, 7000);
 
       return () => clearTimeout(timeout);
     }
