@@ -36,6 +36,8 @@ export class GatewayService {
     client: AuthenticatedSocket,
   ): Iuser_left | null {
     const game = this.gameService.leaveRoom(userId, gsid, client);
+    this.authService.removeGuestSession(userId);
+
     if (!game) {
       return null;
     }
