@@ -27,7 +27,7 @@
 
 <a href="https://lush-collision-539.notion.site/151b0f9caa6980e9b298cae8b7a11ebc?pvs=4"> 📙 게임 메뉴얼</a>
 
-### 🔎 주요 기능
+## 🔎 주요 기능
 
 ---
 
