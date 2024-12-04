@@ -85,4 +85,5 @@ export interface Istart_ending {
   pinoco: string;
   isGuessed: boolean;
   guessingWord: string;
+  word: string;
 }

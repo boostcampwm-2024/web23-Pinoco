@@ -194,6 +194,7 @@ export class GatewayService {
         pinoco: newGameState.pinocoId,
         isGuessed: false,
         guessingWord: '',
+        word: newGameState.word,
       };
     }
 
@@ -215,6 +216,7 @@ export class GatewayService {
       pinoco: gameState.pinocoId,
       isGuessed: true,
       guessingWord: gameState.guessingWord,
+      word: gameState.word,
     };
   }
 }
