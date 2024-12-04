@@ -21,7 +21,7 @@ export interface IGameState {
   };
 }
 
-export interface IStartGameResponse {
+export interface Istart_game_success {
   userSpecificData: {
     [userId: string]: {
       isPinoco: boolean;

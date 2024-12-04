@@ -4,7 +4,7 @@ import { GameService } from '../game/game.service';
 import {
   IGameState,
   GamePhase,
-  IStartGameResponse,
+  Istart_game_success,
   Istart_speaking,
   Ireceive_vote_result,
   Istart_guessing,
@@ -114,9 +114,9 @@ export class GatewayService {
     };
   }
 
-  startGame(gsid: string, userId: string): IStartGameResponse {
+  startGame(gsid: string, userId: string): Istart_game_success {
     const gameState = this.gameService.startGame(gsid);
-    const userSpecificData: IStartGameResponse['userSpecificData'] = {};
+    const userSpecificData: Istart_game_success['userSpecificData'] = {};
 
     Array.from(gameState.userIds).forEach((uid) => {
       const isPinoco = gameState.pinocoId === uid;
