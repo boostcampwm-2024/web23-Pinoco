@@ -7,6 +7,7 @@ interface IEndingResult {
   pinoco: string;
   isGuessed: boolean;
   guessingWord: string;
+  word: string;
 }
 
 export default function useEnding(setGamePhase: (phase: GamePhase) => void) {
