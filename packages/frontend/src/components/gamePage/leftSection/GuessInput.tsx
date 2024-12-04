@@ -1,23 +1,30 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 
 interface IGuessInputProps {
   onSubmitGuess: (word: string) => void;
 }
 
-export default function GuessInput({ onSubmitGuess }: IGuessInputProps) {
+const GuessInput = memo(function GuessInput({ onSubmitGuess }: IGuessInputProps) {
   const [inputValue, setInputValue] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (!inputValue.trim()) return;
     onSubmitGuess(inputValue);
     setInputValue('');
-  };
+  }, [inputValue, onSubmitGuess]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        handleSubmit();
+      }
+    },
+    [handleSubmit],
+  );
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
@@ -26,7 +33,7 @@ export default function GuessInput({ onSubmitGuess }: IGuessInputProps) {
         type="text"
         placeholder="제시어 입력"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         className="p-2 text-lg rounded-md bg-gray-800 text-white-default outline-none"
       />
@@ -38,4 +45,6 @@ export default function GuessInput({ onSubmitGuess }: IGuessInputProps) {
       </button>
     </div>
   );
-}
+});
+
+export default GuessInput;

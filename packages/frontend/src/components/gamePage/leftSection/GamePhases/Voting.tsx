@@ -1,4 +1,5 @@
 import Button from '@/components/common/Button';
+import { memo } from 'react';
 
 interface IVotingPhaseProps {
   userId: string;
@@ -9,7 +10,33 @@ interface IVotingPhaseProps {
   handleVote: () => void;
 }
 
-export default function Voting({
+const VoteButton = memo(
+  ({
+    userId,
+    isSelected,
+    isVoteSubmitted,
+    onClick,
+  }: {
+    userId: string;
+    isSelected: boolean;
+    isVoteSubmitted: boolean;
+    onClick: () => void;
+  }) => (
+    <button
+      onClick={onClick}
+      disabled={isVoteSubmitted}
+      className={`w-full p-4 text-lg font-medium transition-colors rounded-lg ${
+        isSelected
+          ? 'bg-green-default text-white-default'
+          : 'bg-white text-gray-800 hover:bg-gray-100'
+      } ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}`}
+    >
+      {userId}
+    </button>
+  ),
+);
+
+const Voting = memo(function Voting({
   userId,
   allUsers,
   selectedVote,
@@ -30,19 +57,14 @@ export default function Voting({
     <div className="flex flex-col items-center justify-center w-full h-full space-y-6">
       <h2 className="text-2xl font-bold text-white-default">피노코를 지목해주세요!</h2>
       <div className="flex flex-col w-full max-w-md space-y-3">
-        {Array.from(allUsers).map((userId: string) => (
-          <button
-            key={userId}
-            onClick={() => !isVoteSubmitted && setSelectedVote(userId)}
-            disabled={isVoteSubmitted}
-            className={`w-full p-4 text-lg font-medium transition-colors rounded-lg ${
-              selectedVote === userId
-                ? 'bg-green-default text-white-default'
-                : 'bg-white text-gray-800 hover:bg-gray-100'
-            } ${isVoteSubmitted && 'opacity-60 cursor-not-allowed'}`}
-          >
-            {userId}
-          </button>
+        {Array.from(allUsers).map((voterId: string) => (
+          <VoteButton
+            key={voterId}
+            userId={voterId}
+            isSelected={selectedVote === voterId}
+            isVoteSubmitted={isVoteSubmitted}
+            onClick={() => !isVoteSubmitted && setSelectedVote(voterId)}
+          />
         ))}
       </div>
       {isVoteSubmitted ? (
@@ -64,4 +86,6 @@ export default function Voting({
       )}
     </div>
   );
-}
+});
+
+export default Voting;

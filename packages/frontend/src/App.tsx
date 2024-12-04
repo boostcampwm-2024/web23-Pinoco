@@ -1,6 +1,5 @@
-import { RouterProvider } from 'react-router-dom';
-import { router } from './routes/router';
 import { useEffect } from 'react';
+import AppRouter from './routes/router';
 
 function App() {
   useEffect(() => {
@@ -10,17 +9,12 @@ function App() {
     };
 
     window.addEventListener('beforeunload', handleUnload);
-
     return () => {
       window.removeEventListener('beforeunload', handleUnload);
     };
   }, []);
 
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <AppRouter />;
 }
 
 export default App;
