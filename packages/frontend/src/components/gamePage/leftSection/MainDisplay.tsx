@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { useRoomStore } from '@/store/roomStore';
 import StartButton from './GameButtons/StartButton';
 import ReadyButton from './GameButtons/ReadyButton';
@@ -20,7 +20,7 @@ import VideoStream from '@/components/gamePage/stream/VideoStream';
 import { useLocalStreamStore } from '@/store/localStreamStore';
 import { useSpeakingControl } from '@/hooks/useSpeakingControl';
 
-export default function MainDisplay() {
+const MainDisplay = memo(function MainDisplay() {
   const { userId } = useAuthStore();
   const { isHost, isPinoco, allUsers } = useRoomStore();
   const [gamePhase, setGamePhase] = useState<GamePhase>(GAME_PHASE.WAITING);
@@ -38,13 +38,21 @@ export default function MainDisplay() {
     setGamePhase,
     setSelectedVote,
   );
-  function getCurrentStream() {
-    const localStream = useLocalStreamStore.getState().localStream;
-    const remoteStreams = usePeerConnectionStore.getState().remoteStreams;
-    if (currentSpeaker === userId) return localStream;
-    const currentStream = remoteStreams.get(currentSpeaker || '');
-    return currentStream;
-  }
+
+  const handleCountdownEnd = useCallback(() => {
+    setGamePhase(GAME_PHASE.WORD_REVEAL);
+    const timer = setTimeout(() => {
+      setGamePhase(GAME_PHASE.SPEAKING);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleVote = useCallback(() => {
+    if (!isVoteSubmitted) {
+      votePinoco(selectedVote ?? '');
+      setIsVoteSubmitted(true);
+    }
+  }, [isVoteSubmitted, selectedVote, votePinoco]);
 
   useEffect(() => {
     if (gameStartData) {
@@ -54,23 +62,76 @@ export default function MainDisplay() {
     }
   }, [gameStartData]);
 
-  const handleCountdownEnd = () => {
-    setGamePhase(GAME_PHASE.WORD_REVEAL);
-    setTimeout(() => {
-      setGamePhase(GAME_PHASE.SPEAKING);
-    }, 3000);
-  };
-
-  const handleVote = () => {
-    if (!isVoteSubmitted) {
-      if (selectedVote === null) {
-        votePinoco('');
-      } else {
-        votePinoco(selectedVote);
-      }
-      setIsVoteSubmitted(true);
+  const currentStreamData = useMemo(() => {
+    if (currentSpeaker === userId) {
+      return useLocalStreamStore.getState().localStream;
     }
-  };
+    return usePeerConnectionStore.getState().remoteStreams.get(currentSpeaker || '');
+  }, [currentSpeaker, userId]);
+
+  const renderGamePhaseContent = useMemo(() => {
+    switch (gamePhase) {
+      case GAME_PHASE.WAITING:
+        return (
+          <div className="flex flex-col items-center justify-center h-full">
+            {isHost ? <StartButton /> : <ReadyButton />}
+          </div>
+        );
+      case GAME_PHASE.COUNTDOWN:
+        return <Countdown onCountdownEnd={handleCountdownEnd} />;
+      case GAME_PHASE.VOTING:
+        return (
+          <Voting
+            userId={userId!}
+            allUsers={allUsers}
+            selectedVote={selectedVote}
+            isVoteSubmitted={isVoteSubmitted}
+            setSelectedVote={setSelectedVote}
+            handleVote={handleVote}
+          />
+        );
+      case GAME_PHASE.VOTING_RESULT:
+        return (
+          <VoteResult
+            deadPerson={deadPerson ?? ''}
+            voteResult={voteResult}
+            isDeadPersonPinoco={isDeadPersonPinoco ?? null}
+          />
+        );
+      case GAME_PHASE.GUESSING:
+        return (
+          <div className="flex flex-col items-center justify-center h-full">
+            {isPinoco ? (
+              <GuessInput onSubmitGuess={submitGuess} />
+            ) : (
+              <p className="text-xl text-center text-white-default">
+                피노코가 제시어를 추측 중입니다 🤔
+              </p>
+            )}
+          </div>
+        );
+      case GAME_PHASE.ENDING:
+        return <EndingResult endingResult={endingResult} />;
+      default:
+        return null;
+    }
+  }, [
+    gamePhase,
+    isHost,
+    userId,
+    allUsers,
+    selectedVote,
+    isVoteSubmitted,
+    handleVote,
+    handleCountdownEnd,
+    endingResult,
+    deadPerson,
+    voteResult,
+    isDeadPersonPinoco,
+    isPinoco,
+    submitGuess,
+  ]);
+
   return (
     <div
       className={`relative flex-1 flex flex-col w-full p-4 mt-4 rounded-lg overflow-hidden ${
@@ -80,7 +141,7 @@ export default function MainDisplay() {
       {gamePhase === GAME_PHASE.SPEAKING && (
         <div className="absolute inset-0">
           <VideoStream
-            stream={getCurrentStream() || null}
+            stream={currentStreamData || null}
             userName={currentSpeaker}
             isLocal={true}
             height="h-full"
@@ -105,43 +166,7 @@ export default function MainDisplay() {
           )}
         </div>
 
-        <div className="flex-1">
-          {gamePhase === GAME_PHASE.WAITING && (
-            <div className="flex flex-col items-center justify-center h-full">
-              {isHost ? <StartButton /> : <ReadyButton />}
-            </div>
-          )}
-          {gamePhase === GAME_PHASE.COUNTDOWN && <Countdown onCountdownEnd={handleCountdownEnd} />}
-          {gamePhase === GAME_PHASE.VOTING && (
-            <Voting
-              userId={userId!}
-              allUsers={allUsers}
-              selectedVote={selectedVote}
-              isVoteSubmitted={isVoteSubmitted}
-              setSelectedVote={setSelectedVote}
-              handleVote={handleVote}
-            />
-          )}
-          {gamePhase === GAME_PHASE.VOTING_RESULT && (
-            <VoteResult
-              deadPerson={deadPerson ?? ''}
-              voteResult={voteResult}
-              isDeadPersonPinoco={isDeadPersonPinoco ?? null}
-            />
-          )}
-          {gamePhase === GAME_PHASE.GUESSING && (
-            <div className="flex flex-col items-center justify-center h-full">
-              {isPinoco ? (
-                <GuessInput onSubmitGuess={submitGuess} />
-              ) : (
-                <p className="text-xl text-center text-white-default">
-                  피노코가 제시어를 추측 중입니다 🤔
-                </p>
-              )}
-            </div>
-          )}
-          {gamePhase === GAME_PHASE.ENDING && <EndingResult endingResult={endingResult} />}
-        </div>
+        <div className="flex-1">{renderGamePhaseContent}</div>
 
         <div className="relative mt-auto">
           {gamePhase === GAME_PHASE.SPEAKING && currentSpeaker === userId && (
@@ -170,4 +195,6 @@ export default function MainDisplay() {
       </div>
     </div>
   );
-}
+});
+
+export default MainDisplay;

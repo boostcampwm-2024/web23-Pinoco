@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSocketStore } from '@/store/socketStore';
 import { useRoomStore } from '@/store/roomStore';
 import { GAME_PHASE, GamePhase } from '@/constants';
@@ -30,74 +30,83 @@ export const useGameSocket = (onPhaseChange?: (phase: GamePhase) => void) => {
   const [gameStartData, setGameStartData] = useState<IGameStart | null>(null);
   const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleUpdateReady = (data: IReadyUsers) => {
+  const handleUpdateReady = useCallback(
+    (data: IReadyUsers) => {
       setReadyUsers(data.readyUsers);
-    };
+    },
+    [setReadyUsers],
+  );
 
-    const handleStartSpeaking = (data: ISpeakingStart) => {
+  const handleStartSpeaking = useCallback(
+    (data: ISpeakingStart) => {
       setCurrentSpeaker(data.speakerId);
-      if (onPhaseChange) {
-        onPhaseChange(GAME_PHASE.SPEAKING);
-      }
-    };
+      onPhaseChange?.(GAME_PHASE.SPEAKING);
+    },
+    [onPhaseChange],
+  );
 
-    const handleStartGame = (data: IGameStart) => {
+  const handleStartGame = useCallback(
+    (data: IGameStart) => {
       setAllUsers(data.allUserIds);
       setGameStartData(data);
       setCurrentSpeaker(data.speakerId);
       setIsPinoco(data.isPinoco);
       setReadyUsers([]);
-    };
+    },
+    [setAllUsers, setIsPinoco, setReadyUsers],
+  );
 
-    const handleStartVote = () => {
-      if (onPhaseChange) {
-        onPhaseChange(GAME_PHASE.VOTING);
-      }
-    };
+  const handleStartVote = useCallback(() => {
+    onPhaseChange?.(GAME_PHASE.VOTING);
+  }, [onPhaseChange]);
+
+  useEffect(() => {
+    if (!socket) return;
 
     socket.on('update_ready', handleUpdateReady);
+    socket.on('start_game_success', handleStartGame);
+    socket.on('start_speaking', handleStartSpeaking);
+    socket.on('start_vote', handleStartVote);
     socket.on('error', (data: IGameErrorMessage) => {
       setError(data.errorMessage);
       setTimeout(() => setError(null), 3000);
     });
-    socket.on('start_game_success', handleStartGame);
-    socket.on('start_speaking', handleStartSpeaking);
-    socket.on('start_vote', handleStartVote);
 
     return () => {
       socket.off('update_ready', handleUpdateReady);
-      socket.off('error');
       socket.off('start_game_success', handleStartGame);
       socket.off('start_speaking', handleStartSpeaking);
       socket.off('start_vote', handleStartVote);
+      socket.off('error');
     };
-  }, [socket, setIsPinoco, onPhaseChange, setCurrentSpeaker, setAllUsers, setReadyUsers]);
+  }, [socket, handleUpdateReady, handleStartGame, handleStartSpeaking, handleStartVote]);
 
-  const sendReady = (isReady: boolean) => {
-    if (!socket) return;
-    socket.emit('send_ready', { isReady });
-  };
+  const sendReady = useCallback(
+    (isReady: boolean) => {
+      socket?.emit('send_ready', { isReady });
+    },
+    [socket],
+  );
 
-  const startGame = () => {
-    if (!socket) return;
-    socket.emit('start_game');
-  };
+  const startGame = useCallback(() => {
+    socket?.emit('start_game');
+  }, [socket]);
 
-  const endSpeaking = (userId: string) => {
-    if (!socket) return;
-    if (userId === currentSpeaker) {
-      console.log('endSpeaking 호출');
-      socket.emit('end_speaking');
-    }
-  };
+  const endSpeaking = useCallback(
+    (userId: string) => {
+      if (userId === currentSpeaker) {
+        socket?.emit('end_speaking');
+      }
+    },
+    [socket, currentSpeaker],
+  );
 
-  const votePinoco = (voteUserId: string) => {
-    if (!socket) return;
-    socket.emit('vote_pinoco', { voteUserId });
-  };
+  const votePinoco = useCallback(
+    (voteUserId: string) => {
+      socket?.emit('vote_pinoco', { voteUserId });
+    },
+    [socket],
+  );
 
   return {
     sendReady,
