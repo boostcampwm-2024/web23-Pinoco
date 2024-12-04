@@ -17,15 +17,20 @@ const VideoFeed = memo(function VideoFeed() {
   const { userId } = useAuthStore();
   const feedHeight = 'h-[180px]';
   const readyUsers = useRoomStore((state) => state.readyUsers);
+  const hostUserId = useRoomStore((state) => state.hostUserId);
   const isUserReady = (userId: string) => readyUsers.includes(userId);
+  const isHost = (userId: string) => userId === hostUserId;
 
   return (
     <>
       <div
-        className={`relative rounded-lg`}
-        style={{
-          boxShadow: isUserReady(userId || '') ? '0 0 0 4px white' : '',
-        }}
+        className={`relative rounded-lg ${
+          isHost(userId || '')
+            ? 'border-4 border-blue-500'
+            : isUserReady(userId || '')
+              ? 'border-4 border-white'
+              : ''
+        }`}
       >
         <MemoizedVideoStream
           stream={localStream}
@@ -38,13 +43,23 @@ const VideoFeed = memo(function VideoFeed() {
             <span className="px-2 py-1 font-bold text-orange-500 bg-white rounded-full">READY</span>
           </div>
         )}
+        {isHost(userId || '') && (
+          <div className="absolute top-2 right-2">
+            <span className="px-2 py-1 font-bold text-blue-500 bg-white rounded-full">HOST</span>
+          </div>
+        )}
       </div>
+
       {Array.from(remoteStreams).map(([remoteUserId, stream]) => (
         <div
           key={remoteUserId}
-          className={`relative ${
-            isUserReady(remoteUserId) ? 'border-4 border-white' : ''
-          } rounded-lg`}
+          className={`relative rounded-lg ${
+            isHost(remoteUserId)
+              ? 'border-4 border-blue-500'
+              : isUserReady(remoteUserId)
+                ? 'border-4 border-white'
+                : ''
+          }`}
         >
           <MemoizedVideoStream
             stream={stream}
@@ -59,8 +74,14 @@ const VideoFeed = memo(function VideoFeed() {
               </span>
             </div>
           )}
+          {isHost(remoteUserId) && (
+            <div className="absolute top-2 right-2">
+              <span className="px-2 py-1 font-bold text-blue-500 bg-white rounded-full">HOST</span>
+            </div>
+          )}
         </div>
       ))}
+
       {[...Array(Math.max(0, 5 - remoteStreams.size))].map((_, idx) => (
         <EmptySlot key={`empty-${idx}`} idx={idx} height={feedHeight} />
       ))}

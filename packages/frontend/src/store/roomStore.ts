@@ -7,7 +7,13 @@ interface IRoomState {
   isPinoco: boolean;
   allUsers: Set<string>;
   readyUsers: string[];
-  setRoomData: (gsid: string | null, isHost: boolean, isPinoco: boolean) => void;
+  hostUserId: string | null;
+  setRoomData: (
+    gsid: string | null,
+    isHost: boolean,
+    isPinoco: boolean,
+    hostUserId: string,
+  ) => void;
   setIsPinoco: (isPinoco: boolean) => void;
   setAllUsers: (allUsers: string[]) => void;
   addUser: (userId: string) => void;
@@ -16,6 +22,7 @@ interface IRoomState {
   setReadyUsers: (readyUsers: string[]) => void;
   addReadyUser: (userId: string) => void;
   removeReadyUser: (userId: string) => void;
+  setHostUserId: (hostUserId: string) => void;
 }
 
 export const useRoomStore = create<IRoomState>()(
@@ -26,13 +33,14 @@ export const useRoomStore = create<IRoomState>()(
       isPinoco: false,
       allUsers: new Set(),
       readyUsers: [],
+      hostUserId: null,
 
-      setRoomData: (gsid, isHost, isPinoco) =>
+      setRoomData: (gsid, isHost, isPinoco, hostUserId) =>
         set((state) => {
           if (state.gsid === gsid && state.isHost === isHost && state.isPinoco === isPinoco) {
             return state;
           }
-          return { gsid, isHost, isPinoco };
+          return { gsid, isHost, isPinoco, hostUserId };
         }),
 
       setIsPinoco: (isPinoco) =>
@@ -71,7 +79,6 @@ export const useRoomStore = create<IRoomState>()(
           if (state.isHost === isHost) return state;
           return { isHost };
         }),
-
       setReadyUsers: (readyUsers) =>
         set((state) => {
           if (JSON.stringify(state.readyUsers) === JSON.stringify(readyUsers)) {
@@ -95,6 +102,7 @@ export const useRoomStore = create<IRoomState>()(
             readyUsers: state.readyUsers.filter((id) => id !== userId),
           };
         }),
+      setHostUserId: (hostUserId) => set({ hostUserId }),
     }),
     { name: 'room-storage' },
   ),

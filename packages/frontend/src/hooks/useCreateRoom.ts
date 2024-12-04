@@ -17,7 +17,7 @@ export default function useCreateRoom() {
     socket.emit('create_room');
 
     socket.on('create_room_success', (data: { gsid: string; isHost: boolean }) => {
-      setRoomData(data.gsid, data.isHost, false);
+      setRoomData(data.gsid, data.isHost, false, userId);
       setAllUsers([userId]);
       signalingSocket.emit('create_room', { gsid: data.gsid });
       navigate(`/game/${data.gsid}`);

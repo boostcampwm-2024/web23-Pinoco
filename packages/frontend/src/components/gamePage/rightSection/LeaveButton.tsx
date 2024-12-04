@@ -20,7 +20,7 @@ export default function LeaveButton() {
     socket.emit('leave_room');
     signalingSocket.emit('leave_room');
     setChatHistory([]);
-    setRoomData(null, false, false);
+    setRoomData(null, false, false, '');
     navigate('/lobby');
   }
 
