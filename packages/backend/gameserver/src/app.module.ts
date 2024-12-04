@@ -3,19 +3,11 @@ import { AuthModule } from './auth/auth.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { RoomModule } from './room/room.module';
 import { GameModule } from './game/game.module';
-import { ChatModule } from './chat/chat.module';
 import { LoggerModule } from './logger/logger.module';
 import { HttpLoggerMiddleware } from './middleware/http-logger.middleware';
 
 @Module({
-  imports: [
-    LoggerModule,
-    AuthModule,
-    GatewayModule,
-    RoomModule,
-    GameModule,
-    ChatModule,
-  ],
+  imports: [LoggerModule, AuthModule, GatewayModule, RoomModule, GameModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

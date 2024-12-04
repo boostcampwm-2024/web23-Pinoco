@@ -6,17 +6,3 @@ export interface AuthenticatedSocket extends Socket {
     gsid?: string;
   };
 }
-
-export interface CreateRoomResponse {
-  gsid: string;
-  isHost: boolean;
-}
-
-export interface SendMessagePayload {
-  userId: string;
-  message: string;
-}
-
-export interface ErrorResponse {
-  errorMessage: string;
-}

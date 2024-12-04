@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { IRoomInfo, IJoinRoomResponse } from './types/room.types';
+import { IRoomInfo } from './types/room.types';
 import { v4 as uuidv4 } from 'uuid';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class RoomService {
   private rooms: Map<string, IRoomInfo> = new Map();
-  private MAX_ROOM_SIZE = 6;
+  private readonly MAX_ROOM_SIZE = 6;
 
-  async createRoom(userId: string): Promise<string> {
+  createRoom(userId: string): IRoomInfo {
     let gsid: string;
     do {
       gsid = uuidv4().substring(0, 4);
@@ -22,54 +23,104 @@ export class RoomService {
     };
 
     this.rooms.set(gsid, roomInfo);
-    return gsid;
+    return roomInfo;
   }
 
-  async joinRoom(gsid: string, userId: string): Promise<IJoinRoomResponse> {
-    const room = this.rooms.get(gsid);
+  joinRoom(userId: string, gsid: string, client: any): IRoomInfo {
+    const room = this.getRoom(gsid);
     if (!room) {
-      throw new Error('존재하지 않는 방입니다.');
+      throw new WsException('존재하지 않는 방입니다.');
     }
 
     if (room.userIds.size >= this.MAX_ROOM_SIZE) {
-      throw new Error('방이 가득 찼습니다.');
+      throw new WsException('방이 가득 찼습니다.');
     }
 
     if (room.isPlaying) {
-      throw new Error('게임이 진행중입니다.');
+      throw new WsException('게임이 진행중입니다.');
     }
 
     room.userIds.add(userId);
+    client.join(gsid);
+    client.data.gsid = gsid;
 
-    return {
-      userIds: Array.from(room.userIds),
-      readyUserIds: Array.from(room.readyUserIds),
-      isHost: room.hostUserId === userId,
-      hostUserId: room.hostUserId,
-    };
+    return room;
   }
 
-  async leaveRoom(gsid: string, userId: string): Promise<string | null> {
-    const room = this.rooms.get(gsid);
+  leaveRoom(userId: string, gsid: string, client: any): IRoomInfo | null {
+    const room = this.getRoom(gsid);
     if (!room) return null;
 
     room.userIds.delete(userId);
     room.readyUserIds.delete(userId);
 
-    // 방에 아무도 없으면 방 삭제
+    if (client) {
+      client.leave(gsid);
+      client.data.gsid = null;
+    }
+
     if (room.userIds.size === 0) {
       this.rooms.delete(gsid);
       return null;
     }
 
-    // 호스트가 나간 경우 새로운 호스트 지정
     if (room.hostUserId === userId) {
-      const newHost = Array.from(room.userIds)[0];
-      room.hostUserId = newHost;
-      return newHost;
+      room.hostUserId = Array.from(room.userIds)[0];
     }
 
-    return room.hostUserId;
+    return room;
+  }
+
+  handleReady(
+    gsid: string,
+    userId: string,
+    isReady: boolean,
+    server: any,
+  ): IRoomInfo {
+    const room = this.getRoom(gsid);
+    if (!room) {
+      throw new WsException('방을 찾을 수 없습니다.');
+    }
+
+    if (room.hostUserId === userId) {
+      throw new WsException('방장은 준비할 수 없습니다.');
+    }
+
+    if (isReady) {
+      room.readyUserIds.add(userId);
+    } else {
+      room.readyUserIds.delete(userId);
+    }
+
+    server.to(gsid).emit('update_ready', {
+      readyUsers: Array.from(room.readyUserIds),
+    });
+
+    return room;
+  }
+
+  createMessage(
+    userId: string,
+    message: string,
+    gsid: string,
+    server: any,
+  ): IRoomInfo {
+    const room = this.getRoom(gsid);
+    if (!room) {
+      throw new WsException('방을 찾을 수 없습니다.');
+    }
+
+    if (!room.userIds.has(userId)) {
+      throw new WsException('방에 참여하지 않은 사용자입니다.');
+    }
+
+    server.to(gsid).emit('receive_message', {
+      userId,
+      message,
+      timestamp: Date.now(),
+    });
+
+    return room;
   }
 
   getRoom(gsid: string): IRoomInfo | undefined {

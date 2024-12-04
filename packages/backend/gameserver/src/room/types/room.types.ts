@@ -6,14 +6,33 @@ export interface IRoomInfo {
   isPlaying: boolean;
 }
 
-export interface IRoomEventPayload {
-  userId: string;
-  hostUserId: string;
+export interface Icreate_room_success {
+  gsid: string;
+  isHost: true;
 }
 
-export interface IJoinRoomResponse {
+export interface Ijoin_room_success {
   userIds: string[];
   readyUserIds: string[];
   isHost: boolean;
   hostUserId: string;
+}
+
+export interface Iuser_left {
+  userId: string;
+  hostUserId: string;
+}
+
+export interface Iuser_joined {
+  userId: string;
+}
+
+export interface Iupdate_ready {
+  readyUsers: string[];
+}
+
+export interface Ireceive_message {
+  userId: string;
+  message: string;
+  timestamp: number;
 }
