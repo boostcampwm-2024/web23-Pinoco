@@ -4,13 +4,14 @@ interface IEndingPhaseProps {
     pinoco: string;
     isGuessed: boolean;
     guessingWord: string | null;
+    word: string;
   } | null;
 }
 
 export default function EndingResult({ endingResult }: IEndingPhaseProps) {
   if (!endingResult) return null;
 
-  const { isPinocoWin, pinoco, isGuessed, guessingWord } = endingResult;
+  const { isPinocoWin, pinoco, isGuessed, guessingWord, word } = endingResult;
 
   const resultImage = isPinocoWin
     ? '/images/ending/pinocoWin.png'
@@ -52,6 +53,9 @@ export default function EndingResult({ endingResult }: IEndingPhaseProps) {
       <div className="text-lg text-center text-white-default leading-relaxed px-4">
         <p>
           피노코는 <span className="font-extrabold">{pinoco}</span>였습니다!
+        </p>
+        <p>
+          제시어 : <span className="font-extrabold">{word}</span>
         </p>
         <p>{getEndingMessage()}</p>
       </div>
