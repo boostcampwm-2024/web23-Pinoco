@@ -12,6 +12,8 @@
   <a href="https://lush-collision-539.notion.site/130b0f9caa6981f1b10df3a24a4ef039?pvs=74">📚 개발 위키</a>
   &nbsp; | &nbsp; 
   <a href="https://github.com/boostcampwm-2024/web23-Pinoco/wiki/%EA%B7%B8%EB%9D%BC%EC%9A%B4%EB%93%9C-%EB%A3%B0">📏 그라운드 룰</a>
+  &nbsp; | &nbsp; 
+  <a href="https://lush-collision-539.notion.site/151b0f9caa6980e9b298cae8b7a11ebc?pvs=4"> 📙 게임 메뉴얼</a>
 </p>
 
 <br>
@@ -23,9 +25,38 @@
 
 #  프로젝트 소개
 <p>Pinoco는 친구들과 실시간으로 라이어 게임을 즐길 수 있는 화상 채팅 기반의 웹 애플리케이션입니다.</p> <br/>
-<p>플레이 방법은 아래 게임 메뉴얼을 참고해주세요 !</p> <br/>
 
-<a href="https://lush-collision-539.notion.site/151b0f9caa6980e9b298cae8b7a11ebc?pvs=4"> 📙 게임 메뉴얼</a>
+웹 상에서 P2P로 미디어를 공유하는 기술은 WebRTC를 활용하여 실시간으로 화상 게임으로 진행하면 심리전이 중요한 라이어 게임에의 재미를 극대화 할 수 있을 것이라 생각했습니다.
+
+<details>
+  <summary>
+  라이어 게임이란?
+  </summary>
+
+  <img src="https://github.com/user-attachments/assets/3db07c10-16b8-417d-9f0f-5fe4067dd2c4" width="400px">
+
+<br/>
+라이어 게임은 일종의 마피아 게임으로 시민과 라이어 2가지의 역할이 있으며
+<br/>
+<img src="https://github.com/user-attachments/assets/a8f28b40-6c29-4fcd-b3fa-da8fe1a7f015" width="400px">
+<br/>
+시민에게는 제시어 / 라이어에게는 주제만 주어집니다.
+<br/>
+<img src="https://github.com/user-attachments/assets/a2f10fc3-6a79-41bc-9273-c4244cbb0903" width="400px">
+<br/>
+예를 들어 제시어가 부대찌개면, 라이어는 음식이라는 키워드 / 시민은 부대찌개라는 키워드를 알게 됩니다.
+<br/>
+<img src="https://github.com/user-attachments/assets/bf40ff37-cb4b-4d7a-8ed2-6f13bb1039d4" width="400px">
+<br/>
+이후 각자의 발언 기회가 주어지는데, 시민은 라이어한테 크게 힌트가 되지 않는 선에서 다른 시민들에게 본인이 시민임을 어필해야 합니다.
+라이어는 본인이 시민인 것처럼 행동하고 시민들의 발언을 들으며 제시어를 유추해야 하는 게임입니다.
+
+</details>
+
+
+<p>플레이 방법은 상단의 게임 메뉴얼을 참고해주세요 !</p> <br/>
+
+
 
 ## 🔎 주요 기능
 
