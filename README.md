@@ -76,17 +76,37 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 그 속에 숨겨진 진실과 거짓을 실시간으로 읽어보세요.
 
-### 📹 **미디어 장치 설정**
+### 📹 **다중 미디어 장치 설정**
 
 다중 미디어 사용자도 원하는 장치를 선택할 수 있습니다.
 
-<img src="https://github.com/user-attachments/assets/54c0f7bc-556c-41fb-8a99-5d04e1c955f3" width="500px">
+<table>
+  <tr align="center">
+    <td><strong>다중 미디어 장치 설정</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
+      <img src="https://github.com/user-attachments/assets/54c0f7bc-556c-41fb-8a99-5d04e1c955f3" width="500px">
+    </td>
+  </tr>
+</table>
 
 ### 📹 **미디어 장치 on / off**
 
 사용자는 게임 도중 원할 때 비디오 및 오디오 장치를 on / off 할 수 있습니다
 
+<table>
+  <tr align="center">
+    <td><strong>미디어 장치 on / off</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
 <img src="https://github.com/user-attachments/assets/d0533121-1e0e-4e91-b8e4-f4bbe7258a10" width="500px">
+    </td>
+  </tr>
+</table>
+
+
 
 
 ---
@@ -103,7 +123,18 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 모든 이용자의 준비 상태 유/무를 확인할 수 있습니다.
 
+<table>
+  <tr align="center">
+    <td><strong>레디 공유 기능</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
 <img src="https://github.com/user-attachments/assets/f86d0724-cdc1-491d-bfab-0e4f76911a34" width="500px">
+    </td>
+  </tr>
+</table>
+
+
 
 
 
@@ -115,7 +146,18 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 `socket.io` 로 구현한 게임 중 **실시간 채팅**으로 심리전을 더욱 풍부하게 즐길 수 있습니다.
 
+<table>
+  <tr align="center">
+    <td><strong>실시간 채팅</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
 <img src="https://github.com/user-attachments/assets/8fe0f757-564b-4d81-9ba1-128e3c3c08fe" width="300px">
+    </td>
+  </tr>
+</table>
+
+
 
 ---
 
@@ -133,8 +175,17 @@ Pinoco의 게임 진행은 각 페이즈마다 독특한 재미와 긴장감을 
     
     "너... 뭔가 이상한데?" 추리와 의심이 난무하는 순간 !
 
-  <img src="https://github.com/user-attachments/assets/2c20e79a-d9a5-43da-bc09-910850a1132f" width="500px">
-
+  
+<table>
+  <tr align="center">
+    <td><strong>발언 페이즈</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
+<img src="https://github.com/user-attachments/assets/2c20e79a-d9a5-43da-bc09-910850a1132f" width="500px">
+    </td>
+  </tr>
+</table>
 
 
 - 🤹🏻 **투표 및 결과 발표**
@@ -145,7 +196,18 @@ Pinoco의 게임 진행은 각 페이즈마다 독특한 재미와 긴장감을 
     
     단 하나의 선택이 승패를 가르는 순간, 피노코는 바로 너 !?..
 
+  <table>
+  <tr align="center">
+    <td><strong>투표 및 결과 발표</strong></td>
+  </tr>
+  <tr align="center">
+    <td>
 <img src="https://github.com/user-attachments/assets/51858491-67ff-4816-a32c-a4c792138033" width="500px">
+    </td>
+  </tr>
+</table>
+
+
 
 
 <br/>
