@@ -54,7 +54,9 @@
 </details>
 
 
-<p>플레이 방법은 상단의 [게임 메뉴얼](https://lush-collision-539.notion.site/151b0f9caa6980e9b298cae8b7a11ebc?pvs=4)을 참고해주세요 !</p> <br/>
+플레이 방법은 [게임 메뉴얼](https://lush-collision-539.notion.site/151b0f9caa6980e9b298cae8b7a11ebc?pvs=4)을 참고해주세요 !
+
+<br/>
 
 
 
