@@ -101,8 +101,6 @@ Pinoco의 게임 진행은 각 페이즈마다 독특한 재미와 긴장감을 
   <img src="https://github.com/user-attachments/assets/2c20e79a-d9a5-43da-bc09-910850a1132f" width="500px">
 
 
-https://github.com/user-attachments/assets/91087b10-14ef-49ac-a75c-2b26a5181b81
-
 
 - 🤹🏻 **투표 및 결과 발표**
     
