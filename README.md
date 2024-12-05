@@ -80,7 +80,7 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 `socket.io` 로 구현한 게임 중 **실시간 채팅**으로 심리전을 더욱 풍부하게 즐길 수 있습니다.
 
-<img src="https://github.com/user-attachments/assets/8fe0f757-564b-4d81-9ba1-128e3c3c08fe" width="500px">
+<img src="https://github.com/user-attachments/assets/8fe0f757-564b-4d81-9ba1-128e3c3c08fe" width="300px">
 
 ---
 
