@@ -1,4 +1,4 @@
-<div align="center">
+![상단](https://github.com/user-attachments/assets/6260f285-6fc1-42bf-8d46-0d58f6cef482)<div align="center">
   <img width="712" alt="image" src="https://github.com/user-attachments/assets/603afc77-0a6f-439f-b13c-025d95ff4829">
  </div>
 
@@ -40,6 +40,19 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 라이어 게임의 재미는 디테일에 있습니다. **표정과 말투**,
 
 그 속에 숨겨진 진실과 거짓을 실시간으로 읽어보세요.
+
+### 미디어 장치 설정
+
+### 미디어 장치 on / off 
+
+![상단](https://github.com/user-attachments/assets/f69930f9-d45a-457d-92af-0c44315b3b3f)
+![아래](https://github.com/user-attachments/assets/0848fcd1-1f6f-404b-923b-c68088797469)
+
+
+
+
+
+
 
 ---
 
