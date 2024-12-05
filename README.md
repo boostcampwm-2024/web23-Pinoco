@@ -43,15 +43,11 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 ### 미디어 장치 설정
 
+<img src="https://github.com/user-attachments/assets/54c0f7bc-556c-41fb-8a99-5d04e1c955f3" width="500px">
+
 ### 미디어 장치 on / off 
 
-![상단](https://github.com/user-attachments/assets/f69930f9-d45a-457d-92af-0c44315b3b3f)
-![아래](https://github.com/user-attachments/assets/0848fcd1-1f6f-404b-923b-c68088797469)
-
-
-
-
-
+<img src="https://github.com/user-attachments/assets/d0533121-1e0e-4e91-b8e4-f4bbe7258a10" width="500px">
 
 
 ---
@@ -64,6 +60,13 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 
 복잡한 과정 없이 친구들을 바로 게임으로 초대할 수 있어요.
 
+### 레디 공유 기능
+
+
+<img src="https://github.com/user-attachments/assets/f86d0724-cdc1-491d-bfab-0e4f76911a34" width="500px">
+
+
+
 ---
 
 ### 💬 **실시간 채팅**
@@ -71,6 +74,8 @@ WebRTC 기반의 **실시간 화상 채팅**으로 심리전의 핵심을 제대
 >**"피노코의 한 마디에 무수히 쏟아지는 갈고리 세례 .."**
 
 `socket.io` 로 구현한 게임 중 **실시간 채팅**으로 심리전을 더욱 풍부하게 즐길 수 있습니다.
+
+<img src="https://github.com/user-attachments/assets/8fe0f757-564b-4d81-9ba1-128e3c3c08fe" width="500px">
 
 ---
 
@@ -87,22 +92,22 @@ Pinoco의 게임 진행은 각 페이즈마다 독특한 재미와 긴장감을 
     피노코는 진실처럼 들리도록 **완벽한 연기**를 펼쳐야 하죠.
     
     "너... 뭔가 이상한데?" 추리와 의심이 난무하는 순간 !
-    
-- **투표 페이즈**
+
+  <img src="https://github.com/user-attachments/assets/2c20e79a-d9a5-43da-bc09-910850a1132f" width="500px">
+
+
+https://github.com/user-attachments/assets/91087b10-14ef-49ac-a75c-2b26a5181b81
+
+
+- **투표 및 결과 발표**
     
     이제 모든 플레이어가 서로를 지목하며 **심리전을 벌입니다**.
     
     **"진짜 피노코는 누구일까?"** 오고가는 의심 속에서
     
     단 하나의 선택이 승패를 가르는 순간, 피노코는 바로 너 !?..
-    
-- **결과 발표**
-    
-    진실이 밝혀지고, 모든 플레이어의 역할이 드러나고,
-    
-    숨겨진 반전이 비로소 찾아옵니다.
-    
-    과연, 누가 모두를 속였으며, 또 누가 진실을 꿰뚫었을까요?
+
+<img src="https://github.com/user-attachments/assets/51858491-67ff-4816-a32c-a4c792138033" width="500px">
 
 
 <br/>
