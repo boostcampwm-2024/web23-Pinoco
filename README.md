@@ -196,7 +196,7 @@ Pinoco의 게임 진행은 각 페이즈마다 독특한 재미와 긴장감을 
     
     단 하나의 선택이 승패를 가르는 순간, 피노코는 바로 너 !?..
 
-  <table>
+<table>
   <tr align="center">
     <td><strong>투표 및 결과 발표</strong></td>
   </tr>
