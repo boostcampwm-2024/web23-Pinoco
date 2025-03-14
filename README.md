@@ -60,6 +60,9 @@
 
 <br/>
 
+## 🎬 시연 영상
+https://github.com/user-attachments/assets/c8ecf850-8569-46e2-84d0-e59b01e03f08
+
 
 
 ## 🔎 주요 기능
